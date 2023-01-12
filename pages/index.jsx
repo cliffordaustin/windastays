@@ -15,8 +15,6 @@ import Button from "../components/ui/Button";
 
 import CookiesMessage from "../components/Home/CookiesMessage";
 
-import Dialogue from "../components/Home/Dialogue";
-
 import Cookies from "js-cookie";
 import Review from "../components/Reviews/Review";
 import { Link as ScrollLink } from "react-scroll";
