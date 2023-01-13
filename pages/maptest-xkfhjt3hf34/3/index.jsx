@@ -102,7 +102,7 @@ function MapTest2() {
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
       <GlobalStyle></GlobalStyle>
 
-      <div className="w-full h-screen">
+      <div className="w-full h-[90vh]">
         <div className="flex items-center justify-center h-[70px] w-full bg-white">
           <Link href="/">
             <a className="font-lobster text-xl relative w-28 h-9 cursor-pointer">
@@ -122,9 +122,9 @@ function MapTest2() {
           ref={mapRef}
           width="100%"
           height="100%"
-          scrollZoom={false}
-          boxZoom={false}
-          doubleClickZoom={false}
+          scrollZoom={true}
+          boxZoom={true}
+          doubleClickZoom={true}
           mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY}
           onMove={(evt) => setViewportExpandedMap(evt.viewState)}
           mapStyle="mapbox://styles/mapbox/streets-v9"
