@@ -161,7 +161,7 @@ function Main({ specialLodges }) {
             <h1 className="font-bold font-SourceSans items-start text-2xl lg:text-2xl xl:text-4xl">
               Expensive isn&apos;t luxury
             </h1>
-            <p className="text-lg md:text-xl">
+            <p className="text-lg md:text-lg">
               So much energy is spent on planning a great safari or getaway, and
               you want to make sure you have the best time. When browsing
               through the lodge options and talking to travel agents, it can
@@ -203,7 +203,7 @@ function Main({ specialLodges }) {
             <h1 className="font-bold font-SourceSans items-start text-2xl lg:text-2xl xl:text-4xl">
               Hakuna Matata
             </h1>
-            <p className="text-lg md:text-xl">
+            <p className="text-lg md:text-lg">
               It means no worries because winda&apos;s got you covered. We get
               it, safari is a once-in-a-lifetime chance for many of us and we
               want to have the best one, but that doesn&apos;t mean you&apos;ve
@@ -339,11 +339,11 @@ function Main({ specialLodges }) {
                       className="!w-fit cursor-pointer pr-8 pl-2"
                     >
                       <div className="flex flex-col gap-0.5">
-                        <div className="uppercase self-start font-bold text-xs text-gray-500">
+                        <div className="uppercase self-start font-SourceSans font-bold text-xs text-gray-500">
                           {listing.location}
                         </div>
 
-                        <div className="text-xl font-black font-OpenSans capitalize">
+                        <div className="text-xl font-black font-SourceSans capitalize">
                           {listing.name}
                         </div>
                       </div>
