@@ -32,12 +32,7 @@ Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());
 Router.events.on("routeChangeError", () => NProgress.done());
 
-if (process.env.NODE_ENV === "development") {
-  ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID);
-  if (process.browser) {
-    ReactGA.pageview(window.location.pathname + window.location.search);
-  }
-} else if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID);
   if (process.browser) {
     ReactGA.pageview(window.location.pathname + window.location.search);

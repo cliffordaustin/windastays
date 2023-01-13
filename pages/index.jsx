@@ -198,7 +198,9 @@ export default function Home({ userProfile, specialLodges }) {
     >
       <div className="">
         <Head>
-          <title>Winda.guide | book travel essentials in Kenya</title>
+          <title>
+            Winda.guide | High quality and affordable lodges in Africa
+          </title>
           <meta
             name="description"
             content="Search, discover, and book your travel needs in Kenya, all in one place. Try it now."

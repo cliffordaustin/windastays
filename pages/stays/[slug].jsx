@@ -516,7 +516,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const FullBoardPackageCard = () => {
     const images = getFullBoardPackageImage();
     return (
-      <div className="w-full sm:w-[280px] h-[325px] border rounded-2xl shadow-lg">
+      <div className="w-full sm:w-[280px] h-fit pb-2">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
@@ -531,7 +531,7 @@ const StaysDetail = ({ userProfile, stay }) => {
 
           <div className="flex justify-between mt-2">
             <div className="flex flex-col w-full gap-0.5">
-              <div className="flex justify-between w-full items-center">
+              {/* <div className="flex justify-between w-full items-center">
                 <div className="text-gray-600 text-sm">Lodge price</div>
 
                 <Price
@@ -545,7 +545,9 @@ const StaysDetail = ({ userProfile, stay }) => {
                   className="!font-bold !text-sm"
                   stayPrice={stay.private_safari.price}
                 ></Price>
-              </div>
+              </div> */}
+
+              <h1 className="text-gray-600">accommodation and all meals</h1>
             </div>
           </div>
           <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
@@ -577,7 +579,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const GamePackageCard = () => {
     const images = getGamePackageImages();
     return (
-      <div className="w-full sm:w-[280px] h-[325px] border rounded-2xl shadow-lg">
+      <div className="w-full sm:w-[280px] h-fit pb-2">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
@@ -592,21 +594,9 @@ const StaysDetail = ({ userProfile, stay }) => {
 
           <div className="flex justify-between mt-2">
             <div className="flex flex-col w-full gap-0.5">
-              <div className="flex justify-between w-full items-center">
-                <div className="text-gray-600 text-sm">Lodge price</div>
-
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.price}
-                ></Price>
-              </div>
-              <div className="flex justify-between w-full items-center mt-0.5">
-                <div className="text-gray-600 text-sm">Package price</div>
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.shared_safari.price}
-                ></Price>
-              </div>
+              <h1 className="text-gray-600">
+                accommodation, all meals, and game drives
+              </h1>
             </div>
           </div>
           <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
@@ -637,7 +627,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const AllInclusive = () => {
     const images = getAllInclusiveImages();
     return (
-      <div className="w-full sm:w-[280px] h-[325px] border rounded-2xl shadow-lg">
+      <div className="w-full sm:w-[280px] h-fit pb-2">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
@@ -652,21 +642,10 @@ const StaysDetail = ({ userProfile, stay }) => {
 
           <div className="flex justify-between mt-2">
             <div className="flex flex-col w-full gap-0.5">
-              <div className="flex justify-between w-full items-center">
-                <div className="text-gray-600 text-sm">Lodge price</div>
-
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.price}
-                ></Price>
-              </div>
-              <div className="flex justify-between w-full items-center mt-0.5">
-                <div className="text-gray-600 text-sm">Package price</div>
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.all_inclusive.price}
-                ></Price>
-              </div>
+              <h1 className="text-gray-600">
+                accommodation, all meals, game drives, and drinks ie. sodas,
+                juice, tea coffee, and some alcoholic drinks
+              </h1>
             </div>
           </div>
           <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
@@ -942,7 +921,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       onClick={() => {
                         showAllPhotosBtn();
                       }}
-                      className="px-2 cursor-pointer text-sm font-bold absolute top-[450px] rounded-lg right-3 z-10 py-1.5 bg-white border flex items-center justify-center gap-1"
+                      className="px-2 cursor-pointer text-sm font-bold absolute top-[350px] sm:top-[400px] md:top-[450px] rounded-lg right-3 z-10 py-1.5 bg-white border flex items-center justify-center gap-1"
                     >
                       <Icon className="w-6 h-6" icon="gg:menu-grid-o" />
                       <h1>Show all photos</h1>
@@ -1462,39 +1441,12 @@ const StaysDetail = ({ userProfile, stay }) => {
                       </div>
 
                       <div className="flex flex-col mt-4 items-center gap-8">
-                        <div className="w-fit flex items-center justify-center">
-                          <Button
-                            onClick={() => {
-                              lodgeOnlyBtnClicked();
-                            }}
-                            className="btn-gradient !rounded-full font-bold"
-                          >
-                            Book this lodge only -{" "}
-                            <Price
-                              className="!font-bold !text-sm ml-1 mr-0.5"
-                              stayPrice={stay.price * numberOfNights}
-                            ></Price>
-                            <div className="text-sm ">
-                              ({numberOfNights}{" "}
-                              {numberOfNights > 1 ? "nights" : "night"} )
-                            </div>
-                          </Button>
-                        </div>
-
-                        <div className="w-[80%] flex justify-between items-center">
-                          <div className="w-[43%] h-[1px] bg-gray-200"></div>
-                          <p className="font-bold text-sm text-center">
-                            or with
-                          </p>
-                          <div className="w-[43%] h-[1px] bg-gray-200"></div>
-                        </div>
-
                         <div className="flex flex-wrap w-full justify-center gap-6">
-                          {stay.shared_safari && (
-                            <GamePackageCard></GamePackageCard>
-                          )}
                           {stay.private_safari && (
                             <FullBoardPackageCard></FullBoardPackageCard>
+                          )}
+                          {stay.shared_safari && (
+                            <GamePackageCard></GamePackageCard>
                           )}
 
                           {stay.all_inclusive && <AllInclusive></AllInclusive>}
