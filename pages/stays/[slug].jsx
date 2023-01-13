@@ -562,9 +562,7 @@ const StaysDetail = ({ userProfile, stay }) => {
               Book now -{"  "}
               <Price
                 className="!font-bold !text-sm ml-1 mr-0.5"
-                stayPrice={
-                  (stay.price + stay.private_safari.price) * numberOfNights
-                }
+                stayPrice={stay.private_safari.price * numberOfNights}
               ></Price>{" "}
               <div className="text-sm ">
                 ({numberOfNights} {numberOfNights > 1 ? "nights" : "night"} )
@@ -610,9 +608,7 @@ const StaysDetail = ({ userProfile, stay }) => {
               Book now -{"  "}
               <Price
                 className="!font-bold !text-sm ml-1 mr-0.5"
-                stayPrice={
-                  (stay.price + stay.shared_safari.price) * numberOfNights
-                }
+                stayPrice={stay.shared_safari.price * numberOfNights}
               ></Price>
               <div className="text-sm ">
                 ({numberOfNights} {numberOfNights > 1 ? "nights" : "night"} )
@@ -659,9 +655,7 @@ const StaysDetail = ({ userProfile, stay }) => {
               Book now -{"  "}
               <Price
                 className="!font-bold !text-sm ml-1 mr-0.5"
-                stayPrice={
-                  (stay.price + stay.all_inclusive.price) * numberOfNights
-                }
+                stayPrice={stay.all_inclusive.price * numberOfNights}
               ></Price>
               <div className="text-sm ">
                 ({numberOfNights} {numberOfNights > 1 ? "nights" : "night"} )
@@ -675,12 +669,12 @@ const StaysDetail = ({ userProfile, stay }) => {
 
   const getOptionPrice = () => {
     return router.query.option === "2"
-      ? stay.price + stay.shared_safari.price
+      ? stay.shared_safari.price
       : router.query.option === "3"
-      ? stay.price + stay.private_safari.price
+      ? stay.private_safari.price
       : router.query.option === "4"
-      ? stay.price + stay.all_inclusive.price
-      : stay.price;
+      ? stay.all_inclusive.price
+      : stay.private_safari.price;
   };
 
   const formatOptionPrice = () => {
@@ -701,7 +695,7 @@ const StaysDetail = ({ userProfile, stay }) => {
     email: formik.values.email,
     amount: formatOptionPrice(),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-    currency: userIsFromKenya ? "KES" : "USD",
+    currency: userIsFromKenya ? "KES" : "GHS",
     channels: ["card", "mobile_money"],
   };
 
@@ -2044,7 +2038,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       router.back();
                     }}
                     dialoguePanelClassName="!max-w-md !h-[265px]"
-                    title={"Thanks for booking this stay"}
+                    title={"Thanks for booking this lodge"}
                     dialogueTitleClassName="!font-bold text-xl !font-OpenSans mb-3"
                   >
                     <div>
