@@ -516,7 +516,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const FullBoardPackageCard = () => {
     const images = getFullBoardPackageImage();
     return (
-      <div className="w-full sm:w-[280px] h-fit pb-2">
+      <div className="w-full sm:w-[280px] h-fit pb-2 border rounded-2xl shadow-lg">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
@@ -579,7 +579,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const GamePackageCard = () => {
     const images = getGamePackageImages();
     return (
-      <div className="w-full sm:w-[280px] h-fit pb-2">
+      <div className="w-full sm:w-[280px] h-fit pb-2 border rounded-2xl shadow-lg">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
@@ -627,7 +627,7 @@ const StaysDetail = ({ userProfile, stay }) => {
   const AllInclusive = () => {
     const images = getAllInclusiveImages();
     return (
-      <div className="w-full sm:w-[280px] h-fit pb-2">
+      <div className="w-full sm:w-[280px] h-fit pb-2 border rounded-2xl shadow-lg">
         <div className={"w-full relative h-[170px] "}>
           <Carousel
             images={images}
