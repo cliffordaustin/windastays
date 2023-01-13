@@ -531,22 +531,6 @@ const StaysDetail = ({ userProfile, stay }) => {
 
           <div className="flex justify-between mt-2">
             <div className="flex flex-col w-full gap-0.5">
-              {/* <div className="flex justify-between w-full items-center">
-                <div className="text-gray-600 text-sm">Lodge price</div>
-
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.price}
-                ></Price>
-              </div>
-              <div className="flex justify-between w-full items-center mt-0.5">
-                <div className="text-gray-600 text-sm">Package price</div>
-                <Price
-                  className="!font-bold !text-sm"
-                  stayPrice={stay.private_safari.price}
-                ></Price>
-              </div> */}
-
               <h1 className="text-gray-600">accommodation and all meals</h1>
             </div>
           </div>
@@ -982,7 +966,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                         {getAllImages().map((image, index) => (
                           <div
                             key={index}
-                            className="w-[49%] h-[300px] relative"
+                            className="w-full sm:w-[49%] h-[300px] relative"
                           >
                             <Image
                               layout="fill"
