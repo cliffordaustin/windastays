@@ -22,12 +22,13 @@ function MapTest1() {
     const locations = await axios.get(
       `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/y8pk6y02e8tyat8pt747654u/locations/`
     );
+    console.log(locations.data.results);
     setLocations(locations.data.results);
   };
 
   useEffect(() => {
     getLocation();
-  }, [router.query.slug]);
+  }, []);
 
   const mapRef = useRef();
 
