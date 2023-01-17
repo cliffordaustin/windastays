@@ -400,7 +400,17 @@ function Main({ specialLodges }) {
                                 {listing.name}
                               </div>
 
-                              <div className="mt-4">
+                              <div
+                                onClick={() => {
+                                  Mixpanel.track(
+                                    "Clicked on a lodge from homepage",
+                                    {
+                                      listing: listing.name,
+                                    }
+                                  );
+                                }}
+                                className="mt-4"
+                              >
                                 <Link href={`/stays/${listing.slug}`}>
                                   <a>
                                     <StyledLink

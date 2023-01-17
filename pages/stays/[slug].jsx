@@ -745,6 +745,11 @@ const StaysDetail = ({ userProfile, stay }) => {
     return images;
   };
 
+  const installmentPrice = () => {
+    let price = (getOptionPrice() * numberOfNights) / 3;
+    return price;
+  };
+
   return (
     <div
       className={
@@ -1837,7 +1842,7 @@ const StaysDetail = ({ userProfile, stay }) => {
               <div className="md:w-[60%] w-full md:pl-4">
                 <div className="h-[0.4px] w-[100%] my-4 bg-gray-400 md:hidden"></div>
 
-                <h1 className="font-bold text-2xl mb-4 font-OpenSans">
+                <h1 className="font-bold font-SourceSans text-2xl mb-4">
                   Your details
                 </h1>
                 <div className="my-4 flex flex-col">
@@ -2120,6 +2125,45 @@ const StaysDetail = ({ userProfile, stay }) => {
                         ></LoadingSpinerChase>
                       </div>
                     </Button>
+                  </div>
+
+                  <div className="mt-4 flex justify-between items-center w-full">
+                    <div className="w-[47%] h-[1px] bg-gray-200"></div>
+                    <h1 className="text-sm font-bold">Or</h1>
+                    <div className="w-[47%] h-[1px] bg-gray-200"></div>
+                  </div>
+
+                  <div className="mt-4">
+                    <h1 className="font-bold font-SourceSans text-2xl">
+                      Pay in installment
+                    </h1>
+
+                    <div className="flex justify-between items-center">
+                      <h1 className="font-bold">Total Price</h1>
+
+                      <Price
+                        stayPrice={getOptionPrice() * numberOfNights}
+                        className="!text-base"
+                      ></Price>
+                    </div>
+
+                    <div className="flex justify-between mt-3 items-center">
+                      <h1 className="font-bold">Amount to pay now</h1>
+
+                      <Price
+                        stayPrice={getOptionPrice() * numberOfNights * 0.038}
+                        className="!text-base"
+                      ></Price>
+                    </div>
+
+                    <div className="flex justify-between mt-3 items-center">
+                      <h1 className="font-bold">Card processing fees (3.8%)</h1>
+
+                      <Price
+                        stayPrice={getOptionPrice() * numberOfNights * 0.038}
+                        className="!text-base"
+                      ></Price>
+                    </div>
                   </div>
                 </div>
               </div>
