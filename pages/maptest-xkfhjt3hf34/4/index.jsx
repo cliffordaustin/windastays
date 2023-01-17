@@ -13,24 +13,21 @@ import MapMakers from "../../../components/Home/MapMakers";
 import Link from "next/link";
 import Image from "next/image";
 
-function MapTest1() {
+function MapTest1({ trip }) {
   const router = useRouter();
 
-  const [locations, setLocations] = useState([]);
+  //   const [trip, setTrip] = useState([]);
 
-  const getLocation = async () => {
-    const locations = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/y8pk6y02e8tyat8pt747654u/locations/`
-    );
-    console.log(locations.data.results);
-    setLocations(locations.data.results);
-  };
+  //   const getTrip = async () => {
+  //     const trip = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/hy1yr0stvp9quw8eaju9adwh/`
+  //     );
+  //     setTrip(trip.data);
+  //   };
 
-  useEffect(() => {
-    getLocation();
-  }, []);
-
-  const mapRef = useRef();
+  //   useEffect(() => {
+  //     getTrip();
+  //   }, []);
 
   const [viewportExpandedMap, setViewportExpandedMap] = useState({
     longitude: 36.8442449,
@@ -75,8 +72,6 @@ function MapTest1() {
         <Map
           {...viewportExpandedMap}
           maxZoom={20}
-          reuseMaps
-          ref={mapRef}
           width="100%"
           height="100%"
           scrollZoom={true}
@@ -87,7 +82,7 @@ function MapTest1() {
           mapStyle="mapbox://styles/mapbox/streets-v9"
         >
           <NavigationControl></NavigationControl>
-          {locations.map((location, index) => (
+          {trip.locations.map((location, index) => (
             <MapMakers
               key={index}
               num={index + 1}
@@ -101,5 +96,31 @@ function MapTest1() {
 }
 
 MapTest1.propTypes = {};
+
+export async function getServerSideProps(context) {
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/y8pk6y02e8tyat8pt747654u/`
+    );
+
+    return {
+      props: {
+        trip: data,
+      },
+    };
+  } catch (error) {
+    if (error.response.status === 404) {
+      return {
+        notFound: true,
+      };
+    } else {
+      return {
+        props: {
+          trip: [],
+        },
+      };
+    }
+  }
+}
 
 export default MapTest1;
