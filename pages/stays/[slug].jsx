@@ -472,9 +472,11 @@ const StaysDetail = ({ userProfile, stay }) => {
       new Date(router.query.starting_date).getDate() || 1;
 
   const getFullBoardPackageImage = () => {
-    const sortedImages = stay.private_safari.private_safari_images.sort(
-      (x, y) => y.main - x.main
-    );
+    const sortedImages = stay.private_safari
+      ? stay.private_safari.private_safari_images.sort(
+          (x, y) => y.main - x.main
+        )
+      : [];
 
     const images = sortedImages.map((image) => {
       return image.image;
@@ -492,9 +494,9 @@ const StaysDetail = ({ userProfile, stay }) => {
   };
 
   const getGamePackageImages = () => {
-    const sortedImages = stay.shared_safari.shared_safari_images.sort(
-      (x, y) => y.main - x.main
-    );
+    const sortedImages = stay.shared_safari
+      ? stay.shared_safari.shared_safari_images.sort((x, y) => y.main - x.main)
+      : [];
 
     const images = sortedImages.map((image) => {
       return image.image;
@@ -503,9 +505,9 @@ const StaysDetail = ({ userProfile, stay }) => {
   };
 
   const getAllInclusiveImages = () => {
-    const sortedImages = stay.all_inclusive.all_inclusive_images.sort(
-      (x, y) => y.main - x.main
-    );
+    const sortedImages = stay.all_inclusive
+      ? stay.all_inclusive.all_inclusive_images.sort((x, y) => y.main - x.main)
+      : [];
 
     const images = sortedImages.map((image) => {
       return image.image;
@@ -828,7 +830,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       </div>
                     </div>
                     <div className="text-2xl font-bold">
-                      {stay.property_name || stay.name}
+                      {stay.name || stay.property_name}
                     </div>
                   </div>
 
@@ -1424,7 +1426,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       </div>
 
                       <div className="flex flex-col mt-4 items-center gap-8">
-                        <div className="flex flex-wrap w-full justify-center gap-6">
+                        <div className="flex flex-wrap w-full gap-6">
                           {stay.private_safari && (
                             <FullBoardPackageCard></FullBoardPackageCard>
                           )}
@@ -2127,7 +2129,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                     </Button>
                   </div>
 
-                  <div className="mt-4 flex justify-between items-center w-full">
+                  {/* <div className="mt-4 flex justify-between items-center w-full">
                     <div className="w-[47%] h-[1px] bg-gray-200"></div>
                     <h1 className="text-sm font-bold">Or</h1>
                     <div className="w-[47%] h-[1px] bg-gray-200"></div>
@@ -2151,7 +2153,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       <h1 className="font-bold">Amount to pay now</h1>
 
                       <Price
-                        stayPrice={getOptionPrice() * numberOfNights * 0.038}
+                        stayPrice={installmentPrice() * 0.038}
                         className="!text-base"
                       ></Price>
                     </div>
@@ -2164,7 +2166,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                         className="!text-base"
                       ></Price>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

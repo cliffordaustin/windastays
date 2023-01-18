@@ -100,7 +100,7 @@ MapTest1.propTypes = {};
 export async function getServerSideProps(context) {
   try {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/y8pk6y02e8tyat8pt747654u/`
+      `${process.env.NEXT_PUBLIC_baseURL}/curated-trips/hy1yr0stvp9quw8eaju9adwh/`
     );
 
     return {
