@@ -357,7 +357,7 @@ function Main({ specialLodges }) {
               navigation={true}
               loop={true}
               autoplay={{
-                delay: 5000,
+                delay: 7000,
                 disableOnInteraction: false,
               }}
               speed={1000}
