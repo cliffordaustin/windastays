@@ -979,7 +979,6 @@ const StaysDetail = ({ userProfile, stay }) => {
                               layout="fill"
                               objectFit="cover"
                               src={image}
-                              unoptimized={true}
                               alt="Image of the lodge and it's various options"
                             ></Image>
                           </div>
@@ -1739,7 +1738,6 @@ const StaysDetail = ({ userProfile, stay }) => {
                             ? getAllInclusiveImages()[0]
                             : stay.stay_images[0].image
                         }
-                        unoptimized={true}
                         alt="Main image of the order"
                       ></Image>
                     </div>

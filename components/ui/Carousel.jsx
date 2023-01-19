@@ -15,7 +15,7 @@ function Carousel({
   images,
   imageClass = "",
   className = "",
-  unoptimized = true,
+
   objectPosition = "center",
   layout = "fill",
   alt = "Image Gallery",
@@ -119,7 +119,6 @@ function Carousel({
               objectPosition={objectPosition}
               layout={layout}
               objectFit="cover"
-              unoptimized={unoptimized}
             />
           </SwiperSlide>
         ))}

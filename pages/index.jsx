@@ -237,7 +237,6 @@ export default function Home({ userProfile, specialLodges }) {
               objectPosition={"bottom"}
               sizes="380"
               alt="Image of samburu man looking at a vast landscape"
-              unoptimized={true}
               priority
             />
           </video>
