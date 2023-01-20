@@ -467,6 +467,30 @@ const StaysDetail = ({ userProfile, stay }) => {
     });
   };
 
+  const otherOptionBtnClicked = () => {
+    router.push({
+      query: {
+        ...router.query,
+        adults: Number(router.query.adults) || 1,
+        rooms: Number(router.query.rooms) || 1,
+        starting_date:
+          (router.query.starting_date &&
+            moment(new Date(router.query.starting_date)).format(
+              "YYYY-MM-DD"
+            )) ||
+          moment(new Date()).format("YYYY-MM-DD"),
+        end_date:
+          (router.query.end_date &&
+            moment(new Date(router.query.end_date)).format("YYYY-MM-DD")) ||
+          moment(new Date().setDate(new Date().getDate() + 1)).format(
+            "YYYY-MM-DD"
+          ),
+        checkout_page: 2,
+        option: 5,
+      },
+    });
+  };
+
   const numberOfNights =
     new Date(router.query.end_date).getDate() -
       new Date(router.query.starting_date).getDate() || 1;
@@ -507,6 +531,17 @@ const StaysDetail = ({ userProfile, stay }) => {
   const getAllInclusiveImages = () => {
     const sortedImages = stay.all_inclusive
       ? stay.all_inclusive.all_inclusive_images.sort((x, y) => y.main - x.main)
+      : [];
+
+    const images = sortedImages.map((image) => {
+      return image.image;
+    });
+    return images;
+  };
+
+  const getOtherOptionImages = () => {
+    const sortedImages = stay.other_option
+      ? stay.other_option.other_option_images.sort((x, y) => y.main - x.main)
       : [];
 
     const images = sortedImages.map((image) => {
@@ -653,6 +688,50 @@ const StaysDetail = ({ userProfile, stay }) => {
     );
   };
 
+  const OtherOption = () => {
+    const images = getOtherOptionImages();
+    return (
+      <div className="w-full sm:w-[280px] h-fit pb-2 border rounded-2xl shadow-lg">
+        <div className={"w-full relative h-[170px] "}>
+          <Carousel
+            images={images}
+            imageClass="rounded-tl-2xl rounded-tr-2xl"
+          ></Carousel>
+        </div>
+
+        <div className="px-2 mt-2">
+          <h1 className="font-black">{stay.other_option.title}</h1>
+
+          <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
+
+          <div className="flex justify-between mt-2">
+            <div className="flex flex-col w-full gap-0.5">
+              <h1 className="text-gray-600">{stay.other_option.about}</h1>
+            </div>
+          </div>
+          <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
+          <div className="mt-2">
+            <Button
+              onClick={() => {
+                otherOptionBtnClicked();
+              }}
+              className="btn-gradient !rounded-full font-bold w-full mt-2"
+            >
+              Book now -{"  "}
+              <Price
+                className="!font-bold !text-sm ml-1 mr-0.5"
+                stayPrice={stay.other_option.price * numberOfNights}
+              ></Price>
+              <div className="text-sm ">
+                ({numberOfNights} {numberOfNights > 1 ? "nights" : "night"} )
+              </div>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const getOptionPrice = () => {
     return router.query.option === "2"
       ? stay.shared_safari.price
@@ -660,7 +739,9 @@ const StaysDetail = ({ userProfile, stay }) => {
       ? stay.private_safari.price
       : router.query.option === "4"
       ? stay.all_inclusive.price
-      : stay.private_safari.price;
+      : router.query.option === "5"
+      ? stay.other_option.price
+      : 0;
   };
 
   const formatOptionPrice = () => {
@@ -676,12 +757,14 @@ const StaysDetail = ({ userProfile, stay }) => {
     );
   };
 
+  const currency = process.env.NODE_ENV === "development" ? "GHS" : "USD";
+
   const optionConfig = {
     reference: new Date().getTime().toString(),
     email: formik.values.email,
     amount: formatOptionPrice(),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-    currency: userIsFromKenya ? "KES" : "GHS",
+    currency: userIsFromKenya ? "KES" : currency,
     channels: ["card", "mobile_money"],
   };
 
@@ -705,6 +788,8 @@ const StaysDetail = ({ userProfile, stay }) => {
                 ? "Full board"
                 : router.query.option === "4"
                 ? "All inclusive"
+                : router.query.option === "5"
+                ? stay.other_option.title
                 : "Lodge only",
             phone: phone,
             from_date: new Date(router.query.starting_date),
@@ -1434,6 +1519,8 @@ const StaysDetail = ({ userProfile, stay }) => {
                           )}
 
                           {stay.all_inclusive && <AllInclusive></AllInclusive>}
+
+                          {stay.other_option && <OtherOption></OtherOption>}
                         </div>
                       </div>
                     </div>
@@ -1736,6 +1823,8 @@ const StaysDetail = ({ userProfile, stay }) => {
                             ? getFullBoardPackageImage()[0]
                             : router.query.option === "4"
                             ? getAllInclusiveImages()[0]
+                            : router.query.option === "5"
+                            ? getOtherOptionImages()[0]
                             : stay.stay_images[0].image
                         }
                         alt="Main image of the order"
@@ -1756,6 +1845,8 @@ const StaysDetail = ({ userProfile, stay }) => {
                           ? "Full board"
                           : router.query.option === "4"
                           ? "All inclusive"
+                          : router.query.option === "5"
+                          ? stay.other_option.title
                           : "Lodge only"}
                       </h1>
                       <p className="mt-0.5 text-sm text-gray-600 flex items-center gap-1">
