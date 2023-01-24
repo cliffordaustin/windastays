@@ -467,7 +467,7 @@ const StaysDetail = ({ userProfile, stay }) => {
     });
   };
 
-  const otherOptionBtnClicked = () => {
+  const otherOptionBtnClicked = (index) => {
     router.push({
       query: {
         ...router.query,
@@ -487,6 +487,7 @@ const StaysDetail = ({ userProfile, stay }) => {
           ),
         checkout_page: 2,
         option: 5,
+        other_option: index,
       },
     });
   };
@@ -539,9 +540,9 @@ const StaysDetail = ({ userProfile, stay }) => {
     return images;
   };
 
-  const getOtherOptionImages = () => {
-    const sortedImages = stay.other_option
-      ? stay.other_option.other_option_images.sort((x, y) => y.main - x.main)
+  const getOtherOptionImages = (option) => {
+    const sortedImages = option
+      ? option.other_option_images.sort((x, y) => y.main - x.main)
       : [];
 
     const images = sortedImages.map((image) => {
@@ -688,8 +689,8 @@ const StaysDetail = ({ userProfile, stay }) => {
     );
   };
 
-  const OtherOption = () => {
-    const images = getOtherOptionImages();
+  const OtherOption = ({ option, index }) => {
+    const images = getOtherOptionImages(option);
     return (
       <div className="w-full sm:w-[280px] h-fit pb-2 border rounded-2xl shadow-lg">
         <div className={"w-full relative h-[170px] "}>
@@ -700,27 +701,27 @@ const StaysDetail = ({ userProfile, stay }) => {
         </div>
 
         <div className="px-2 mt-2">
-          <h1 className="font-black">{stay.other_option.title}</h1>
+          <h1 className="font-black">{option.title}</h1>
 
           <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
 
           <div className="flex justify-between mt-2">
             <div className="flex flex-col w-full gap-0.5">
-              <h1 className="text-gray-600">{stay.other_option.about}</h1>
+              <h1 className="text-gray-600">{option.about}</h1>
             </div>
           </div>
           <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
           <div className="mt-2">
             <Button
               onClick={() => {
-                otherOptionBtnClicked();
+                otherOptionBtnClicked(index);
               }}
               className="btn-gradient !rounded-full font-bold w-full mt-2"
             >
               Book now -{"  "}
               <Price
                 className="!font-bold !text-sm ml-1 mr-0.5"
-                stayPrice={stay.other_option.price * numberOfNights}
+                stayPrice={option.price * numberOfNights}
               ></Price>
               <div className="text-sm ">
                 ({numberOfNights} {numberOfNights > 1 ? "nights" : "night"} )
@@ -740,7 +741,7 @@ const StaysDetail = ({ userProfile, stay }) => {
       : router.query.option === "4"
       ? stay.all_inclusive.price
       : router.query.option === "5"
-      ? stay.other_option.price
+      ? stay.other_options[Number(router.query.other_option)].price
       : 0;
   };
 
@@ -789,7 +790,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                 : router.query.option === "4"
                 ? "All inclusive"
                 : router.query.option === "5"
-                ? stay.other_option.title
+                ? stay.other_options[Number(router.query.other_option)].title
                 : "Lodge only",
             phone: phone,
             from_date: new Date(router.query.starting_date),
@@ -1520,7 +1521,13 @@ const StaysDetail = ({ userProfile, stay }) => {
 
                           {stay.all_inclusive && <AllInclusive></AllInclusive>}
 
-                          {stay.other_option && <OtherOption></OtherOption>}
+                          {stay.other_options.map((option, index) => (
+                            <OtherOption
+                              option={option}
+                              index={index}
+                              key={index}
+                            ></OtherOption>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -1824,7 +1831,11 @@ const StaysDetail = ({ userProfile, stay }) => {
                             : router.query.option === "4"
                             ? getAllInclusiveImages()[0]
                             : router.query.option === "5"
-                            ? getOtherOptionImages()[0]
+                            ? getOtherOptionImages(
+                                stay.other_options[
+                                  Number(router.query.other_option)
+                                ]
+                              )[0]
                             : stay.stay_images[0].image
                         }
                         alt="Main image of the order"
@@ -1846,7 +1857,9 @@ const StaysDetail = ({ userProfile, stay }) => {
                           : router.query.option === "4"
                           ? "All inclusive"
                           : router.query.option === "5"
-                          ? stay.other_option.title
+                          ? stay.other_options[
+                              Number(router.query.other_option)
+                            ].title
                           : "Lodge only"}
                       </h1>
                       <p className="mt-0.5 text-sm text-gray-600 flex items-center gap-1">
