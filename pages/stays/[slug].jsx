@@ -1140,16 +1140,6 @@ const StaysDetail = ({ userProfile, stay }) => {
                                 </div>
                               </div>
                             )}
-                            {stay.views > 0 && (
-                              <div className="px-4 border-l w-[45%] md:w-fit flex flex-col items-center md:gap-1">
-                                <h1 className="font-bold text-base md:text-lg text-gray-800">
-                                  Views
-                                </h1>
-                                <div className="text-gray-600">
-                                  {stay.views} views
-                                </div>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
