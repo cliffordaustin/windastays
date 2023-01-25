@@ -33,7 +33,7 @@ function Header() {
 
       <div className="flex flex-col items-center justify-center absolute w-[90%] text-center top-[50%] gap-4 md:top-[40%] z-20 px-6 md:px-0">
         <div className="flex flex-col items-center">
-          <h1 className="font-black font-lobster mb-2 text-5xl uppercase sm:text-4xl md:text-8xl xl:text-9xl text-[#D31567] text-center">
+          <h1 className="font-black font-SourceSans  mb-2 text-5xl uppercase sm:text-4xl md:text-8xl xl:text-9xl text-[#D31567] text-center">
             kaleidoscope
           </h1>
         </div>
