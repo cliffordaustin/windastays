@@ -21,8 +21,8 @@ function PartnerLodges(props) {
       value: "Calendar",
     },
     {
-      name: "Events",
-      value: "Events",
+      name: "Bookings",
+      value: "Bookings",
     },
     {
       name: "Analytics",
@@ -104,7 +104,7 @@ function PartnerLodges(props) {
           }
         >
           <Icon className="w-6 h-6" icon="ic:round-view-list" />
-          <h1 className="font-bold text-black">Events</h1>
+          <h1 className="font-bold text-black">Bookings</h1>
         </div>
 
         <div
