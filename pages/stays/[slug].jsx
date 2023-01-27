@@ -822,12 +822,26 @@ const StaysDetail = ({ userProfile, stay }) => {
     setShowAllPhotos(true);
   };
 
+  const getAllOtherOptionImages = () => {
+    const sortedImages = [];
+
+    stay.other_options.forEach((option) => {
+      const options = option.other_option_images.map((image) => {
+        return image.image;
+      });
+      sortedImages.push(...options);
+    });
+
+    return sortedImages;
+  };
+
   const getAllImages = () => {
     const images = [
       ...getStayImages(),
       ...getFullBoardPackageImage(),
       ...getGamePackageImages(),
       ...getAllInclusiveImages(),
+      ...getAllOtherOptionImages(),
     ];
 
     return images;
@@ -921,7 +935,9 @@ const StaysDetail = ({ userProfile, stay }) => {
                   </div>
 
                   <div className={"-ml-8 -mr-0"}>
-                    <ImageGallery images={stay.stay_images}></ImageGallery>
+                    <ImageGallery
+                      allSortedImages={getAllImages()}
+                    ></ImageGallery>
 
                     <div className="flex absolute bg-white px-3 rounded-3xl py-1 top-[80px] right-3 gap-2 items-center">
                       <div className="cursor-pointer">
@@ -1175,7 +1191,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                     </div>
                   </div>
 
-                  <div className={"mt-6 " + (!stay.is_an_event ? "px-4" : "")}>
+                  <div className={"mt-6 px-4"}>
                     {!showAllDescription && (
                       <p className="font-medium text-gray-600">
                         {stay.description.slice(0, 500)}
@@ -1234,13 +1250,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                   </div>
 
                   {stay.unique_about_place && (
-                    <div
-                      className={
-                        "pt-10 " +
-                        (reviews.length > 0 ? "" : "") +
-                        (!stay.is_an_event ? "px-4" : "")
-                      }
-                    >
+                    <div className={"pt-10 px-4"}>
                       <h1 className="font-black text-xl mb-5">
                         What makes this listing unique
                       </h1>
@@ -1307,8 +1317,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                   <Element
                     name="activities"
                     className={
-                      "flex flex-col md:flex-row gap-3 justify-between pt-10 " +
-                      (!stay.is_an_event ? "px-4" : "")
+                      "flex flex-col md:flex-row gap-3 justify-between pt-10 px-4"
                     }
                   >
                     <div className="">
@@ -1411,8 +1420,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                 <Element
                   name="amenities"
                   className={
-                    "flex flex-col md:flex-row gap-3 justify-between pt-10 " +
-                    (!stay.is_an_event ? "px-4" : "")
+                    "flex flex-col md:flex-row gap-3 justify-between pt-10 px-4"
                   }
                 >
                   <div className="w-full">
@@ -1524,12 +1532,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                   </Element>
                 )}
 
-                <Element
-                  name="policies"
-                  className={
-                    "w-full pt-12 " + (!stay.is_an_event ? "px-4" : "")
-                  }
-                >
+                <Element name="policies" className={"w-full pt-12 px-4"}>
                   <h1 className="font-black text-xl mb-2">Policies</h1>
 
                   <div className="mt-4">
@@ -1598,7 +1601,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                     (reviews.length > 0 ? "" : " mb-16 md:mb-24")
                   }
                 >
-                  <div className={"" + (!stay.is_an_event ? "px-4" : "")}>
+                  <div className={"px-4"}>
                     <div className="text-xl font-black">Map</div>
                     <div className="mt-1 mb-4 text-sm text-gray-600">
                       Detailed location provided after booking
@@ -1611,10 +1614,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                 </Element>
 
                 {/* reviews */}
-                <Element
-                  name="reviews"
-                  className={"pt-24 " + (!stay.is_an_event ? "px-4" : "")}
-                >
+                <Element name="reviews" className={"pt-24 px-4"}>
                   {!reviewLoading && reviews.length > 0 && (
                     <div className="mb-16 md:mb-24">
                       <div className="max-w-[750px] mb-10">
