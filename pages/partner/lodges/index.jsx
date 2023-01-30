@@ -11,141 +11,226 @@ import Calendar from "../../../components/Partner/Calendar";
 import Events from "../../../components/Partner/Events";
 import Analytics from "../../../components/Partner/Analytics";
 import SelectOptions from "../../../components/Partner/SelectOptions";
+import Accommodation from "../../../components/Partner/Accommodation";
 
-function PartnerLodges(props) {
+function PartnerLodges({ stays }) {
   const router = useRouter();
 
-  const options = [
-    {
-      name: "Calendar",
-      value: "Calendar",
-    },
-    {
-      name: "Bookings",
-      value: "Bookings",
-    },
-    {
-      name: "Analytics",
-      value: "Analytics",
-    },
-  ];
+  const tableData = {
+    id: 1,
+    name: "Mara Serena Lodge",
+
+    rooms: [
+      {
+        id: 1,
+        name: "Standard Room",
+        dates: [
+          {
+            id: 1,
+            price: 100,
+            available: 2,
+            date: "2023-02-01",
+          },
+          {
+            id: 2,
+            price: 130,
+            available: 1,
+            date: "2023-02-02",
+          },
+          {
+            id: 3,
+            price: 150,
+            available: 0,
+            date: "2023-02-03",
+          },
+          {
+            id: 4,
+            price: 120,
+            available: 1,
+            date: "2023-02-04",
+          },
+          {
+            id: 5,
+            price: 100,
+            available: 2,
+            date: "2023-02-06",
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: "Deluxe Room",
+
+        dates: [
+          {
+            id: 1,
+            price: 100,
+            available: 2,
+            date: "2023-02-01",
+          },
+          {
+            id: 2,
+            price: 130,
+            available: 1,
+            date: "2023-02-02",
+          },
+          {
+            id: 3,
+            price: 150,
+            available: 0,
+            date: "2023-02-03",
+          },
+          {
+            id: 4,
+            price: 120,
+            available: 1,
+            date: "2023-02-04",
+          },
+          {
+            id: 5,
+            price: 100,
+            available: 2,
+            date: "2023-02-05",
+          },
+        ],
+      },
+      {
+        id: 3,
+        name: "Family Room",
+
+        dates: [
+          {
+            id: 1,
+            price: 100,
+            available: 2,
+            date: "2023-02-01",
+          },
+          {
+            id: 2,
+            price: 130,
+            available: 1,
+            date: "2023-02-02",
+          },
+          {
+            id: 3,
+            price: 150,
+            available: 0,
+            date: "2023-02-03",
+          },
+          {
+            id: 4,
+            price: 120,
+            available: 1,
+            date: "2023-02-04",
+          },
+          {
+            id: 5,
+            price: 100,
+            available: 2,
+            date: "2023-02-05",
+          },
+        ],
+      },
+    ],
+  };
+
   return (
-    <div className="flex md:flex-row flex-col">
-      <div className="flex w-full md:hidden items-center px-2 py-3 border-b bg-gray-100 justify-center">
-        <Link href="/">
-          <a className="relative w-28 h-9 cursor-pointer">
-            <Image
-              layout="fill"
-              alt="Logo"
-              src="/images/winda_logo/horizontal-blue-font.png"
-              priority
-            ></Image>
-          </a>
-        </Link>
-      </div>
-      <div className="my-4 md:hidden px-3 top-0">
-        <SelectOptions options={options}></SelectOptions>
-      </div>
+    <div className="flex">
+      <div className="flex-grow">
+        <div className="px-3 py-2 h-[70px] border-b flex items-center justify-center">
+          <div className="flex gap-4 items-center justify-center">
+            <div className="relative w-28 h-9 z-40">
+              <Image
+                layout="fill"
+                alt="Logo"
+                src="/images/winda_logo/horizontal-blue-font.png"
+                priority
+              ></Image>
+            </div>
 
-      <div className="w-[20%] hidden md:block sticky px-2 bottom-0 top-0 bg-gray-50 h-screen">
-        <div className="relative w-28 h-9 mx-auto mt-4 cursor-pointer">
-          <Image
-            layout="fill"
-            alt="Logo"
-            src="/images/winda_logo/horizontal-blue-font.png"
-            priority
-          ></Image>
-        </div>
+            <div className="h-[25px] w-[1px] mt-4 z-40 bg-gray-400"></div>
 
-        <div className="h-[1px] w-full bg-gray-200 my-6"></div>
-
-        <div
-          onClick={() => {
-            router.replace(
-              {
-                query: {
-                  ...router.query,
-                  option: 1,
-                },
-              },
-              undefined,
-              { shallow: true }
-            );
-          }}
-          className={
-            "flex items-center gap-2 hover:bg-[#4361EE] hover:bg-opacity-20 rounded-sm hover:text-blue-600 cursor-pointer transition-colors duration-300 ease-linear px-2 py-3 " +
-            (router.query.option === "1" || !router.query.option
-              ? "bg-[#4361EE] bg-opacity-20 text-blue-600"
-              : "")
-          }
-        >
-          <Icon className="w-6 h-6" icon="ic:baseline-calendar-month" />
-          <h1 className="font-bold text-black">Calendar</h1>
-        </div>
-
-        <div
-          onClick={() => {
-            router.replace(
-              {
-                query: {
-                  ...router.query,
-                  option: 2,
-                },
-              },
-              undefined,
-              { shallow: true }
-            );
-          }}
-          className={
-            "flex items-center gap-2 mt-1 hover:bg-[#4361EE] hover:bg-opacity-20 rounded-sm hover:text-blue-600 cursor-pointer transition-colors duration-300 ease-linear px-2 py-3 " +
-            (router.query.option === "2"
-              ? "bg-[#4361EE] bg-opacity-20 text-blue-600"
-              : "")
-          }
-        >
-          <Icon className="w-6 h-6" icon="ic:round-view-list" />
-          <h1 className="font-bold text-black">Bookings</h1>
-        </div>
-
-        <div
-          onClick={() => {
-            router.replace(
-              {
-                query: {
-                  ...router.query,
-                  option: 3,
-                },
-              },
-              undefined,
-              { shallow: true }
-            );
-          }}
-          className={
-            "flex items-center gap-2 mt-1 hover:bg-[#4361EE] hover:bg-opacity-20 rounded-sm hover:text-blue-600 cursor-pointer transition-colors duration-300 ease-linear px-2 py-3 " +
-            (router.query.option === "3"
-              ? "bg-[#4361EE] bg-opacity-20 text-blue-600"
-              : "")
-          }
-        >
-          <Icon
-            className="w-6 h-6"
-            icon="material-symbols:stacked-line-chart-rounded"
-          />
-          <h1 className="font-bold text-black">Analytics</h1>
-        </div>
-      </div>
-
-      <div className="md:p-4 mt-3 md:mt-0 w-full md:w-[80%]">
-        {(router.query.option === "1" || !router.query.option) && (
-          <div className="w-full h-full">
-            <Calendar></Calendar>
+            <h1 className="uppercase font-OpenSans mt-3 text-lg text-gray-700 tracking-widest z-40">
+              partner
+            </h1>
           </div>
-        )}
+        </div>
+
+        <h1 className="mt-4 font-bold ml-3 text-xl font-SourceSans">
+          Your Accommodation
+        </h1>
+
+        <div className="px-4 mt-5 flex flex-col gap-3">
+          <Accommodation listing={stays[0]} index={0}></Accommodation>
+        </div>
+      </div>
+
+      <div className="w-[1100px] px-4 border-l relative flex flex-col gap-6 overflow-x-scroll pt-8">
+        <Events
+          tableData={{
+            name: stays[0].property_name || stays[0].name,
+            rooms: stays[0].room_types,
+          }}
+        ></Events>
       </div>
     </div>
   );
 }
 
 PartnerLodges.propTypes = {};
+
+export async function getServerSideProps(context) {
+  try {
+    const token = getToken(context);
+
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_baseURL}/user/`,
+      {
+        headers: {
+          Authorization: "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+        },
+      }
+    );
+
+    if (response.data[0].is_partner) {
+      const stays = await axios.get(
+        `${process.env.NEXT_PUBLIC_baseURL}/user-stays/`,
+        {
+          headers: {
+            Authorization:
+              "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+          },
+        }
+      );
+
+      return {
+        props: {
+          userProfile: response.data[0],
+          stays: stays.data.results,
+        },
+      };
+    } else {
+      return {
+        notFound: true,
+      };
+    }
+  } catch (error) {
+    if (error.response.status === 401) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: `/login?redirect=/partner/lodges`,
+        },
+      };
+    } else {
+      return {
+        props: {
+          userProfile: "",
+          stays: [],
+        },
+      };
+    }
+  }
+}
 
 export default PartnerLodges;
