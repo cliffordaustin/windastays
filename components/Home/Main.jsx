@@ -495,7 +495,17 @@ function Main({ specialLodges }) {
                         </div>
                       </div>
 
-                      <div className="">
+                      <div
+                        onClick={() => {
+                          Mixpanel.track(
+                            "User clicked on an accommodation from windastays homepage",
+                            {
+                              name_of_accommodation: listing.name,
+                            }
+                          );
+                        }}
+                        className=""
+                      >
                         <Link href={`/stays/${listing.slug}`}>
                           <a>
                             <StyledLink
