@@ -578,6 +578,9 @@ const StaysDetail = ({ userProfile, stay }) => {
             <Button
               onClick={() => {
                 FullBoardPackageBtnClicked();
+                Mixpanel.track("Full board package clicked", {
+                  stay: stay.name,
+                });
               }}
               className="btn-gradient !rounded-full font-bold w-full mt-2"
             >
@@ -624,6 +627,9 @@ const StaysDetail = ({ userProfile, stay }) => {
             <Button
               onClick={() => {
                 GamePackageBtnClicked();
+                Mixpanel.track("Game package clicked", {
+                  stay: stay.name,
+                });
               }}
               className="btn-gradient !rounded-full font-bold w-full mt-2"
             >
@@ -671,6 +677,9 @@ const StaysDetail = ({ userProfile, stay }) => {
             <Button
               onClick={() => {
                 allInclusiveBtnClicked();
+                Mixpanel.track("All inclusive clicked", {
+                  stay: stay.name,
+                });
               }}
               className="btn-gradient !rounded-full font-bold w-full mt-2"
             >
@@ -715,6 +724,9 @@ const StaysDetail = ({ userProfile, stay }) => {
             <Button
               onClick={() => {
                 otherOptionBtnClicked(index);
+                Mixpanel.track("Other option clicked", {
+                  stay: stay.name,
+                });
               }}
               className="btn-gradient !rounded-full font-bold w-full mt-2"
             >
@@ -905,13 +917,7 @@ const StaysDetail = ({ userProfile, stay }) => {
             <div className="flex flex-col relative md:flex-row justify-around h-full w-full">
               <div className={"w-full"}>
                 <div className="!relative" name="about">
-                  <div
-                    className={
-                      stay.is_an_event
-                        ? "md:mt-[135px] mt-5"
-                        : "mt-4 md:mt-[98px] px-3"
-                    }
-                  >
+                  <div className={"mt-4 md:mt-[98px] px-3"}>
                     <div className="text-sm text-gray-600 font-medium flex items-center">
                       <div>
                         <div className="inline transition-colors duration-200 ease-in-out">
