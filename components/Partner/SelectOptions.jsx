@@ -44,7 +44,7 @@ export default function SelectOptions({ options }) {
                         option:
                           person.value === "Analytics"
                             ? 3
-                            : person.value === "Events"
+                            : person.value === "Bookings"
                             ? 2
                             : 1,
                       },

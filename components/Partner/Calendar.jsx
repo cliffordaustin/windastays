@@ -7,6 +7,12 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import { createGlobalStyle } from "styled-components";
 import "react-day-picker/dist/style.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+
+const localizer = momentLocalizer(moment);
 
 function Calendar() {
   const GlobalStyle = createGlobalStyle`
@@ -26,48 +32,70 @@ function Calendar() {
   }
 `;
 
+  const resources = [
+    {
+      id: "a",
+      title: "Room A",
+    },
+    {
+      id: "b",
+      title: "Room B",
+    },
+    {
+      id: "c",
+      title: "Room C",
+    },
+  ];
+
   return (
     <>
       <GlobalStyle></GlobalStyle>
 
       <div className="hidden md:block">
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-          initialView="dayGridMonth"
+        {/* <FullCalendar
+          plugins={[timeGridPlugin]}
+          initialView="timeGridDay"
           eventClassNames={
             "cursor-pointer !border-l-[6px] !border-t-[0px] !border-r-[0px] !border-b-[0px]"
           }
           editable={true}
           selectable={true}
           selectMirror={true}
+          dayHeaderContent={(args) => {
+            return args.date.toLocaleString("en-US", {
+              weekday: "short",
+            });
+          }}
           headerToolbar={{
             right: "prev,next",
           }}
-        />
-      </div>
+        /> */}
 
-      <div className="md:hidden">
-        <FullCalendar
-          plugins={[listPlugin, interactionPlugin, timeGridPlugin]}
-          initialView="listWeek"
-          eventClassNames={
-            "cursor-pointer !border-l-[6px] !border-t-[0px] !border-r-[0px] !border-b-[0px]"
-          }
-          views={{
-            listDay: { buttonText: "Day" },
-            listWeek: { buttonText: "Week" },
-            list: {
-              listDayAltFormat: "dddd",
-              duration: { days: 30 },
+        <BigCalendar
+          localizer={localizer}
+          resources={resources}
+          events={[
+            {
+              id: 1,
+              title: "John Doe",
+              start: moment().toDate(),
+              end: moment().add(330, "minutes").toDate(),
+              allDay: false,
+              resourceId: "a",
             },
-          }}
-          height="auto"
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          headerToolbar={{
-            right: "prev,next",
-          }}
+            {
+              id: 1,
+              title: "Jane Doe",
+              start: moment().toDate(),
+              end: moment().add(530, "minutes").toDate(),
+              allDay: false,
+              resourceId: "b",
+            },
+          ]}
+          views={["day", "week", "month"]}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 600 }}
         />
       </div>
     </>
