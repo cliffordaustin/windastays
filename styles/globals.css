@@ -118,7 +118,7 @@ body {
 }
 
 .rdp-day {
-  @apply !w-full !h-full !max-w-none !rounded-none;
+  @apply !w-full !h-full !max-w-none rounded-none;
 }
 
 .rdp-button:focus:not([disabled]),
@@ -138,7 +138,7 @@ body {
 .rdp-day_selected:focus:not([disabled]),
 .rdp-day_selected:active:not([disabled]),
 .rdp-day_selected:hover:not([disabled]) {
-  @apply !bg-blue-700;
+  @apply !bg-gray-700;
 }
 
 .rdp-button {
@@ -146,7 +146,7 @@ body {
 }
 
 .rdp-cell--selected {
-  @apply !bg-blue-700 !rounded-full w-10 h-10 sm:!w-12 sm:!h-12 outline-none transition-colors ease-linear duration-200;
+  @apply !bg-gray-700 !rounded-full w-10 h-10 sm:!w-12 sm:!h-12 outline-none transition-colors ease-linear duration-200;
 }
 
 .swiper-pagination > .swiper-pagination-bullet {
