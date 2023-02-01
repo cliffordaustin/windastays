@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import Input from "../../../../../components/ui/Input";
 import { Popover, Transition } from "@headlessui/react";
 import LoadingSpinerChase from "../../../../../components/ui/LoadingSpinerChase";
+import Cookies from "js-cookie";
 
 function AddAvailability({ stay }) {
   const router = useRouter();
@@ -33,8 +34,7 @@ function AddAvailability({ stay }) {
           },
           {
             headers: {
-              Authorization:
-                "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+              Authorization: "Token " + Cookies.get("token"),
             },
           }
         )
@@ -163,7 +163,7 @@ export async function getServerSideProps(context) {
       `${process.env.NEXT_PUBLIC_baseURL}/user/`,
       {
         headers: {
-          Authorization: "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+          Authorization: "Token " + token,
         },
       }
     );
@@ -173,8 +173,7 @@ export async function getServerSideProps(context) {
         `${process.env.NEXT_PUBLIC_baseURL}/user-stays/${context.params.slug}`,
         {
           headers: {
-            Authorization:
-              "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+            Authorization: "Token " + token,
           },
         }
       );

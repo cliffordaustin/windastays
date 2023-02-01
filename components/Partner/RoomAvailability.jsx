@@ -13,6 +13,7 @@ import "react-day-picker/dist/style.css";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 import LoadingSpinerChase from "../ui/LoadingSpinerChase";
+import Cookies from "js-cookie";
 
 function RoomAvailability({
   availability,
@@ -58,8 +59,7 @@ function RoomAvailability({
           },
           {
             headers: {
-              Authorization:
-                "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+              Authorization: "Token " + Cookies.get("token"),
             },
           }
         )
@@ -96,6 +96,7 @@ function RoomAvailability({
       },
       {
         Header: "Date",
+        accessor: "date",
         Cell: (row) => {
           return (
             <h1 className="font-bold">
@@ -106,12 +107,14 @@ function RoomAvailability({
       },
       {
         Header: "Available Rooms",
+        accessor: "num_of_available_rooms",
         Cell: (row) => {
           return row.row.original.num_of_available_rooms;
         },
       },
       {
         Header: "Price",
+        accessor: "price",
         Cell: (row) => {
           return "$" + row.row.original.price;
         },
@@ -171,8 +174,7 @@ function RoomAvailability({
         `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/availabilities/${row.slug}/`,
         {
           headers: {
-            Authorization:
-              "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+            Authorization: "Token " + Cookies.get("token"),
           },
         }
       )

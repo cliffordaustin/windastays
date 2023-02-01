@@ -136,7 +136,7 @@ function PartnerLodges({ stays }) {
 
   return (
     <div className="flex">
-      <div className="flex-grow">
+      <div className="w-[350px]">
         <div className="px-3 py-2 h-[70px] border-b flex items-center justify-center">
           <div className="flex gap-4 items-center justify-center">
             <div className="relative w-28 h-9 z-40">
@@ -160,16 +160,32 @@ function PartnerLodges({ stays }) {
           Your Accommodation
         </h1>
 
-        <div className="px-4 mt-5 flex flex-col gap-3">
-          <Accommodation listing={stays[0]} index={0}></Accommodation>
+        <div className="px-4 mt-5 relative flex flex-col gap-5">
+          {stays.map((stay, index) => (
+            <Accommodation
+              listing={stay}
+              key={index}
+              index={index}
+            ></Accommodation>
+          ))}
         </div>
       </div>
 
-      <div className="w-[1100px] px-4 border-l relative flex flex-col gap-6 overflow-x-scroll pt-8">
+      <div className="flex-grow px-4 border-l relative flex flex-col gap-6 overflow-x-scroll pt-8">
         <Events
           tableData={{
-            name: stays[0].property_name || stays[0].name,
-            rooms: stays[0].room_types,
+            name:
+              stays.length > 0
+                ? stays[router.query.index ? Number(router.query.index) : 0]
+                    .property_name ||
+                  stays[router.query.index ? Number(router.query.index) : 0]
+                    .name
+                : "",
+            rooms:
+              stays.length > 0
+                ? stays[router.query.index ? Number(router.query.index) : 0]
+                    .room_types
+                : [],
           }}
         ></Events>
       </div>
@@ -187,7 +203,7 @@ export async function getServerSideProps(context) {
       `${process.env.NEXT_PUBLIC_baseURL}/user/`,
       {
         headers: {
-          Authorization: "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+          Authorization: "Token " + token,
         },
       }
     );
@@ -197,8 +213,7 @@ export async function getServerSideProps(context) {
         `${process.env.NEXT_PUBLIC_baseURL}/user-stays/`,
         {
           headers: {
-            Authorization:
-              "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+            Authorization: "Token " + token,
           },
         }
       );

@@ -16,8 +16,15 @@ function Accommodation({ listing, index }) {
     return image.image;
   });
 
+  const selectedIndex = Number(router.query.index) || 0;
+
   return (
-    <div className="w-full flex xl:flex-row flex-col">
+    <div
+      className={
+        "w-full flex xl:flex-row rounded-md flex-col " +
+        (selectedIndex === index ? "border border-blue-600" : "border-none")
+      }
+    >
       <div className={"w-[240px] h-[150px] relative"}>
         <Image
           className={"w-full object-cover "}
@@ -119,7 +126,7 @@ function Accommodation({ listing, index }) {
           </Button>
 
           <PopoverBox
-            panelClassName="bg-white rounded-xl shadow-md mt-1 border -left-[20px] w-[250px] p-1"
+            panelClassName="bg-white absolute rounded-xl shadow-md mt-1 border -left-[20px] w-[250px] p-1"
             btnPopover={
               <div className="!rounded-lg cursor-pointer mt-2 !w-[60px] !h-[40px] !flex !px-0 !py-0 items-center justify-center bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
                 <Icon

@@ -137,67 +137,73 @@ function Events({ tableData }) {
     <div className="px-2 h-screen overflow-x-scroll">
       <GlobalStyle></GlobalStyle>
 
-      <div className="flex items-center gap-4 mb-6 justify-center">
-        <PopoverBox
-          panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px] p-2"
-          btnPopover={
-            <div className="w-[220px] px-2 py-2 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300">
-              {!startDates && <h1>Arrival date</h1>}
-              {startDates && (
-                <h1>{moment(startDates).format("MMM Do YYYY")}</h1>
-              )}
-              <Icon
-                className="w-6 h-6 text-gray-700"
-                icon="clarity:date-solid"
-              />
-            </div>
-          }
-        >
-          <DayPicker
-            mode="single"
-            disabled={{ before: new Date() }}
-            selected={startDates}
-            onSelect={(date) => {
-              setStartDate(date);
-              setEndDate(null);
-            }}
-          />
-        </PopoverBox>
+      {data.length > 0 && (
+        <div className="flex items-center gap-4 mb-6 justify-center">
+          <PopoverBox
+            panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px] p-2"
+            btnPopover={
+              <div className="w-[220px] px-2 py-2 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300">
+                {!startDates && <h1>Arrival date</h1>}
+                {startDates && (
+                  <h1>{moment(startDates).format("MMM Do YYYY")}</h1>
+                )}
+                <Icon
+                  className="w-6 h-6 text-gray-700"
+                  icon="clarity:date-solid"
+                />
+              </div>
+            }
+          >
+            <DayPicker
+              mode="single"
+              disabled={{ before: new Date() }}
+              selected={startDates}
+              onSelect={(date) => {
+                setStartDate(date);
+                setEndDate(null);
+              }}
+            />
+          </PopoverBox>
 
-        <div className="w-[20px] h-[1px] bg-gray-500"></div>
-        <PopoverBox
-          panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px] p-2"
-          btnPopover={
-            <div className="w-[220px] px-2 py-2 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300">
-              {!endDates && <h1>Depature date</h1>}
-              {endDates && <h1>{moment(endDates).format("MMM Do YYYY")}</h1>}
-              <Icon
-                className="w-6 h-6 text-gray-700"
-                icon="clarity:date-solid"
-              />
-            </div>
-          }
-        >
-          <DayPicker
-            mode="single"
-            disabled={{ before: new Date() }}
-            selected={endDates}
-            onSelect={(date) => {
-              setEndDate(date);
-            }}
-          />
-        </PopoverBox>
-      </div>
+          <div className="w-[20px] h-[1px] bg-gray-500"></div>
+          <PopoverBox
+            panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px] p-2"
+            btnPopover={
+              <div className="w-[220px] px-2 py-2 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300">
+                {!endDates && <h1>Depature date</h1>}
+                {endDates && <h1>{moment(endDates).format("MMM Do YYYY")}</h1>}
+                <Icon
+                  className="w-6 h-6 text-gray-700"
+                  icon="clarity:date-solid"
+                />
+              </div>
+            }
+          >
+            <DayPicker
+              mode="single"
+              disabled={{ before: new Date() }}
+              selected={endDates}
+              onSelect={(date) => {
+                setEndDate(date);
+              }}
+            />
+          </PopoverBox>
+        </div>
+      )}
 
       <div className="w-full">
         {data.length > 0 && <Table columns={columns} data={data}></Table>}
-
-        {data.length === 0 && (
-          <div className="flex justify-center items-center h-full">
-            <h1 className="text-2xl font-bold text-gray-500">No data</h1>
-          </div>
-        )}
       </div>
+
+      {data.length === 0 && (
+        <div className="h-full flex-col gap-2 flex items-center justify-center">
+          <Icon
+            className="w-[40px] h-[40px] text-gray-500"
+            icon="mdi:house-city"
+          />
+          <h1 className="text-xl font-bold text-gray-500">No data</h1>
+        </div>
+      )}
     </div>
   );
 }

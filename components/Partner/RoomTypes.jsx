@@ -15,6 +15,8 @@ import { createGlobalStyle } from "styled-components";
 import moment from "moment";
 import axios from "axios";
 import LoadingSpinerChase from "../ui/LoadingSpinerChase";
+import ListItem from "../ui/ListItem";
+import Cookies from "js-cookie";
 
 function RoomTypes({ room, index }) {
   const router = useRouter();
@@ -39,40 +41,59 @@ function RoomTypes({ room, index }) {
     initialValues: {
       number_of_available_rooms: "",
       price: "",
-      date: "",
+      startDate: "",
+      endDate: "",
     },
     validationSchema: Yup.object({
       number_of_available_rooms: Yup.number().required(
         "Number of available rooms is required"
       ),
       price: Yup.number().required("Price is required"),
-      date: Yup.date().required("Date is required"),
+      startDate: Yup.date().required("Date is required"),
+      endDate: Yup.date().required("Date is required"),
     }),
-    onSubmit: (values) => {
-      setAddAvailabilityLoading(true);
-      axios
-        .post(
-          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/add-availability/`,
-          {
-            num_of_available_rooms: values.number_of_available_rooms,
-            price: values.price,
-            date: moment(values.date).format("YYYY-MM-DD"),
-          },
-          {
-            headers: {
-              Authorization:
-                "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
-            },
-          }
-        )
-        .then((res) => {
-          setRoomAvailabilities([...roomAvailabilities, res.data]);
-          setAddAvailabilityLoading(false);
-          setOpenAddAvailabilityModal(false);
-        })
-        .catch((err) => {
-          setAddAvailabilityLoading(false);
-        });
+    onSubmit: async (values) => {
+      const allDates = [];
+      if (values.startDate && values.endDate) {
+        var currentDate = moment(values.startDate);
+        var stopDate = moment(values.endDate);
+        while (currentDate <= stopDate) {
+          allDates.push(moment(currentDate).format("YYYY-MM-DD"));
+          currentDate = moment(currentDate).add(1, "days");
+        }
+      }
+
+      if (allDates.length < 21) {
+        setAddAvailabilityLoading(true);
+        for (const date in allDates) {
+          await axios
+            .post(
+              `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/add-availability/`,
+              {
+                num_of_available_rooms: values.number_of_available_rooms,
+                price: values.price,
+                date: allDates[date],
+              },
+              {
+                headers: {
+                  Authorization: "Token " + Cookies.get("token"),
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((err) => {
+              setAddAvailabilityLoading(false);
+            });
+        }
+
+        router.reload();
+      } else {
+        setAddAvailabilityLoading(false);
+        formikAdd.setFieldError(
+          "endDate",
+          "You can only add availability for 20 days at a time"
+        );
+      }
     },
   });
 
@@ -83,8 +104,7 @@ function RoomTypes({ room, index }) {
         `${process.env.NEXT_PUBLIC_baseURL}/stays/${router.query.slug}/room-types/${room.slug}/`,
         {
           headers: {
-            Authorization:
-              "Token " + "ebfae841806f5f312f304a1e44f367b22b37547d",
+            Authorization: "Token " + Cookies.get("token"),
           },
         }
       )
@@ -151,7 +171,7 @@ function RoomTypes({ room, index }) {
           dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
           outsideDialogueClass="!p-0"
           dialoguePanelClassName={
-            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-lg screen-height-safari md:!min-h-0 md:max-h-[500px] "
+            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-2xl screen-height-safari md:!min-h-0 md:!max-h-[500px] "
           }
         >
           <div className="px-4 py-2">
@@ -162,53 +182,110 @@ function RoomTypes({ room, index }) {
 
             <div className="mt-4 flex gap-3 flex-col">
               <div className="flex flex-col gap-1">
-                <h1 className="text-sm font-bold">
-                  What date is the room available?
-                </h1>
-                <PopoverBox
-                  panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px] p-2"
-                  btnClassName="w-full"
-                  btnPopover={
-                    <div
-                      className={
-                        "!w-full rounded-md px-2 py-5 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300 " +
-                        (formikAdd.touched.date && formikAdd.errors.date
-                          ? "border-red-500"
-                          : "")
+                <div className="flex justify-between">
+                  <div className="w-[47%]">
+                    <h1 className="text-sm font-bold">Start date</h1>
+                    <PopoverBox
+                      panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px]"
+                      btnClassName="w-full"
+                      btnPopover={
+                        <div
+                          className={
+                            "!w-full rounded-md px-2 py-5 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300 " +
+                            (formikAdd.touched.startDate &&
+                            formikAdd.errors.startDate
+                              ? "border-red-500"
+                              : "")
+                          }
+                        >
+                          {!formikAdd.values.startDate && (
+                            <h1 className="font-bold text-gray-400">
+                              Availability date
+                            </h1>
+                          )}
+                          {formikAdd.values.startDate && (
+                            <h1>
+                              {moment(formikAdd.values.startDate).format(
+                                "MMM Do YYYY"
+                              )}
+                            </h1>
+                          )}
+                          <Icon
+                            className="w-6 h-6 text-gray-700"
+                            icon="clarity:date-solid"
+                          />
+                        </div>
                       }
                     >
-                      {!formikAdd.values.date && (
-                        <h1 className="font-bold text-gray-400">
-                          Availability date
-                        </h1>
-                      )}
-                      {formikAdd.values.date && (
-                        <h1>
-                          {moment(formikAdd.values.date).format("MMM Do YYYY")}
-                        </h1>
-                      )}
-                      <Icon
-                        className="w-6 h-6 text-gray-700"
-                        icon="clarity:date-solid"
+                      <DayPicker
+                        mode="single"
+                        disabled={{ before: new Date() }}
+                        selected={formikAdd.values.startDate}
+                        onSelect={(date) => {
+                          formikAdd.setFieldValue("startDate", date);
+                        }}
                       />
-                    </div>
-                  }
-                >
-                  <DayPicker
-                    mode="single"
-                    disabled={{ before: new Date() }}
-                    selected={formikAdd.values.date}
-                    onSelect={(date) => {
-                      formikAdd.setFieldValue("date", date);
-                    }}
-                  />
-                </PopoverBox>
+                    </PopoverBox>
 
-                {formikAdd.touched.date && formikAdd.errors.date ? (
-                  <span className="text-sm font-bold text-red-400">
-                    {formikAdd.errors.date}
-                  </span>
-                ) : null}
+                    {formikAdd.touched.startDate &&
+                    formikAdd.errors.startDate ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikAdd.errors.startDate}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="w-[47%]">
+                    <h1 className="text-sm font-bold">End date</h1>
+                    <PopoverBox
+                      panelClassName="bg-white rounded-xl shadow-md mt-2 right-0 border w-[400px]"
+                      btnClassName="w-full"
+                      btnPopover={
+                        <div
+                          className={
+                            "!w-full rounded-md px-2 py-5 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300 " +
+                            (formikAdd.touched.endDate &&
+                            formikAdd.errors.endDate
+                              ? "border-red-500"
+                              : "")
+                          }
+                        >
+                          {!formikAdd.values.endDate && (
+                            <h1 className="font-bold text-gray-400">
+                              Availability date
+                            </h1>
+                          )}
+                          {formikAdd.values.endDate && (
+                            <h1>
+                              {moment(formikAdd.values.endDate).format(
+                                "MMM Do YYYY"
+                              )}
+                            </h1>
+                          )}
+                          <Icon
+                            className="w-6 h-6 text-gray-700"
+                            icon="clarity:date-solid"
+                          />
+                        </div>
+                      }
+                    >
+                      <DayPicker
+                        mode="single"
+                        disabled={{ before: new Date() }}
+                        selected={formikAdd.values.endDate}
+                        onSelect={(date) => {
+                          formikAdd.setFieldValue("endDate", date);
+                        }}
+                      />
+                    </PopoverBox>
+
+                    {formikAdd.touched.endDate && formikAdd.errors.endDate ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikAdd.errors.endDate}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -262,6 +339,18 @@ function RoomTypes({ room, index }) {
                   </span>
                 ) : null}
               </div>
+            </div>
+
+            <p className="font-bold mb-2 mt-4 text-sm">Note:</p>
+            <div className="mb-3 flex flex-col gap-1">
+              <ListItem>
+                You can only add availability for 20 days at a time.
+              </ListItem>
+              <ListItem>If date is already added, it will be updated.</ListItem>
+              <ListItem>
+                Price and number of available rooms can be changed at anytime.
+              </ListItem>
+              <ListItem>Price is in USD.</ListItem>
             </div>
 
             <div className="flex items-center gap-4 mt-6">
