@@ -562,3 +562,15 @@ body {
     rgba(8, 193, 231, 1) 100%
   );
 }
+
+.tooltip::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%; /* At the top of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent black transparent;
+  @apply border-b-gray-500 border-r-transparent border-t-transparent border-l-transparent;
+}
