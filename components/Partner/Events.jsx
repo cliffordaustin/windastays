@@ -51,6 +51,36 @@ function Events({ tableData }) {
     setDate(allDates);
   }, [startDates, endDates]);
 
+  const [openSelectedDateModal, setOpenSelectedDateModal] =
+    React.useState(false);
+
+  const [selectedDate, setSelectedDate] = React.useState();
+
+  const [selectedDateLoading, setSelectedDateLoading] = React.useState(false);
+
+  const [activeSelectedDate, setActiveSelectedDate] = React.useState([]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setSelectedDateLoading(true);
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${
+            selectedDate.slug
+          }/bookings/?date=${moment(selectedDate.date).format("YYYY-MM-DD")}`,
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((response) => {
+          setActiveSelectedDate(response.data.results);
+          setSelectedDateLoading(false);
+        });
+    }
+  }, [selectedDate]);
+
   const columns = React.useMemo(
     () => [
       {
@@ -72,7 +102,16 @@ function Events({ tableData }) {
             });
 
             return (
-              <>
+              <div
+                onClick={() => {
+                  setSelectedDate({
+                    ...dateData,
+                    name: room.name,
+                  });
+                  setOpenSelectedDateModal(true);
+                }}
+                className="cursor-pointer"
+              >
                 {dateData && (
                   <div className="flex flex-col">
                     <div className="text-xs font-bold text-gray-600">
@@ -89,13 +128,53 @@ function Events({ tableData }) {
                     <h1 className="font-black"> -- </h1>
                   </div>
                 )}
-              </>
+              </div>
             );
           },
         };
       }),
     ],
     [dates]
+  );
+
+  const selectedDateColumns = React.useMemo(
+    () => [
+      {
+        Header: "Guest Name",
+        Cell: (row) => {
+          return row.row.original.full_name;
+        },
+
+        accessor: "full_name",
+      },
+      {
+        Header: "Check In",
+        Cell: (row) => {
+          return moment(row.row.original.check_in_date).format("MMM Do");
+        },
+        accessor: "check_in_date",
+      },
+      {
+        Header: "Check Out",
+        Cell: (row) => {
+          return moment(row.row.original.check_out_date).format("MMM Do");
+        },
+        accessor: "check_out_date",
+      },
+      {
+        Header: "Number of Guests",
+        Cell: (row) => {
+          return row.row.original.num_of_guests;
+        },
+      },
+      {
+        Header: "Number of rooms",
+        Cell: (row) => {
+          return row.row.original.num_of_rooms;
+        },
+      },
+    ],
+    []
   );
 
   const GlobalStyle = createGlobalStyle`
@@ -146,6 +225,11 @@ function Events({ tableData }) {
 
   const data = React.useMemo(() => tableData.rooms, [tableData]);
 
+  const selectDateData = React.useMemo(
+    () => activeSelectedDate,
+    [activeSelectedDate]
+  );
+
   const [addGuestLoading, setAddGuestLoading] = React.useState(false);
 
   const formik = useFormik({
@@ -155,6 +239,7 @@ function Events({ tableData }) {
       numberOfRooms: "",
       numberOfGuests: "",
       roomType: "",
+      fullName: "",
     },
     validationSchema: Yup.object({
       startDate: Yup.date().required("Date is required"),
@@ -162,6 +247,7 @@ function Events({ tableData }) {
       numberOfRooms: Yup.number().required("Number of rooms is required"),
       numberOfGuests: Yup.number().required("Number of guests is required"),
       roomType: Yup.object().required("Please select a room").nullable(),
+      fullName: Yup.string().required("Full name is required"),
     }),
     onSubmit: async (values) => {
       const allDates = [];
@@ -219,15 +305,83 @@ function Events({ tableData }) {
         }
       }
 
+      await axios
+        .post(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/add-booking/`,
+          {
+            check_in_date: moment(values.startDate).format("YYYY-MM-DD"),
+            check_out_date: moment(values.endDate).format("YYYY-MM-DD"),
+            num_of_rooms: values.numberOfRooms,
+            num_of_guests: values.numberOfGuests,
+            full_name: values.fullName,
+          },
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {})
+        .catch((err) => {
+          setAddGuestLoading(false);
+        });
+
       router.reload();
     },
   });
 
   const [showStartDate, setShowStartDate] = React.useState(false);
   const [showEndDate, setShowEndDate] = React.useState(false);
+
+  const [showGuestStartDate, setShowGuestStartDate] = React.useState(false);
+  const [showGuestEndDate, setShowGuestEndDate] = React.useState(false);
+
   return (
     <div className="px-2 h-screen overflow-x-scroll">
       <GlobalStyle></GlobalStyle>
+
+      <Dialogue
+        isOpen={openSelectedDateModal}
+        closeModal={() => {
+          setOpenSelectedDateModal(false);
+        }}
+        dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
+        outsideDialogueClass="!p-0"
+        dialoguePanelClassName={
+          "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-3xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
+        }
+      >
+        {selectDateData.length > 0 && (
+          <div className="px-4 py-2">
+            <h1 className="font-bold font-SourceSan mb-5 text-lg truncate">
+              <span className="text-gray-600">
+                {moment(selectedDate.date).format("MMM Do YYYY")} -{" "}
+                {selectedDate.name}
+              </span>
+            </h1>
+            <Table columns={selectedDateColumns} data={selectDateData}></Table>
+          </div>
+        )}
+
+        {selectDateData.length === 0 && (
+          <div className="px-4 py-2">
+            {selectedDate && (
+              <h1 className="font-bold font-SourceSans text-lg truncate">
+                <span className="text-gray-600">
+                  {moment(selectedDate.date).format("MMM Do YYYY")} -{" "}
+                  {selectedDate.name}
+                </span>
+              </h1>
+            )}
+
+            <div className="flex items-center justify-center h-[300px]">
+              <h1 className="text-gray-500 text-xl font-bold">
+                No bookings available
+              </h1>
+            </div>
+          </div>
+        )}
+      </Dialogue>
 
       {data.length > 0 && (
         <div className="flex items-center mb-6 justify-between">
@@ -324,7 +478,7 @@ function Events({ tableData }) {
             dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
             outsideDialogueClass="!p-0"
             dialoguePanelClassName={
-              "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-2xl screen-height-safari md:!min-h-0 md:!max-h-[500px] "
+              "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-3xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
             }
           >
             <div className="px-4 py-2">
@@ -336,6 +490,107 @@ function Events({ tableData }) {
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between">
                     <div className="w-[47%]">
+                      <h1 className="text-sm font-bold">Start date</h1>
+                      <div
+                        onClick={() => {
+                          setShowGuestStartDate(!showGuestStartDate);
+                          setShowGuestEndDate(false);
+                        }}
+                        className={
+                          "!w-full rounded-md px-2 py-5 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300 " +
+                          (formik.touched.startDate && formik.errors.startDate
+                            ? "border-red-500"
+                            : "")
+                        }
+                      >
+                        {!formik.values.startDate && (
+                          <h1 className="font-bold text-gray-400">
+                            Availability date
+                          </h1>
+                        )}
+                        {formik.values.startDate && (
+                          <h1>
+                            {moment(formik.values.startDate).format(
+                              "MMM Do YYYY"
+                            )}
+                          </h1>
+                        )}
+                        <Icon
+                          className="w-6 h-6 text-gray-700"
+                          icon="clarity:date-solid"
+                        />
+                      </div>
+
+                      <Dropdown
+                        className={
+                          "absolute mt-2 left-0 border w-[400px] p-2 after:!left-[20%] tooltip"
+                        }
+                        showDropdown={showGuestStartDate}
+                      >
+                        <DayPicker
+                          mode="single"
+                          disabled={{ before: new Date() }}
+                          selected={formik.values.startDate}
+                          onSelect={(date) => {
+                            formik.setFieldValue("startDate", date);
+                            setShowGuestStartDate(false);
+                            setShowGuestEndDate(true);
+                            formik.setFieldValue("endDate", null);
+                          }}
+                        />
+                      </Dropdown>
+                    </div>
+
+                    <div className="w-[47%]">
+                      <h1 className="text-sm font-bold">End date</h1>
+                      <div
+                        onClick={() => {
+                          setShowGuestEndDate(!showGuestEndDate);
+                          setShowGuestStartDate(false);
+                        }}
+                        className={
+                          "!w-full rounded-md px-2 py-5 flex items-center cursor-pointer justify-between text-sm text-gray-500 h-[35px] border border-gray-300 " +
+                          (formik.touched.endDate && formik.errors.endDate
+                            ? "border-red-500"
+                            : "")
+                        }
+                      >
+                        {!formik.values.endDate && (
+                          <h1 className="font-bold text-gray-400">
+                            Depature date
+                          </h1>
+                        )}
+                        {formik.values.endDate && (
+                          <h1>
+                            {moment(formik.values.endDate).format(
+                              "MMM Do YYYY"
+                            )}
+                          </h1>
+                        )}
+                        <Icon
+                          className="w-6 h-6 text-gray-700"
+                          icon="clarity:date-solid"
+                        />
+                      </div>
+
+                      <Dropdown
+                        className="absolute mt-2 right-0 border w-[400px] p-2 after:!left-[80%] tooltip"
+                        showDropdown={showGuestEndDate}
+                      >
+                        <DayPicker
+                          mode="single"
+                          disabled={{ before: new Date() }}
+                          selected={formik.values.endDate}
+                          onSelect={(date) => {
+                            formik.setFieldValue("endDate", date);
+                            setShowGuestStartDate(false);
+                            setShowGuestEndDate(false);
+                          }}
+                        />
+                      </Dropdown>
+                    </div>
+
+                    {/* <div className="w-[47%]">
                       <h1 className="text-sm font-bold">Start date</h1>
                       <PopoverBox
                         panelClassName="bg-white rounded-xl shadow-md mt-2 border w-[400px]"
@@ -384,9 +639,9 @@ function Events({ tableData }) {
                           {formik.errors.startDate}
                         </span>
                       ) : null}
-                    </div>
+                    </div> */}
 
-                    <div className="w-[47%]">
+                    {/* <div className="w-[47%]">
                       <h1 className="text-sm font-bold">End date</h1>
                       <PopoverBox
                         panelClassName="bg-white rounded-xl shadow-md mt-2 right-0 border w-[400px]"
@@ -434,7 +689,7 @@ function Events({ tableData }) {
                           {formik.errors.endDate}
                         </span>
                       ) : null}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -521,6 +776,31 @@ function Events({ tableData }) {
                   formik.errors.numberOfGuests ? (
                     <span className="text-sm font-bold text-red-400">
                       {formik.errors.numberOfGuests}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div>
+                  <Input
+                    name="fullName"
+                    type="text"
+                    value={formik.values.fullName}
+                    placeholder="Name of guest"
+                    errorStyle={
+                      formik.touched.fullName && formik.errors.fullName
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Add the name of a guest"
+                  ></Input>
+                  {formik.touched.fullName && formik.errors.fullName ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formik.errors.fullName}
                     </span>
                   ) : null}
                 </div>
