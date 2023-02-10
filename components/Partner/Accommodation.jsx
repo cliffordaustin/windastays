@@ -21,13 +21,14 @@ function Accommodation({ listing, index }) {
   return (
     <div
       className={
-        "w-full flex xl:flex-row rounded-md flex-col " +
-        (selectedIndex === index ? "border border-blue-600" : "border-none")
+        "w-full flex xl:flex-row rounded-md shadow-md border flex-col "
       }
     >
-      <div className={"w-[240px] h-[150px] relative"}>
+      <div className={"w-full h-[150px] relative"}>
         <Image
-          className={"w-full object-cover "}
+          className={
+            "w-full object-cover rounded-t-lg xl:rounded-tl-lg xl:rounded-bl-lg xl:rounded-tr-none "
+          }
           src={images[0]}
           alt=""
           objectPosition="center"
@@ -35,10 +36,21 @@ function Accommodation({ listing, index }) {
         />
       </div>
 
-      <div className="xl:px-2 xl:py-2 flex flex-col xl:justify-between">
+      <div
+        className={
+          "w-[30px] absolute top-1 left-5 border border-gray-300 h-[30px] rounded-full flex items-center justify-center " +
+          (selectedIndex === index
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 bg-opacity-60")
+        }
+      >
+        <Icon className="w-8 h-8" icon="material-symbols:check-small-rounded" />
+      </div>
+
+      <div className="px-2 py-2 flex flex-col xl:justify-between">
         <div className="flex flex-col gap-0.5 mt-2 xl:mt-0">
           <h1 className="uppercase text-gray-500 text-xs">
-            {listing.location}
+            {listing.location || listing.city || listing.country}
           </h1>
           <h1 className="font-bold font-SourceSans text-xl truncate">
             {listing.property_name || listing.name}
@@ -128,7 +140,7 @@ function Accommodation({ listing, index }) {
           <PopoverBox
             panelClassName="bg-white absolute rounded-xl shadow-md mt-1 border -left-[20px] w-[250px] p-1"
             btnPopover={
-              <div className="!rounded-lg cursor-pointer mt-2 !w-[60px] !h-[40px] !flex !px-0 !py-0 items-center justify-center bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
+              <div className="rounded-lg xl:!rounded-3xl cursor-pointer mt-2 !w-[60px] xl:!w-[40px] !h-[40px] !flex !px-0 !py-0 items-center justify-center bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
                 <Icon
                   className="w-8 h-8"
                   icon="carbon:overflow-menu-horizontal"
@@ -139,7 +151,7 @@ function Accommodation({ listing, index }) {
             <Link href={`/partner/lodges/${listing.slug}/actions`}>
               <a>
                 <div className="py-2 px-2 cursor-pointer hover:bg-gray-100 rounded-md text-sm transition-colors duration-300">
-                  Add/edit availability
+                  Add rooms
                 </div>
               </a>
             </Link>

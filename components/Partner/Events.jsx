@@ -266,6 +266,33 @@ function Events({ tableData }) {
       });
 
       for (const date in allDates) {
+        const dateData = room.room_availabilities.find((roomDate) => {
+          return (
+            moment(roomDate.date).format("YYYY-MM-DD") ===
+            moment(allDates[date]).format("YYYY-MM-DD")
+          );
+        });
+        if (dateData.num_of_available_rooms < values.numberOfRooms) {
+          formik.setFieldError(
+            "numberOfRooms",
+            dateData.num_of_available_rooms > 0
+              ? "Only " +
+                  dateData.num_of_available_rooms +
+                  " rooms are available" +
+                  " on " +
+                  moment(allDates[date]).format("MMM Do") +
+                  ". Please select another date."
+              : "No rooms are available on " +
+                  moment(allDates[date]).format("MMM Do") +
+                  ". Please select another date."
+          );
+          setAddGuestLoading(false);
+
+          return;
+        }
+      }
+
+      for (const date in allDates) {
         setAddGuestLoading(true);
         const dateData = room.room_availabilities.find((roomDate) => {
           return (
@@ -274,35 +301,24 @@ function Events({ tableData }) {
           );
         });
 
-        if (dateData.num_of_available_rooms < values.numberOfRooms) {
-          setAddGuestLoading(false);
-          formik.setFieldError(
-            "numberOfRooms",
-            "Only " +
-              dateData.num_of_available_rooms +
-              " rooms are available" +
-              " on " +
-              moment(allDates[date]).format("MMM Do")
-          );
-        } else {
-          await axios
-            .patch(
-              `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/availabilities/${dateData.slug}/`,
-              {
-                num_of_available_rooms:
-                  dateData.num_of_available_rooms - values.numberOfRooms,
+        await axios
+          .patch(
+            `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/availabilities/${dateData.slug}/`,
+            {
+              num_of_available_rooms:
+                dateData.num_of_available_rooms - values.numberOfRooms,
+            },
+            {
+              headers: {
+                Authorization: "Token " + Cookies.get("token"),
               },
-              {
-                headers: {
-                  Authorization: "Token " + Cookies.get("token"),
-                },
-              }
-            )
-            .then((res) => {})
-            .catch((err) => {
-              setAddGuestLoading(false);
-            });
-        }
+            }
+          )
+          .then((res) => {})
+          .catch((err) => {
+            console.log(err.response);
+            setAddGuestLoading(false);
+          });
       }
 
       await axios
@@ -847,12 +863,54 @@ function Events({ tableData }) {
       </div>
 
       {data.length === 0 && (
-        <div className="h-full flex-col gap-2 flex items-center justify-center">
-          <Icon
-            className="w-[40px] h-[40px] text-gray-500"
-            icon="mdi:house-city"
-          />
-          <h1 className="text-xl font-bold text-gray-500">No data</h1>
+        <div className="h-full flex-col gap-2">
+          <h1 className="text-2xl font-black font-SourceSans">
+            Welcome to winda calendar
+          </h1>
+          <p className="mt-1 text-gray-500 text-sm">
+            Here are 3 steps to get you started
+          </p>
+
+          <div className="flex flex-col gap-5 mt-8">
+            <div className="flex items-center gap-2">
+              <div className="w-[46px] h-[46px] rounded-lg flex items-center justify-center bg-red-600 bg-opacity-40">
+                <Icon
+                  className="w-8 h-8 text-red-600"
+                  icon="fluent:cursor-click-24-filled"
+                />
+              </div>
+
+              <h1 className="font-bold text-gray-600">
+                Click on the three dots on an accommodation
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="w-[46px] h-[46px] rounded-lg flex items-center justify-center bg-blue-600 bg-opacity-40">
+                <Icon
+                  className="w-8 h-8 text-blue-600"
+                  icon="material-symbols:add"
+                />
+              </div>
+
+              <h1 className="font-bold text-gray-600">
+                Choose &apos;add rooms&apos;
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="w-[46px] h-[46px] rounded-lg flex items-center justify-center bg-green-600 bg-opacity-40">
+                <Icon
+                  className="w-8 h-8 text-green-600"
+                  icon="material-symbols:calendar-add-on"
+                />
+              </div>
+
+              <h1 className="font-bold text-gray-600">
+                Add availability from the calendar
+              </h1>
+            </div>
+          </div>
         </div>
       )}
     </div>

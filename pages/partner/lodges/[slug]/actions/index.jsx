@@ -143,10 +143,27 @@ function AddAvailability({ stay }) {
           </Popover>
         </div>
 
-        <div className="flex-col flex gap-4 mt-10">
-          {stay.room_types.map((room, index) => (
-            <RoomTypes key={index} room={room} index={index}></RoomTypes>
-          ))}
+        <div className="flex-col flex gap-4 mt-10 mb-6">
+          {stay.room_types.length > 0 &&
+            stay.room_types.map((room, index) => (
+              <RoomTypes key={index} room={room} index={index}></RoomTypes>
+            ))}
+
+          {stay.room_types.length === 0 && (
+            <div className="absolute flex flex-col items-center gap-2 top-[40%] left-[50%] -translate-x-[50%]">
+              <div className="w-[100px] h-[70px] flex items-center justify-center bg-gray-200 rounded-lg">
+                <Icon className="w-10 h-10" icon="material-symbols:search" />
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <h1 className="font-black text-2xl font-SourceSans">
+                  You have no room added yet
+                </h1>
+                <p className="text-gray-600 font-SourceSans">
+                  Get started by adding a room
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -170,7 +187,7 @@ export async function getServerSideProps(context) {
 
     if (response.data[0].is_partner) {
       const stay = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/user-stays/${context.params.slug}`,
+        `${process.env.NEXT_PUBLIC_baseURL}/user-stays-email/${context.params.slug}`,
         {
           headers: {
             Authorization: "Token " + token,

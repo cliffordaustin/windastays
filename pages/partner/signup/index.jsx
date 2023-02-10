@@ -112,12 +112,12 @@ function Signup(props) {
               <Input
                 name="name"
                 type="text"
-                placeholder="Company's name"
+                placeholder="Partner's name"
                 errorStyle={
                   formik.touched.name && formik.errors.name ? true : false
                 }
                 className={"w-full "}
-                label="Company's name"
+                label="Partner's name"
                 {...formik.getFieldProps("name")}
               ></Input>
               {formik.touched.name && formik.errors.name ? (

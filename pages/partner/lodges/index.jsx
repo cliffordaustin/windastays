@@ -278,7 +278,6 @@ function PartnerLodges({ stays }) {
                       stays[router.query.index ? Number(router.query.index) : 0]
                         .name
                     : "",
-
                 rooms:
                   stays.length > 0
                     ? stays[router.query.index ? Number(router.query.index) : 0]
