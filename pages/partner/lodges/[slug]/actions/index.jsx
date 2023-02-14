@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import getToken from "../../../../../lib/getToken";
 import axios from "axios";
@@ -12,6 +12,9 @@ import Input from "../../../../../components/ui/Input";
 import { Popover, Transition } from "@headlessui/react";
 import LoadingSpinerChase from "../../../../../components/ui/LoadingSpinerChase";
 import Cookies from "js-cookie";
+import { DayPicker } from "react-day-picker";
+import moment from "moment";
+import Dropdown from "../../../../../components/ui/Dropdown";
 
 function AddAvailability({ stay }) {
   const router = useRouter();
@@ -47,32 +50,112 @@ function AddAvailability({ stay }) {
     },
   });
 
+  const [startDate, setStartDate] = React.useState({
+    from: router.query.startDate
+      ? new Date(router.query.startDate)
+      : new Date(),
+    to: router.query.endDate
+      ? new Date(router.query.endDate)
+      : new Date(new Date().setDate(new Date().getDate() + 10)),
+  });
+
+  useEffect(() => {
+    if (startDate && startDate.from && startDate.to) {
+      router.replace(
+        {
+          query: {
+            ...router.query,
+            startDate: moment(startDate.from).format("YYYY-MM-DD"),
+            endDate: moment(startDate.to).format("YYYY-MM-DD"),
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+  }, [startDate]);
+
   return (
-    <div>
-      <div className="max-w-[1100px] mt-6 mx-auto px-6 xl:px-0">
+    <div className="mb-20">
+      <div className="flex sticky z-30 bg-white shadow-sm left-0 right-0 top-0 border-b items-center mb-4 px-6 h-[80px] justify-between">
         <div
           onClick={() => {
             router.back();
           }}
-          className="flex gap-1 mb-3 font-bold cursor-pointer items-center text-blue-600"
+          className="flex gap-1 font-bold cursor-pointer items-center text-blue-600"
         >
           <Icon className="w-6 h-6" icon="bx:chevron-left" />
           <span>Back</span>
         </div>
+
+        <PopoverBox
+          panelClassName="bg-white w-[800px] rounded-xl after:!left-[50%] !z-20 shadow-md tooltip mt-2 border w-fit -left-[250px] p-2"
+          btnClassName="!rounded-3xl shadow-md"
+          btnPopover={
+            <div className="w-fit shadow-md px-6 cursor-pointer bg-white flex items-center justify-between gap-6 rounded-3xl border h-[45px]">
+              <Icon
+                className="text-2xl text-blue-600"
+                icon="material-symbols:calendar-month-rounded"
+              />
+              <div className="flex items-center justify-center gap-2">
+                {startDate && (
+                  <>
+                    <h1 className="font-semibold font-SourceSans">
+                      {startDate && startDate.from
+                        ? moment(startDate.from).format("MMM Do")
+                        : ""}
+                    </h1>
+                    <Icon
+                      className="text-3xl"
+                      icon="material-symbols:arrow-right-alt-rounded"
+                    />
+
+                    <h1 className="font-semibold font-SourceSans">
+                      {startDate && startDate.to
+                        ? moment(startDate.to).format("MMM Do")
+                        : ""}
+                    </h1>
+                  </>
+                )}
+
+                {!startDate && (
+                  <h1 className="font-semibold font-SourceSans">
+                    Select two dates
+                  </h1>
+                )}
+              </div>
+            </div>
+          }
+        >
+          <DayPicker
+            mode="range"
+            disabled={{ before: new Date() }}
+            selected={startDate}
+            numberOfMonths={2}
+            onSelect={(date) => {
+              setStartDate(date);
+              console.log(date);
+            }}
+          />
+        </PopoverBox>
+        <div></div>
+      </div>
+      <div className="max-w-[1100px] mt-6 mx-auto px-6 xl:px-0">
         <div className="flex items-center justify-between">
           <h1 className="font-bold font-SourceSans text-2xl truncate">
             <span className="text-gray-600">Add/edit</span>{" "}
             {stay.property_name || stay.name}{" "}
-            <span className="text-gray-600">availability</span>
+            <span className="text-gray-600">rooms</span>
           </h1>
 
-          <Popover className="relative ">
+          <Popover className="relative z-20 ">
             <Popover.Button className="outline-none ">
               <button
                 onClick={() => {}}
-                className="bg-blue-500 text-white text-sm font-bold mt-2 px-6 py-1.5 rounded-md"
+                className="gradient-blue flex items-center gap-1 text-white text-sm font-bold mt-2 px-6 py-1.5 rounded-md"
               >
                 Add a room
+                <Icon className="text-xl" icon="material-symbols:add" />
               </button>
             </Popover.Button>
 
@@ -211,14 +294,14 @@ export async function getServerSideProps(context) {
       return {
         redirect: {
           permanent: false,
-          destination: `/login?redirect=/partner/lodges/${context.params.slug}/edit`,
+          destination: `/partner/signup?redirect=/partner/lodges/${context.params.slug}/actions`,
         },
       };
     } else {
       return {
         props: {
           userProfile: "",
-          stay: [],
+          stay: null,
         },
       };
     }

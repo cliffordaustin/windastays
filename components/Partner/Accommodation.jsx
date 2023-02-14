@@ -21,7 +21,7 @@ function Accommodation({ listing, index }) {
   return (
     <div
       className={
-        "w-full flex xl:flex-row rounded-md shadow-md border flex-col "
+        "w-full flex bg-white xl:flex-row rounded-md shadow-md border flex-col "
       }
     >
       <div className={"w-full h-[150px] relative"}>
@@ -130,7 +130,7 @@ function Accommodation({ listing, index }) {
                 },
               });
             }}
-            className="!rounded-lg mt-2 h-[40px] !flex gap-1 !px-4 items-center justify-center w-full btn-gradient"
+            className="!rounded-lg mt-2 h-[40px] !flex gap-1 !px-4 items-center justify-center w-full gradient-blue"
           >
             <span className="text-white font-bold text-sm">
               check availability

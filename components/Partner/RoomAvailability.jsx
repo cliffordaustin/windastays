@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
-import Table from "./Table";
+import Table from "./SecondTable";
 import { createGlobalStyle } from "styled-components";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -21,6 +21,8 @@ function RoomAvailability({
   roomSlug,
   setOpenAddAvailabilityModal,
   setRoomAvailabilities,
+  isNonResident,
+  inPartnerHomepage,
 }) {
   const roomAvailability = React.useMemo(() => availability, [availability]);
 
@@ -36,54 +38,129 @@ function RoomAvailability({
   const formikEdit = useFormik({
     initialValues: {
       number_of_available_rooms: "",
-      price: "",
       date: "",
+      guestTypes: [
+        {
+          name: "",
+          price: "",
+        },
+      ],
       rowSlug: "",
+      id: "",
     },
     validationSchema: Yup.object({
       number_of_available_rooms: Yup.number().required(
         "Number of available rooms is required"
       ),
-      price: Yup.number().required("Price is required"),
       date: Yup.date().required("Date is required"),
-    }),
-    onSubmit: (values) => {
-      setEditAvailabilityLoading(true);
-      axios
-        .put(
-          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/availabilities/${values.rowSlug}/`,
-          {
-            num_of_available_rooms: values.number_of_available_rooms,
-            price: values.price,
-            date: moment(values.date).format("YYYY-MM-DD"),
-          },
-          {
-            headers: {
-              Authorization: "Token " + Cookies.get("token"),
-            },
-          }
-        )
-        .then((res) => {
-          setRoomAvailabilities(
-            roomAvailability.map((item) => {
-              if (item.slug === values.rowSlug) {
-                return {
-                  ...item,
-                  num_of_available_rooms: values.number_of_available_rooms,
-                  price: values.price,
-                  date: moment(values.date).format("YYYY-MM-DD"),
-                };
-              }
-              return item;
-            })
-          );
-          setEditAvailabilityLoading(false);
-          setOpenEditAvailabilityModal(false);
+      guestTypes: Yup.array().of(
+        Yup.object().shape({
+          name: Yup.string().required("Guest type is required"),
+          price: Yup.number().required("Price is required"),
         })
-        .catch((err) => {
-          setEditAvailabilityLoading(false);
-        });
+      ),
+    }),
+    onSubmit: async (values) => {
+      setEditAvailabilityLoading(true);
+
+      if (isNonResident) {
+        const data = [
+          {
+            id: values.id,
+            date: values.date,
+            num_of_available_rooms: values.number_of_available_rooms,
+            room_non_resident_guest_availabilities: values.guestTypes,
+          },
+        ];
+        await axios
+          .patch(
+            `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/nonresident-availabilities/`,
+            data,
+            {
+              headers: {
+                Authorization: "Token " + Cookies.get("token"),
+              },
+            }
+          )
+          .then((res) => {
+            setRoomAvailabilities(
+              roomAvailability.map((item) => {
+                if (item.id === values.id) {
+                  return {
+                    ...item,
+                    date: values.date,
+                    num_of_available_rooms: values.number_of_available_rooms,
+                    room_non_resident_guest_availabilities: values.guestTypes,
+                  };
+                }
+                return item;
+              })
+            );
+            setEditAvailabilityLoading(false);
+            setOpenEditAvailabilityModal(false);
+          })
+          .catch((err) => {
+            setEditAvailabilityLoading(false);
+          });
+      } else {
+        const data = [
+          {
+            id: values.id,
+            date: values.date,
+            num_of_available_rooms: values.number_of_available_rooms,
+            room_resident_guest_availabilities: values.guestTypes,
+          },
+        ];
+        await axios
+          .patch(
+            `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/resident-availabilities/`,
+            data,
+            {
+              headers: {
+                Authorization: "Token " + Cookies.get("token"),
+              },
+            }
+          )
+          .then((res) => {
+            setRoomAvailabilities(
+              roomAvailability.map((item) => {
+                if (item.id === values.id) {
+                  return {
+                    ...item,
+                    date: values.date,
+                    num_of_available_rooms: values.number_of_available_rooms,
+                    room_resident_guest_availabilities: values.guestTypes,
+                  };
+                }
+                return item;
+              })
+            );
+            setEditAvailabilityLoading(false);
+            setOpenEditAvailabilityModal(false);
+          })
+          .catch((err) => {
+            setEditAvailabilityLoading(false);
+          });
+      }
     },
+  });
+
+  const guestTypes = [];
+
+  roomAvailability.forEach((item) => {
+    if (isNonResident) {
+      item.room_non_resident_guest_availabilities.map((item) => {
+        if (!guestTypes.includes(item.name)) {
+          guestTypes.push(item.name);
+        }
+      });
+    } else {
+      item.room_resident_guest_availabilities.map((item) => {
+        if (!guestTypes.includes(item.name)) {
+          guestTypes.push(item.name);
+        }
+      });
+    }
   });
 
   const columns = React.useMemo(
@@ -113,11 +190,32 @@ function RoomAvailability({
         },
       },
       {
-        Header: "Price",
-        accessor: "price",
-        Cell: (row) => {
-          return "$" + row.row.original.price;
-        },
+        Header: "Pricing",
+        columns: [
+          ...guestTypes.map((item) => {
+            return {
+              Header: item,
+              Cell: (row) => {
+                const guestType = isNonResident
+                  ? row.row.original.room_non_resident_guest_availabilities.find(
+                      (item) => item.name == row.column.Header
+                    )
+                  : row.row.original.room_resident_guest_availabilities.find(
+                      (item) => item.name == row.column.Header
+                    );
+
+                return (
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-bold">
+                      {guestType ? "$" + guestType.price : "N/A"}
+                    </h1>
+                    {guestType && <h1 className="text-gray-500">/ night</h1>}
+                  </div>
+                );
+              },
+            };
+          }),
+        ],
       },
       {
         Header: "Actions",
@@ -157,33 +255,115 @@ function RoomAvailability({
     [roomAvailability]
   );
 
+  const homeColumns = React.useMemo(
+    () => [
+      {
+        Header: "#",
+        Cell: (row) => {
+          return row.row.index + 1;
+        },
+      },
+      {
+        Header: "Date",
+        accessor: "date",
+        Cell: (row) => {
+          return (
+            <h1 className="font-bold">
+              {moment(row.row.original.date).format("MMM Do")}
+            </h1>
+          );
+        },
+      },
+      {
+        Header: "Available Rooms",
+        accessor: "num_of_available_rooms",
+        Cell: (row) => {
+          return row.row.original.num_of_available_rooms;
+        },
+      },
+      {
+        Header: "Pricing",
+        columns: [
+          ...guestTypes.map((item) => {
+            return {
+              Header: item,
+              Cell: (row) => {
+                const guestType = isNonResident
+                  ? row.row.original.room_non_resident_guest_availabilities.find(
+                      (item) => item.name == row.column.Header
+                    )
+                  : row.row.original.room_resident_guest_availabilities.find(
+                      (item) => item.name == row.column.Header
+                    );
+
+                return (
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-bold">
+                      {guestType ? "$" + guestType.price : "N/A"}
+                    </h1>
+                    {guestType && <h1 className="text-gray-500">/ night</h1>}
+                  </div>
+                );
+              },
+            };
+          }),
+        ],
+      },
+    ],
+    [roomAvailability]
+  );
+
   const editAvailability = (row) => {
     formikEdit.setFieldValue(
       "number_of_available_rooms",
       row.num_of_available_rooms
     );
-    formikEdit.setFieldValue("price", row.price);
     formikEdit.setFieldValue("date", row.date);
+    formikEdit.setFieldValue(
+      "guestTypes",
+      isNonResident
+        ? row.room_non_resident_guest_availabilities
+        : row.room_resident_guest_availabilities
+    );
+    formikEdit.setFieldValue("id", row.id);
     formikEdit.setFieldValue("rowSlug", row.slug);
     setOpenEditAvailabilityModal(true);
   };
 
   const deleteAvailability = (row) => {
-    axios
-      .delete(
-        `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/availabilities/${row.slug}/`,
-        {
-          headers: {
-            Authorization: "Token " + Cookies.get("token"),
-          },
-        }
-      )
-      .then((res) => {
-        setRoomAvailabilities(
-          roomAvailability.filter((item) => item.slug !== row.slug)
-        );
-      })
-      .catch((err) => {});
+    if (isNonResident) {
+      axios
+        .delete(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/nonresident-availabilities/${row.slug}/`,
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          setRoomAvailabilities(
+            roomAvailability.filter((item) => item.slug !== row.slug)
+          );
+        })
+        .catch((err) => {});
+    } else {
+      axios
+        .delete(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/resident-availabilities/${row.slug}/`,
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          setRoomAvailabilities(
+            roomAvailability.filter((item) => item.slug !== row.slug)
+          );
+        })
+        .catch((err) => {});
+    }
   };
 
   const GlobalStyle = createGlobalStyle`
@@ -236,15 +416,20 @@ function RoomAvailability({
     <div className="w-full">
       <GlobalStyle></GlobalStyle>
       {roomAvailability.length > 0 && (
-        <Table columns={columns} data={roomAvailability}></Table>
+        <Table
+          columns={inPartnerHomepage ? homeColumns : columns}
+          data={roomAvailability}
+        ></Table>
       )}
 
       {roomAvailability.length === 0 && (
         <div className="flex flex-col p-6 items-center justify-center h-full">
-          <h1 className="text-base font-bold">No Availability added yet</h1>
+          <h1 className="text-base font-bold">
+            No Availability added yet for the filter
+          </h1>
           <button
             onClick={() => {
-              setOpenAddAvailabilityModal(true);
+              setOpenAddAvailabilityModal();
             }}
             className="bg-blue-500 text-white mt-2 px-6 py-0.5 rounded-md"
           >
@@ -261,7 +446,7 @@ function RoomAvailability({
         dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
         outsideDialogueClass="!p-0"
         dialoguePanelClassName={
-          "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-lg screen-height-safari md:!min-h-0 md:max-h-[500px] "
+          "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-3xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
         }
       >
         <div className="px-4 py-2">
@@ -349,29 +534,86 @@ function RoomAvailability({
               ) : null}
             </div>
 
-            <div>
-              <Input
-                name="price"
-                type="number"
-                value={formikEdit.values.price}
-                placeholder="Price on selected date"
-                errorStyle={
-                  formikEdit.touched.price && formikEdit.errors.price
-                    ? true
-                    : false
-                }
-                onChange={(e) => {
-                  formikEdit.handleChange(e);
+            <div className="flex flex-col gap-2 mt-3">
+              {formikEdit.values.guestTypes.map((guest, index) => {
+                return (
+                  <div key={index} className="flex justify-between">
+                    <div className="w-[47%] flex flex-col gap-1">
+                      <Input
+                        name="name"
+                        type="text"
+                        value={guest.name}
+                        placeholder="Type of guest"
+                        errorStyle={
+                          formikEdit.touched.guestTypes &&
+                          formikEdit.errors.guestTypes
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => {
+                          formikEdit.setFieldValue(
+                            `guestTypes[${index}].name`,
+                            e.target.value
+                          );
+                        }}
+                        className={"w-full placeholder:text-sm "}
+                        inputClassName="!text-sm "
+                        label="Add the type of guest. eg 'Adult single'"
+                      ></Input>
+
+                      {formikEdit.touched.guestTypes &&
+                      formikEdit.errors.guestTypes ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.guestTypes[index].name}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="w-[47%] gap-2 flex items-center">
+                      <Input
+                        name="price"
+                        type="number"
+                        value={guest.price}
+                        placeholder="Price"
+                        errorStyle={
+                          formikEdit.touched.guestTypes &&
+                          formikEdit.errors.guestTypes
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => {
+                          formikEdit.setFieldValue(
+                            `guestTypes[${index}].price`,
+                            e.target.value
+                          );
+                        }}
+                        className={"w-full placeholder:text-sm "}
+                        inputClassName="!text-sm "
+                        label="Add the agent price of the guest type"
+                      ></Input>
+
+                      {formikEdit.touched.guestTypes &&
+                      formikEdit.errors.guestTypes ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.guestTypes[index].price}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div
+                onClick={() => {
+                  formikEdit.setFieldValue("guestTypes", [
+                    ...formikEdit.values.guestTypes,
+                    { name: "", price: "" },
+                  ]);
                 }}
-                className={"w-full placeholder:text-sm "}
-                inputClassName="!text-sm "
-                label="Add the price of the room on the selected date"
-              ></Input>
-              {formikEdit.touched.price && formikEdit.errors.price ? (
-                <span className="text-sm font-bold text-red-400">
-                  {formikEdit.errors.price}
-                </span>
-              ) : null}
+                className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
+              >
+                Add more
+              </div>
             </div>
           </div>
 
@@ -390,7 +632,7 @@ function RoomAvailability({
               }}
               className="bg-blue-500 w-[60%] flex items-center justify-center gap-1 text-white font-bold px-2 py-1.5 rounded-md"
             >
-              Edit{" "}
+              Update{" "}
               {editAvailabilityLoading && (
                 <div>
                   <LoadingSpinerChase
