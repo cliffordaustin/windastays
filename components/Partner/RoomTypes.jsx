@@ -83,6 +83,16 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
 
   const [nonResidentIsOpen, setNonResidentIsOpen] = React.useState(false);
 
+  const guestOptions = [
+    { value: "ADULT SINGLE", label: "Adult single (12+ years)" },
+    { value: "ADULT DOUBLE", label: "Adult double (12+ years)" },
+    { value: "ADULT TRIPLE", label: "Adult triple (12+ years)" },
+    { value: "CHILD SINGLE", label: "Child single (2 - 11 years)" },
+    { value: "CHILD DOUBLE", label: "Child double (2 - 11 years)" },
+    { value: "CHILD TRIPLE", label: "Child triple (2 - 11 years)" },
+    { value: "INFANT", label: "Infant (Under 2 years)" },
+  ];
+
   const formikAdd = useFormik({
     initialValues: {
       number_of_available_rooms: "",
@@ -280,7 +290,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
           dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
           outsideDialogueClass="!p-0"
           dialoguePanelClassName={
-            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-3xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
+            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-4xl screen-height-safari md:!min-h-0 md:!h-[570px] "
           }
         >
           <div className="px-4 py-2">
@@ -438,6 +448,113 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 </div>
               </div>
 
+              <div className="flex flex-col gap-3 mt-3">
+                {formikAdd.values.guestTypes.map((guest, index) => {
+                  return (
+                    <div key={index} className="flex justify-between">
+                      <div className="w-[47%] flex flex-col gap-1.5">
+                        <h1 className="text-sm font-bold">
+                          Add the type of guest. eg &quot;Adult single&quot;
+                        </h1>
+                        <SelectInput
+                          options={guestOptions}
+                          selectedOption={guestOptions.find(
+                            (option) => option.value === guest.name
+                          )}
+                          instanceId="rooms"
+                          setSelectedOption={(selected) => {
+                            formikAdd.setFieldValue(
+                              `guestTypes[${index}].name`,
+                              selected.value
+                            );
+                          }}
+                          className={
+                            "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                            (formikAdd.touched.guestTypes &&
+                            formikAdd.errors.guestTypes
+                              ? "border-red-500"
+                              : "")
+                          }
+                          placeholder="Select a type of guest"
+                          isSearchable={false}
+                        ></SelectInput>
+
+                        {formikAdd.touched.guestTypes &&
+                        formikAdd.errors.guestTypes ? (
+                          <span className="text-sm font-bold text-red-400">
+                            {formikAdd.errors.guestTypes[index].name}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="w-[47%] gap-2 flex items-center">
+                        <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
+                          <Input
+                            name="price"
+                            type="number"
+                            value={guest.price}
+                            placeholder="Price"
+                            errorStyle={
+                              formikAdd.touched.guestTypes &&
+                              formikAdd.errors.guestTypes
+                                ? true
+                                : false
+                            }
+                            onChange={(e) => {
+                              formikAdd.setFieldValue(
+                                `guestTypes[${index}].price`,
+                                e.target.value
+                              );
+                            }}
+                            className={"w-full placeholder:text-sm "}
+                            inputClassName="!text-sm "
+                            label="Add the agent price of the guest type"
+                          ></Input>
+
+                          {formikAdd.touched.guestTypes &&
+                          formikAdd.errors.guestTypes ? (
+                            <span className="text-sm font-bold text-red-400">
+                              {formikAdd.errors.guestTypes[index].price}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        {index > 0 && (
+                          <div
+                            onClick={() => {
+                              formikAdd.setFieldValue(
+                                "guestTypes",
+                                formikAdd.values.guestTypes.filter(
+                                  (_, i) => i !== index
+                                )
+                              );
+                            }}
+                            className="w-[24px] cursor-pointer h-[24px] bg-red-500 mt-6 rounded-full flex items-center justify-center"
+                          >
+                            <Icon
+                              className="text-white text-lg"
+                              icon="octicon:dash-16"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div
+                  onClick={() => {
+                    formikAdd.setFieldValue("guestTypes", [
+                      ...formikAdd.values.guestTypes,
+                      { name: "", price: "" },
+                    ]);
+                  }}
+                  className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
+                >
+                  Add more
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1">
                 <h1 className="text-sm font-bold">Residency</h1>
 
@@ -452,7 +569,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                     formikAdd.setFieldValue("residency", selected);
                   }}
                   className={
-                    "!w-full !border !rounded-md !text-sm " +
+                    "!w-full !border !rounded-md !text-sm !text-sm py-1 pl-1 " +
                     (formikAdd.touched.residency && formikAdd.errors.residency
                       ? "border-red-500"
                       : "")
@@ -496,109 +613,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 mt-3">
-              {formikAdd.values.guestTypes.map((guest, index) => {
-                return (
-                  <div key={index} className="flex justify-between">
-                    <div className="w-[47%] flex flex-col gap-1">
-                      <Input
-                        name="name"
-                        type="text"
-                        value={guest.name}
-                        placeholder="Type of guest"
-                        errorStyle={
-                          formikAdd.touched.guestTypes &&
-                          formikAdd.errors.guestTypes
-                            ? true
-                            : false
-                        }
-                        onChange={(e) => {
-                          formikAdd.setFieldValue(
-                            `guestTypes[${index}].name`,
-                            e.target.value
-                          );
-                        }}
-                        className={"w-full placeholder:text-sm "}
-                        inputClassName="!text-sm "
-                        label="Add the type of guest. eg 'Adult single'"
-                      ></Input>
-
-                      {formikAdd.touched.guestTypes &&
-                      formikAdd.errors.guestTypes ? (
-                        <span className="text-sm font-bold text-red-400">
-                          {formikAdd.errors.guestTypes[index].name}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div className="w-[47%] gap-2 flex items-center">
-                      <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
-                        <Input
-                          name="price"
-                          type="number"
-                          value={guest.price}
-                          placeholder="Price"
-                          errorStyle={
-                            formikAdd.touched.guestTypes &&
-                            formikAdd.errors.guestTypes
-                              ? true
-                              : false
-                          }
-                          onChange={(e) => {
-                            formikAdd.setFieldValue(
-                              `guestTypes[${index}].price`,
-                              e.target.value
-                            );
-                          }}
-                          className={"w-full placeholder:text-sm "}
-                          inputClassName="!text-sm "
-                          label="Add the agent price of the guest type"
-                        ></Input>
-
-                        {formikAdd.touched.guestTypes &&
-                        formikAdd.errors.guestTypes ? (
-                          <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.guestTypes[index].price}
-                          </span>
-                        ) : null}
-                      </div>
-
-                      {index > 0 && (
-                        <div
-                          onClick={() => {
-                            formikAdd.setFieldValue(
-                              "guestTypes",
-                              formikAdd.values.guestTypes.filter(
-                                (_, i) => i !== index
-                              )
-                            );
-                          }}
-                          className="w-[24px] cursor-pointer h-[24px] bg-red-500 mt-6 rounded-full flex items-center justify-center"
-                        >
-                          <Icon
-                            className="text-white text-lg"
-                            icon="octicon:dash-16"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-
-              <div
-                onClick={() => {
-                  formikAdd.setFieldValue("guestTypes", [
-                    ...formikAdd.values.guestTypes,
-                    { name: "", price: "" },
-                  ]);
-                }}
-                className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
-              >
-                Add more
-              </div>
-            </div>
-
             {/* <p className="font-bold mb-2 mt-4 text-sm">Note:</p>
             <div className="mb-3 flex flex-col gap-1">
               <ListItem>
@@ -611,7 +625,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
               <ListItem>Price is in USD.</ListItem>
             </div> */}
 
-            <div className="flex items-center gap-4 mt-6">
+            <div className="flex items-center gap-4 mt-12">
               <button
                 onClick={() => {
                   setOpenAddAvailabilityModal(false);

@@ -7,6 +7,9 @@ import { Icon } from "@iconify/react";
 import Cookies from "js-cookie";
 import { DayPicker } from "react-day-picker";
 import { useRouter } from "next/router";
+import PopoverBox from "../ui/Popover";
+import axios from "axios";
+import SelectedListingCard from "./SelectedListingCard";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -132,9 +135,6 @@ function SelectedListing({ listing, index }) {
             />
           </div>
           <h1 className="font-bold">{listing.name}</h1>
-          <div className="w-5 h-5 rounded-md bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold">
-            {listing.room_types.length}
-          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -151,11 +151,124 @@ function SelectedListing({ listing, index }) {
           </button>
         </div>
       </div>
-      {isOpen && (
+      {/* {isOpen && (
         <div className="w-full mt-2 bg-white">
           {data.length > 0 && <Table columns={columns} data={data}></Table>}
         </div>
-      )}
+      )} */}
+
+      <div className="px-2 py-2 flex h-[160px] w-full rounded-xl bg-white mt-2">
+        <div className="w-fit flex flex-col justify-around">
+          <div>
+            <div className="flex items-center gap-1 px-2 py-1 text-gray-500 bg-gray-100 rounded-md border w-fit">
+              {router.query.residentAdult && (
+                <h1 className="font-bold text-sm">
+                  {router.query.residentAdult}{" "}
+                  {router.query.residentAdult > 1
+                    ? "Resident adults"
+                    : "Resident adult"}
+                </h1>
+              )}
+
+              <h1> | </h1>
+
+              {router.query.residentChild && (
+                <h1 className="font-bold text-sm">
+                  {router.query.residentChild}{" "}
+                  {router.query.residentChild > 1
+                    ? "Resident children"
+                    : "Resident child"}
+                </h1>
+              )}
+
+              <h1> | </h1>
+
+              {router.query.nonResidentAdult && (
+                <h1 className="font-bold text-sm">
+                  {router.query.nonResidentAdult}{" "}
+                  {router.query.nonResidentAdult > 1
+                    ? "Non-resident adults"
+                    : "Non-resident adult"}
+                </h1>
+              )}
+
+              <h1> | </h1>
+
+              {router.query.nonResidentChild && (
+                <h1 className="font-bold text-sm">
+                  {router.query.nonResidentChild}{" "}
+                  {router.query.nonResidentChild > 1
+                    ? "Non-resident children"
+                    : "Non-resident child"}
+                </h1>
+              )}
+
+              {/* <h1> | </h1>
+
+              {router.query.infantResident && (
+                <h1 className="font-bold text-sm">
+                  {router.query.infantResident}{" "}
+                  {router.query.infantResident > 1
+                    ? "Resident infants"
+                    : "Resident infant"}
+                </h1>
+              )}
+
+              <h1> | </h1>
+
+              {router.query.infantNonResident && (
+                <h1 className="font-bold text-sm">
+                  {router.query.infantNonResident}{" "}
+                  {router.query.infantNonResident > 1
+                    ? "Non-resident infants"
+                    : "Non-resident infant"}
+                </h1>
+              )} */}
+            </div>
+
+            <div className="mt-2 ml-1">
+              {router.query.agentCommission && (
+                <h1 className="underline underline-offset-2 text-sm decoration-dashed">
+                  Based on{" "}
+                  <span className="font-black">
+                    {router.query.agentCommission}%
+                  </span>{" "}
+                  commission
+                </h1>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 flex gap-4 items-center justify-self-start">
+            <h1 className="text-4xl font-SourceSans text-gray-600 font-semibold">
+              {moment(router.query.date).format("MMM Do")}
+            </h1>
+
+            <div className="w-fit flex items-center">
+              <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+              <div className="h-[2px] w-[70px] bg-gray-200"></div>
+              <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+            </div>
+
+            <h1 className="text-4xl font-SourceSans font-semibold text-gray-600">
+              {moment(router.query.endDate).format("MMM Do")}
+            </h1>
+          </div>
+        </div>
+
+        <div className="bg-gray-200 w-[1px] h-full ml-6"></div>
+
+        <div className="flex gap-4 w-[60%] h-full px-6">
+          {listing.room_types.map((item, index) => {
+            return (
+              <SelectedListingCard
+                key={index}
+                room={item}
+              ></SelectedListingCard>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

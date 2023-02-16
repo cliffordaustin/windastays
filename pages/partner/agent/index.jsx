@@ -9,23 +9,48 @@ import { Icon } from "@iconify/react";
 import { Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import SelectedListings from "../../../components/Agents/SelectedListings";
+import moment from "moment";
 
 function Agents({ userProfile, stays }) {
   const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
-      location: "",
-      date: "",
-      guests: 1,
+      location: router.query.location || "",
+      date: {
+        from: router.query.date ? new Date(router.query.date) : "",
+        to: router.query.endDate ? new Date(router.query.endDate) : "",
+      },
+      residentAdult: Number(router.query.residentAdult) || 1,
+      nonResidentAdult: Number(router.query.nonResidentAdult) || 0,
+      residentChild: Number(router.query.residentChild) || 0,
+      nonResidentChild: Number(router.query.nonResidentChild) || 0,
+      infantResident: Number(router.query.infantResident) || 0,
+      infantNonResident: Number(router.query.infantNonResident) || 0,
     },
     validationSchema: Yup.object({
       location: Yup.string(),
       date: Yup.object(),
-      guests: Yup.number(),
+      residentAdult: Yup.number(),
+      nonResidentAdult: Yup.number(),
+      residentChild: Yup.number(),
+      nonResidentChild: Yup.number(),
+      infantResident: Yup.number(),
+      infantNonResident: Yup.number(),
     }),
     onSubmit: async (values) => {
-      console.log(values);
+      router.replace(
+        {
+          query: {
+            ...router.query,
+            ...values,
+            date: moment(values.date.from).format("YYYY-MM-DD"),
+            endDate: moment(values.date.to).format("YYYY-MM-DD"),
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
     },
   });
 
