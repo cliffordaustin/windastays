@@ -23,9 +23,11 @@ function AddAvailability({ stay }) {
   const formikCreate = useFormik({
     initialValues: {
       name: "",
+      capacity: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please enter a name for the room"),
+      capacity: Yup.string().required("Please enter a capacity for the room"),
     }),
     onSubmit: (values) => {
       setCreateRoomLoading(true);
@@ -34,6 +36,7 @@ function AddAvailability({ stay }) {
           `${process.env.NEXT_PUBLIC_baseURL}/stays/${router.query.slug}/add-room-type/`,
           {
             name: values.name,
+            capacity: values.capacity,
           },
           {
             headers: {
@@ -194,6 +197,33 @@ function AddAvailability({ stay }) {
                   {formikCreate.touched.name && formikCreate.errors.name ? (
                     <span className="text-sm font-bold text-red-400">
                       {formikCreate.errors.name}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <Input
+                    name="capacity"
+                    type="number"
+                    value={formikCreate.values.capacity}
+                    placeholder="Enter the capacity of the room. eg. 2"
+                    errorStyle={
+                      formikCreate.touched.capacity &&
+                      formikCreate.errors.capacity
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikCreate.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Room capacity"
+                  ></Input>
+                  {formikCreate.touched.capacity &&
+                  formikCreate.errors.capacity ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikCreate.errors.capacity}
                     </span>
                   ) : null}
                 </div>

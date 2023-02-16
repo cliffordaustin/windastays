@@ -84,13 +84,13 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
   const [nonResidentIsOpen, setNonResidentIsOpen] = React.useState(false);
 
   const guestOptions = [
-    { value: "ADULT SINGLE", label: "Adult single (12+ years)" },
-    { value: "ADULT DOUBLE", label: "Adult double (12+ years)" },
-    { value: "ADULT TRIPLE", label: "Adult triple (12+ years)" },
-    { value: "CHILD SINGLE", label: "Child single (2 - 11 years)" },
-    { value: "CHILD DOUBLE", label: "Child double (2 - 11 years)" },
-    { value: "CHILD TRIPLE", label: "Child triple (2 - 11 years)" },
-    { value: "INFANT", label: "Infant (Under 2 years)" },
+    { value: "ADULT SINGLE", label: "Adult single" },
+    { value: "ADULT DOUBLE", label: "Adult double" },
+    { value: "ADULT TRIPLE", label: "Adult triple" },
+    { value: "CHILD SINGLE", label: "Child single" },
+    { value: "CHILD DOUBLE", label: "Child double" },
+    { value: "CHILD TRIPLE", label: "Child triple" },
+    { value: "INFANT", label: "Infant" },
   ];
 
   const formikAdd = useFormik({
@@ -107,6 +107,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
       guestTypes: [
         {
           name: "",
+          age_group: "",
           price: "",
         },
       ],
@@ -126,6 +127,9 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
         Yup.object().shape({
           name: Yup.string().required("Guest type is required"),
           price: Yup.number().required("Price is required"),
+          age_group: Yup.string()
+            .required("Age group is required")
+            .max(100, "Age group must be less than 100 characters"),
         })
       ),
     }),
@@ -255,6 +259,10 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             />
           </div>
           <h1 className="font-bold">{room.name}</h1>
+
+          <div className="text-sm font-bold px-2 py-0.5 rounded-md bg-gray-200">
+            Capacity: {room.capacity}
+          </div>
         </div>
 
         {!inPartnerHomepage && (
@@ -452,7 +460,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 {formikAdd.values.guestTypes.map((guest, index) => {
                   return (
                     <div key={index} className="flex justify-between">
-                      <div className="w-[47%] flex flex-col gap-1.5">
+                      <div className="w-[31%] flex flex-col gap-1.5">
                         <h1 className="text-sm font-bold">
                           Add the type of guest. eg &quot;Adult single&quot;
                         </h1>
@@ -487,7 +495,37 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         ) : null}
                       </div>
 
-                      <div className="w-[47%] gap-2 flex items-center">
+                      <div className="w-[31%] flex flex-col gap-1.5">
+                        <Input
+                          name="age_group"
+                          type="text"
+                          value={guest.age_group}
+                          placeholder="Enter age group."
+                          errorStyle={
+                            formikAdd.touched.age_group &&
+                            formikAdd.errors.age_group
+                              ? true
+                              : false
+                          }
+                          onChange={(e) => {
+                            formikAdd.setFieldValue(
+                              `guestTypes[${index}].age_group`,
+                              e.target.value
+                            );
+                          }}
+                          className={"w-full placeholder:text-sm "}
+                          inputClassName="!text-sm "
+                          label="Age group. eg '12-18 years', '18+ years'"
+                        ></Input>
+                        {formikAdd.touched.age_group &&
+                        formikAdd.errors.age_group ? (
+                          <span className="text-sm font-bold text-red-400">
+                            {formikAdd.errors.guestTypes[index].age_group}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="w-[31%] gap-2 flex items-center">
                         <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
                           <Input
                             name="price"

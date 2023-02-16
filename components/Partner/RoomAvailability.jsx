@@ -14,6 +14,7 @@ import { Icon } from "@iconify/react";
 import axios from "axios";
 import LoadingSpinerChase from "../ui/LoadingSpinerChase";
 import Cookies from "js-cookie";
+import SelectInput from "../ui/SelectInput";
 
 function RoomAvailability({
   availability,
@@ -35,6 +36,16 @@ function RoomAvailability({
   const [openEditAvailabilityModal, setOpenEditAvailabilityModal] =
     React.useState(false);
 
+  const guestOptions = [
+    { value: "ADULT SINGLE", label: "Adult single" },
+    { value: "ADULT DOUBLE", label: "Adult double" },
+    { value: "ADULT TRIPLE", label: "Adult triple" },
+    { value: "CHILD SINGLE", label: "Child single" },
+    { value: "CHILD DOUBLE", label: "Child double" },
+    { value: "CHILD TRIPLE", label: "Child triple" },
+    { value: "INFANT", label: "Infant" },
+  ];
+
   const formikEdit = useFormik({
     initialValues: {
       number_of_available_rooms: "",
@@ -42,6 +53,7 @@ function RoomAvailability({
       guestTypes: [
         {
           name: "",
+          age_group: "",
           price: "",
         },
       ],
@@ -57,6 +69,9 @@ function RoomAvailability({
         Yup.object().shape({
           name: Yup.string().required("Guest type is required"),
           price: Yup.number().required("Price is required"),
+          age_group: Yup.string()
+            .required("Age group is required")
+            .max(100, "Age group must be less than 100 characters"),
         })
       ),
     }),
@@ -446,7 +461,7 @@ function RoomAvailability({
         dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
         outsideDialogueClass="!p-0"
         dialoguePanelClassName={
-          "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-3xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
+          "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-4xl screen-height-safari md:!min-h-0 md:!max-h-[600px] "
         }
       >
         <div className="px-4 py-2">
@@ -535,7 +550,7 @@ function RoomAvailability({
             </div>
 
             <div className="flex flex-col gap-2 mt-3">
-              {formikEdit.values.guestTypes.map((guest, index) => {
+              {/* {formikEdit.values.guestTypes.map((guest, index) => {
                 return (
                   <div key={index} className="flex justify-between">
                     <div className="w-[47%] flex flex-col gap-1">
@@ -598,6 +613,130 @@ function RoomAvailability({
                           {formikEdit.errors.guestTypes[index].price}
                         </span>
                       ) : null}
+                    </div>
+                  </div>
+                );
+              })} */}
+
+              {formikEdit.values.guestTypes.map((guest, index) => {
+                return (
+                  <div key={index} className="flex justify-between">
+                    <div className="w-[31%] flex flex-col gap-1.5">
+                      <h1 className="text-sm font-bold">
+                        Add the type of guest. eg &quot;Adult single&quot;
+                      </h1>
+
+                      <SelectInput
+                        options={guestOptions}
+                        selectedOption={guestOptions.find(
+                          (option) => option.value === guest.name
+                        )}
+                        instanceId="rooms"
+                        setSelectedOption={(selected) => {
+                          formikEdit.setFieldValue(
+                            `guestTypes[${index}].name`,
+                            selected.value
+                          );
+                        }}
+                        className={
+                          "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                          (formikEdit.touched.guestTypes &&
+                          formikEdit.errors.guestTypes
+                            ? "border-red-500"
+                            : "")
+                        }
+                        placeholder="Select a type of guest"
+                        isSearchable={false}
+                      ></SelectInput>
+
+                      {formikEdit.touched.guestTypes &&
+                      formikEdit.errors.guestTypes ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.guestTypes[index].name}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="w-[31%] flex flex-col gap-1.5">
+                      <Input
+                        name="age_group"
+                        type="text"
+                        value={guest.age_group}
+                        placeholder="Enter age group."
+                        errorStyle={
+                          formikEdit.touched.age_group &&
+                          formikEdit.errors.age_group
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => {
+                          formikEdit.setFieldValue(
+                            `guestTypes[${index}].age_group`,
+                            e.target.value
+                          );
+                        }}
+                        className={"w-full placeholder:text-sm "}
+                        inputClassName="!text-sm "
+                        label="Age group. eg '12-18 years', '18+ years'"
+                      ></Input>
+                      {formikEdit.touched.age_group &&
+                      formikEdit.errors.age_group ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.guestTypes[index].age_group}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="w-[31%] gap-2 flex items-center">
+                      <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
+                        <Input
+                          name="price"
+                          type="number"
+                          value={guest.price}
+                          placeholder="Price"
+                          errorStyle={
+                            formikEdit.touched.guestTypes &&
+                            formikEdit.errors.guestTypes
+                              ? true
+                              : false
+                          }
+                          onChange={(e) => {
+                            formikEdit.setFieldValue(
+                              `guestTypes[${index}].price`,
+                              e.target.value
+                            );
+                          }}
+                          className={"w-full placeholder:text-sm "}
+                          inputClassName="!text-sm "
+                          label="Add the agent price of the guest type"
+                        ></Input>
+
+                        {formikEdit.touched.guestTypes &&
+                        formikEdit.errors.guestTypes ? (
+                          <span className="text-sm font-bold text-red-400">
+                            {formikEdit.errors.guestTypes[index].price}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {index > 0 && (
+                        <div
+                          onClick={() => {
+                            formikEdit.setFieldValue(
+                              "guestTypes",
+                              formikEdit.values.guestTypes.filter(
+                                (_, i) => i !== index
+                              )
+                            );
+                          }}
+                          className="w-[24px] cursor-pointer h-[24px] bg-red-500 mt-6 rounded-full flex items-center justify-center"
+                        >
+                          <Icon
+                            className="text-white text-lg"
+                            icon="octicon:dash-16"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
