@@ -24,10 +24,14 @@ function AddAvailability({ stay }) {
     initialValues: {
       name: "",
       capacity: "",
+      childCapacity: "",
+      infantCapacity: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please enter a name for the room"),
-      capacity: Yup.string().required("Please enter a capacity for the room"),
+      capacity: Yup.number().required("Please enter a capacity for the room"),
+      childCapacity: Yup.number(),
+      infantCapacity: Yup.number(),
     }),
     onSubmit: (values) => {
       setCreateRoomLoading(true);
@@ -37,6 +41,8 @@ function AddAvailability({ stay }) {
           {
             name: values.name,
             capacity: values.capacity,
+            child_capacity: values.childCapacity,
+            infant_capacity: values.infantCapacity,
           },
           {
             headers: {
@@ -173,7 +179,7 @@ function AddAvailability({ stay }) {
             >
               <Popover.Panel
                 className={
-                  "absolute z-[30] bg-white rounded-xl !right-0 shadow-md mt-2 border w-[400px] px-3 py-3"
+                  "absolute z-[30] bg-white rounded-xl !right-0 shadow-md mt-2 border w-[500px] px-3 py-3"
                 }
               >
                 <div>
@@ -218,7 +224,7 @@ function AddAvailability({ stay }) {
                     }}
                     className={"w-full placeholder:text-sm "}
                     inputClassName="!text-sm "
-                    label="Room capacity"
+                    label="Adult capacity"
                   ></Input>
                   {formikCreate.touched.capacity &&
                   formikCreate.errors.capacity ? (
@@ -226,6 +232,62 @@ function AddAvailability({ stay }) {
                       {formikCreate.errors.capacity}
                     </span>
                   ) : null}
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="mt-2 w-[50%]">
+                    <Input
+                      name="childCapacity"
+                      type="number"
+                      value={formikCreate.values.childCapacity}
+                      placeholder="Enter the capacity of the room. eg. 2"
+                      errorStyle={
+                        formikCreate.touched.childCapacity &&
+                        formikCreate.errors.childCapacity
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        formikCreate.handleChange(e);
+                      }}
+                      className={"w-full placeholder:text-sm "}
+                      inputClassName="!text-sm "
+                      label="Child capacity"
+                    ></Input>
+                    {formikCreate.touched.childCapacity &&
+                    formikCreate.errors.childCapacity ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikCreate.errors.childCapacity}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-2 w-[50%]">
+                    <Input
+                      name="infantCapacity"
+                      type="number"
+                      value={formikCreate.values.infantCapacity}
+                      placeholder="Enter the capacity of the room. eg. 2"
+                      errorStyle={
+                        formikCreate.touched.infantCapacity &&
+                        formikCreate.errors.infantCapacity
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        formikCreate.handleChange(e);
+                      }}
+                      className={"w-full placeholder:text-sm "}
+                      inputClassName="!text-sm "
+                      label="Infant capacity"
+                    ></Input>
+                    {formikCreate.touched.infantCapacity &&
+                    formikCreate.errors.infantCapacity ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikCreate.errors.infantCapacity}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div className="flex justify-end mt-4">

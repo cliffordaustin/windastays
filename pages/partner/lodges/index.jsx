@@ -9,10 +9,6 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import Calendar from "../../../components/Partner/Calendar";
-import Events from "../../../components/Partner/Events";
-import Analytics from "../../../components/Partner/Analytics";
-import SelectOptions from "../../../components/Partner/SelectOptions";
 import Accommodation from "../../../components/Partner/Accommodation";
 import Button from "../../../components/ui/Button";
 import LoadingSpinerChase from "../../../components/ui/LoadingSpinerChase";

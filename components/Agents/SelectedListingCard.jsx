@@ -9,7 +9,7 @@ import pricing from "../../lib/pricingCalc";
 import Price from "../Stay/Price";
 import moment from "moment";
 
-function SelectedListingCard({ room }) {
+function SelectedListingCard({ room, addedRooms }) {
   const router = useRouter();
 
   const [roomAvailabilities, setRoomAvailabilities] = React.useState([]);
@@ -21,7 +21,13 @@ function SelectedListingCard({ room }) {
     if (router.query.date && router.query.endDate) {
       axios
         .get(
-          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/resident-availabilities/?start_date=${router.query.date}&end_date=${router.query.endDate}`,
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${
+            room.slug
+          }/resident-availabilities/?start_date=${
+            router.query.date
+          }&end_date=${moment(router.query.endDate)
+            .subtract(1, "days")
+            .format("YYYY-MM-DD")}`,
           {
             headers: {
               Authorization: "Token " + Cookies.get("token"),
@@ -34,7 +40,13 @@ function SelectedListingCard({ room }) {
 
       axios
         .get(
-          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/nonresident-availabilities/?start_date=${router.query.date}&end_date=${router.query.endDate}`,
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${
+            room.slug
+          }/nonresident-availabilities/?start_date=${
+            router.query.date
+          }&end_date=${moment(router.query.endDate)
+            .subtract(1, "days")
+            .format("YYYY-MM-DD")}`,
           {
             headers: {
               Authorization: "Token " + Cookies.get("token"),
@@ -47,102 +59,289 @@ function SelectedListingCard({ room }) {
     }
   }, [router.query.date, router.query.endDate]);
 
-  const singleResidentAdultPrice =
-    pricing.singleResidentAdultPrice(roomAvailabilities);
-
-  const singleNonResidentAdultPrice = pricing.singleNonResidentAdultPrice(
-    roomAvailabilitiesNonResident
+  const singleResidentAdultPrice = React.useMemo(
+    () => pricing.singleResidentAdultPrice(roomAvailabilities),
+    [roomAvailabilities]
   );
 
-  const singleResidentChildPrice =
-    pricing.singleResidentChildPrice(roomAvailabilities);
-
-  const singleNonResidentChildPrice = pricing.singleNonResidentChildPrice(
-    roomAvailabilitiesNonResident
+  const singleNonResidentAdultPrice = React.useMemo(
+    () => pricing.singleNonResidentAdultPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
   );
 
-  const doubleResidentAdultPrice =
-    pricing.doubleResidentAdultPrice(roomAvailabilities);
-
-  const doubleNonResidentAdultPrice = pricing.doubleNonResidentAdultPrice(
-    roomAvailabilitiesNonResident
+  const singleResidentChildPrice = React.useMemo(
+    () => pricing.singleResidentChildPrice(roomAvailabilities),
+    [roomAvailabilities]
   );
 
-  const doubleResidentChildPrice =
-    pricing.doubleResidentChildPrice(roomAvailabilities);
-
-  const doubleNonResidentChildPrice = pricing.doubleNonResidentChildPrice(
-    roomAvailabilitiesNonResident
+  const singleNonResidentChildPrice = React.useMemo(
+    () => pricing.singleNonResidentChildPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
   );
 
-  const tripleResidentAdultPrice =
-    pricing.tripleResidentAdultPrice(roomAvailabilities);
-
-  const tripleNonResidentAdultPrice = pricing.tripleNonResidentAdultPrice(
-    roomAvailabilitiesNonResident
+  const doubleResidentAdultPrice = React.useMemo(
+    () => pricing.doubleResidentAdultPrice(roomAvailabilities),
+    [roomAvailabilities]
   );
 
-  const tripleResidentChildPrice =
-    pricing.tripleResidentChildPrice(roomAvailabilities);
-
-  const tripleNonResidentChildPrice = pricing.tripleNonResidentChildPrice(
-    roomAvailabilitiesNonResident
+  const doubleNonResidentAdultPrice = React.useMemo(
+    () => pricing.doubleNonResidentAdultPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
   );
 
-  const infantResidentPrice = pricing.infantResidentPrice(roomAvailabilities);
+  const doubleResidentChildPrice = React.useMemo(
+    () => pricing.doubleResidentChildPrice(roomAvailabilities),
+    [roomAvailabilities]
+  );
 
-  const infantNonResidentPrice = pricing.infantNonResidentPrice(
-    roomAvailabilitiesNonResident
+  const doubleNonResidentChildPrice = React.useMemo(
+    () => pricing.doubleNonResidentChildPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
+  );
+
+  const tripleResidentAdultPrice = React.useMemo(
+    () => pricing.tripleResidentAdultPrice(roomAvailabilities),
+    [roomAvailabilities]
+  );
+
+  const tripleNonResidentAdultPrice = React.useMemo(
+    () => pricing.tripleNonResidentAdultPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
+  );
+
+  const tripleResidentChildPrice = React.useMemo(
+    () => pricing.tripleResidentChildPrice(roomAvailabilities),
+    [roomAvailabilities]
+  );
+
+  const tripleNonResidentChildPrice = React.useMemo(
+    () => pricing.tripleNonResidentChildPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
+  );
+
+  const infantResidentPrice = React.useMemo(
+    () => pricing.infantResidentPrice(roomAvailabilities),
+    [roomAvailabilities]
+  );
+
+  const infantNonResidentPrice = React.useMemo(
+    () => pricing.infantNonResidentPrice(roomAvailabilitiesNonResident),
+    [roomAvailabilitiesNonResident]
   );
 
   const nights = moment
     .duration(moment(router.query.endDate).diff(moment(router.query.date)))
     .asDays();
 
+  const numberOfResidentAdult = React.useMemo(
+    () =>
+      addedRooms.reduce((acc, cur) => {
+        return acc + cur.residentAdult;
+      }, 0),
+    [addedRooms]
+  );
+
+  const numberOfNonResidentAdult = React.useMemo(
+    () => addedRooms.reduce((acc, cur) => acc + cur.nonResidentAdult, 0),
+    [addedRooms]
+  );
+
+  const numberOfResidentChild = React.useMemo(
+    () => addedRooms.reduce((acc, cur) => acc + cur.residentChild, 0),
+    [addedRooms]
+  );
+
+  const numberOfNonResidentChild = React.useMemo(
+    () => addedRooms.reduce((acc, cur) => acc + cur.nonResidentChild, 0),
+    [addedRooms]
+  );
+
+  const numberOfInfantResident = React.useMemo(
+    () => addedRooms.reduce((acc, cur) => acc + cur.infantResident, 0),
+    [addedRooms]
+  );
+
+  const numberOfInfantNonResident = React.useMemo(
+    () => addedRooms.reduce((acc, cur) => acc + cur.infantNonResident, 0),
+    [addedRooms]
+  );
+
+  const singleResidentAdultPriceCalc = singleResidentAdultPrice;
+
+  const doubleResidentAdultPriceCalc = doubleResidentAdultPrice
+    ? doubleResidentAdultPrice
+    : singleResidentAdultPriceCalc * 2;
+
+  const tripleResidentAdultPriceCalc = tripleResidentAdultPrice
+    ? tripleResidentAdultPrice
+    : singleResidentAdultPriceCalc && doubleResidentAdultPriceCalc
+    ? doubleResidentAdultPriceCalc + singleResidentAdultPriceCalc
+    : singleResidentAdultPriceCalc * 3;
+
+  const singleNonResidentAdultPriceCalc = singleNonResidentAdultPrice;
+
+  const doubleNonResidentAdultPriceCalc = doubleNonResidentAdultPrice
+    ? doubleNonResidentAdultPrice
+    : singleNonResidentAdultPriceCalc * 2;
+
+  const tripleNonResidentAdultPriceCalc = tripleNonResidentAdultPrice
+    ? tripleNonResidentAdultPrice
+    : singleNonResidentAdultPriceCalc && doubleNonResidentAdultPriceCalc
+    ? doubleNonResidentAdultPriceCalc + singleNonResidentAdultPriceCalc
+    : singleNonResidentAdultPriceCalc * 3;
+
+  const singleResidentChildPriceCalc = singleResidentChildPrice;
+
+  const doubleResidentChildPriceCalc = doubleResidentChildPrice
+    ? doubleResidentChildPrice
+    : singleResidentChildPriceCalc * 2;
+
+  const tripleResidentChildPriceCalc = tripleResidentChildPrice
+    ? tripleResidentChildPrice
+    : singleResidentChildPriceCalc && doubleResidentChildPriceCalc
+    ? doubleResidentChildPriceCalc + singleResidentChildPriceCalc
+    : singleResidentChildPriceCalc * 3;
+
+  const singleNonResidentChildPriceCalc = singleNonResidentChildPrice;
+
+  const doubleNonResidentChildPriceCalc = doubleNonResidentChildPrice
+    ? doubleNonResidentChildPrice
+    : singleNonResidentChildPriceCalc * 2;
+
+  const tripleNonResidentChildPriceCalc = tripleNonResidentChildPrice
+    ? tripleNonResidentChildPrice
+    : singleNonResidentChildPriceCalc && doubleNonResidentChildPriceCalc
+    ? doubleNonResidentChildPriceCalc + singleNonResidentChildPriceCalc
+    : singleNonResidentChildPriceCalc * 3;
+
+  const infantResidentPriceCalc = infantResidentPrice;
+
+  const infantNonResidentPriceCalc = infantNonResidentPrice;
+
+  function bestPricing(numGuests) {
+    if (numGuests <= 0) {
+      return []; // No guests, so return empty array
+    } else if (numGuests === 1) {
+      return ["single"]; // Only one guest, so use single room
+    } else if (numGuests === 2) {
+      return ["double"]; // Two guests, so use double room
+    } else if (numGuests === 3) {
+      return ["triple"]; // Three guests, so use triple room
+    } else if (numGuests % 3 === 0) {
+      return Array(numGuests / 3).fill("triple"); // Use all triple rooms
+    } else if (numGuests % 3 === 1) {
+      // Use one single room and the rest as triple rooms
+      return ["single"].concat(Array((numGuests - 1) / 3).fill("triple"));
+    } else {
+      // Use one double room and the rest as triple rooms
+      return ["double"].concat(Array((numGuests - 2) / 3).fill("triple"));
+    }
+  }
+
+  function calculateCost(numGuests, singlePrice, doublePrice, triplePrice) {
+    const roomTypes = bestPricing(
+      numGuests,
+      singlePrice,
+      doublePrice,
+      triplePrice
+    );
+    let totalCost = 0;
+    for (let i = 0; i < roomTypes.length; i++) {
+      if (roomTypes[i] === "single") {
+        totalCost += singlePrice;
+      } else if (roomTypes[i] === "double") {
+        totalCost += doublePrice;
+      } else {
+        totalCost += triplePrice;
+      }
+    }
+    return totalCost;
+  }
+
+  const totalResidentAdultMoreThanThree = calculateCost(
+    numberOfResidentAdult,
+    singleResidentAdultPriceCalc,
+    doubleResidentAdultPriceCalc,
+    tripleResidentAdultPriceCalc
+  );
+
+  const totalNonResidentAdultMoreThanThree = calculateCost(
+    numberOfNonResidentAdult,
+    singleNonResidentAdultPriceCalc,
+    doubleNonResidentAdultPriceCalc,
+    tripleNonResidentAdultPriceCalc
+  );
+
+  const totalResidentChildMoreThanThree = calculateCost(
+    numberOfResidentChild,
+    singleResidentChildPriceCalc,
+    doubleResidentChildPriceCalc,
+    tripleResidentChildPriceCalc
+  );
+
+  const totalNonResidentChildMoreThanThree = calculateCost(
+    numberOfNonResidentChild,
+    singleNonResidentChildPriceCalc,
+    doubleNonResidentChildPriceCalc,
+    tripleNonResidentChildPriceCalc
+  );
+
   const getTotalPrice = () => {
     let total = 0;
 
-    if (Number(router.query.residentAdult) === 1) {
-      total += singleResidentAdultPrice;
+    if (numberOfResidentAdult === 1) {
+      total += singleResidentAdultPriceCalc;
     }
-    if (Number(router.query.residentAdult) === 2) {
-      total += doubleResidentAdultPrice;
+    if (numberOfResidentAdult === 2) {
+      total += doubleResidentAdultPriceCalc;
     }
-    if (Number(router.query.residentAdult) === 3) {
-      total += tripleResidentAdultPrice;
+    if (numberOfResidentAdult === 3) {
+      total += tripleResidentAdultPriceCalc;
     }
-    if (Number(router.query.nonResidentAdult) === 1) {
-      total += singleNonResidentAdultPrice;
+    if (numberOfResidentAdult > 3) {
+      total += totalResidentAdultMoreThanThree;
     }
-    if (Number(router.query.nonResidentAdult) === 2) {
-      total += doubleNonResidentAdultPrice;
+    if (numberOfNonResidentAdult === 1) {
+      total += singleNonResidentAdultPriceCalc;
     }
-    if (Number(router.query.nonResidentAdult) === 3) {
-      total += tripleNonResidentAdultPrice;
+    if (numberOfNonResidentAdult === 2) {
+      total += doubleNonResidentAdultPriceCalc;
     }
-    if (Number(router.query.residentChild) === 1) {
-      total += singleResidentChildPrice;
+    if (numberOfNonResidentAdult === 3) {
+      total += tripleNonResidentAdultPriceCalc;
     }
-    if (Number(router.query.residentChild) === 2) {
-      total += doubleResidentChildPrice;
+    if (numberOfNonResidentAdult > 3) {
+      total += totalNonResidentAdultMoreThanThree;
     }
-    if (Number(router.query.residentChild) === 3) {
-      total += tripleResidentChildPrice;
+    if (numberOfResidentChild === 1) {
+      total += singleResidentChildPriceCalc;
     }
-    if (Number(router.query.nonResidentChild) === 1) {
-      total += singleNonResidentChildPrice;
+    if (numberOfResidentChild === 2) {
+      total += doubleResidentChildPriceCalc;
     }
-    if (Number(router.query.nonResidentChild) === 2) {
-      total += doubleNonResidentChildPrice;
+    if (numberOfResidentChild === 3) {
+      total += tripleResidentChildPriceCalc;
     }
-    if (Number(router.query.nonResidentChild) === 3) {
-      total += tripleNonResidentChildPrice;
+    if (numberOfResidentChild > 3) {
+      total += totalResidentChildMoreThanThree;
     }
-    if (Number(router.query.infantResident) > 0) {
-      total += infantResidentPrice * Number(router.query.infantResident);
+    if (numberOfNonResidentChild === 1) {
+      total += singleNonResidentChildPriceCalc;
     }
-    if (Number(router.query.infantNonResident) > 0) {
-      total += infantNonResidentPrice * Number(router.query.infantNonResident);
+    if (numberOfNonResidentChild === 2) {
+      total += doubleNonResidentChildPriceCalc;
+    }
+    if (numberOfNonResidentChild === 3) {
+      total += tripleNonResidentChildPriceCalc;
+    }
+    if (numberOfNonResidentChild > 3) {
+      total += totalNonResidentChildMoreThanThree;
+    }
+    if (numberOfInfantResident > 0) {
+      total += infantResidentPriceCalc * numberOfInfantResident;
+    }
+    if (numberOfInfantNonResident > 0) {
+      total += infantNonResidentPriceCalc * numberOfInfantNonResident;
     }
 
     return total;
@@ -175,163 +374,229 @@ function SelectedListingCard({ room }) {
       >
         <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1>
         <div className="flex flex-col gap-2">
-          {Number(router.query.residentAdult) === 1 && (
+          {numberOfResidentAdult === 1 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Single resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={singleResidentAdultPrice}
+                stayPrice={singleResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.residentAdult) === 2 && (
+          {numberOfResidentAdult === 2 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Double resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={doubleResidentAdultPrice}
+                stayPrice={doubleResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.residentAdult) === 3 && (
+          {numberOfResidentAdult === 3 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Triple resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={tripleResidentAdultPrice}
+                stayPrice={tripleResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentAdult) === 1 && (
+          {numberOfResidentAdult > 3 && (
+            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+              <h1 className="text-sm font-semibold">
+                Resident adult ({nights} nights) x {numberOfResidentAdult}
+              </h1>
+
+              <Price
+                stayPrice={totalResidentAdultMoreThanThree}
+                className="!font-normal !text-sm !font-SourceSans"
+              ></Price>
+            </div>
+          )}
+
+          {numberOfNonResidentAdult === 1 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Single non-resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={singleNonResidentAdultPrice}
+                stayPrice={singleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentAdult) === 2 && (
+          {numberOfNonResidentAdult === 2 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Double non-resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={doubleNonResidentAdultPrice}
+                stayPrice={doubleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentAdult) === 3 && (
+          {numberOfNonResidentAdult === 3 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Triple non-resident adult ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={tripleNonResidentAdultPrice}
+                stayPrice={tripleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.residentChild) === 1 && (
+          {numberOfNonResidentAdult > 3 && (
+            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+              <h1 className="text-sm font-semibold">
+                Non-resident adult ({nights} nights) x{" "}
+                {numberOfNonResidentAdult}
+              </h1>
+
+              <Price
+                stayPrice={totalNonResidentAdultMoreThanThree}
+                className="!font-normal !text-sm !font-SourceSans"
+              ></Price>
+            </div>
+          )}
+
+          {numberOfResidentChild === 1 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Single resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={singleResidentChildPrice}
+                stayPrice={singleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.residentChild) === 2 && (
+          {numberOfResidentChild === 2 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Double resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={doubleResidentChildPrice}
+                stayPrice={doubleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.residentChild) === 3 && (
+          {numberOfResidentChild === 3 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Triple resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={tripleResidentChildPrice}
+                stayPrice={tripleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentChild) === 1 && (
+          {numberOfResidentChild > 3 && (
+            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+              <h1 className="text-sm font-semibold">
+                Resident child ({nights} nights) x {numberOfResidentChild}
+              </h1>
+
+              <Price
+                stayPrice={totalResidentChildMoreThanThree}
+                className="!font-normal !text-sm !font-SourceSans"
+              ></Price>
+            </div>
+          )}
+
+          {numberOfNonResidentChild === 1 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Single non-resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={singleNonResidentChildPrice}
+                stayPrice={singleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentChild) === 2 && (
+          {numberOfNonResidentChild === 2 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Double resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={doubleNonResidentChildPrice}
+                stayPrice={doubleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.nonResidentChild) === 3 && (
+          {numberOfNonResidentChild === 3 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Triple resident child ({nights} nights)
               </h1>
 
               <Price
-                stayPrice={tripleNonResidentChildPrice}
+                stayPrice={tripleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
           )}
 
-          {Number(router.query.infantResident) > 0 && (
+          {numberOfNonResidentChild > 3 && (
+            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+              <h1 className="text-sm font-semibold">
+                Resident child ({nights} nights) x {numberOfNonResidentChild}
+              </h1>
+
+              <Price
+                stayPrice={totalNonResidentChildMoreThanThree}
+                className="!font-normal !text-sm !font-SourceSans"
+              ></Price>
+            </div>
+          )}
+
+          {numberOfInfantResident > 0 && (
+            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+              <h1 className="text-sm font-semibold">
+                Resident infant ({nights} nights)
+              </h1>
+
+              <Price
+                stayPrice={infantResidentPriceCalc * numberOfInfantResident}
+                className="!font-normal !text-sm !font-SourceSans"
+              ></Price>
+            </div>
+          )}
+
+          {numberOfInfantNonResident > 0 && (
             <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
               <h1 className="text-sm font-semibold">
                 Resident infant ({nights} nights)
@@ -339,23 +604,7 @@ function SelectedListingCard({ room }) {
 
               <Price
                 stayPrice={
-                  infantResidentPrice * Number(router.query.infantResident)
-                }
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
-
-          {Number(router.query.infantNonResident) > 0 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident infant ({nights} nights)
-              </h1>
-
-              <Price
-                stayPrice={
-                  infantNonResidentPrice *
-                  Number(router.query.infantNonResident)
+                  infantNonResidentPriceCalc * numberOfInfantNonResident
                 }
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
