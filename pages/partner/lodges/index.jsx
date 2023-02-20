@@ -735,6 +735,8 @@ export async function getServerSideProps(context) {
   try {
     const token = getToken(context);
 
+    console.log("start user");
+
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_baseURL}/user/`,
       {
