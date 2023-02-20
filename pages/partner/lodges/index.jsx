@@ -772,6 +772,7 @@ export async function getServerSideProps(context) {
       };
     }
   } catch (error) {
+    console.log("an ", error);
     if (error.response.status === 401) {
       return {
         redirect: {
