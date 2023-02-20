@@ -745,6 +745,7 @@ export async function getServerSideProps(context) {
     );
 
     if (response.data[0].is_partner) {
+      console.log("is partner");
       const stays = await axios.get(
         `${process.env.NEXT_PUBLIC_baseURL}/user-stays-email/`,
         {
@@ -761,6 +762,7 @@ export async function getServerSideProps(context) {
         },
       };
     } else {
+      console.log("not partner");
       return {
         notFound: true,
       };
