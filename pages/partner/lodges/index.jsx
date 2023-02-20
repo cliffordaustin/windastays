@@ -191,6 +191,8 @@ function PartnerLodges({ stays }) {
   const [showGuestStartDate, setShowGuestStartDate] = React.useState(false);
   const [showGuestEndDate, setShowGuestEndDate] = React.useState(false);
 
+  console.log(stays);
+
   return (
     <div className="relative">
       {stays.length === 0 && (
