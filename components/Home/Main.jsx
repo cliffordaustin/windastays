@@ -181,6 +181,7 @@ function Main({ specialLodges }) {
               className="w-full h-full md:rounded-3xl"
               layout="fill"
               src="/images/home/nairobi-activity.webp"
+              unoptimized={true}
               objectFit="cover"
               alt="Image"
             />
@@ -193,6 +194,7 @@ function Main({ specialLodges }) {
               className="w-full h-full md:rounded-3xl"
               layout="fill"
               src="/images/home/group-of-travelers.jpg"
+              unoptimized={true}
               objectFit="cover"
               alt="Image"
             />
@@ -382,6 +384,7 @@ function Main({ specialLodges }) {
                             className="w-full h-full grayscale opacity-50"
                             layout="fill"
                             objectFit="cover"
+                            unoptimized={true}
                             alt={"Large image of " + listing.name}
                             src={images[0]}
                           />
@@ -424,6 +427,7 @@ function Main({ specialLodges }) {
                               className="w-full h-full"
                               layout="fill"
                               objectFit="cover"
+                              unoptimized={true}
                               alt={"Small image of " + listing.name}
                               src={images[1]}
                             />
@@ -435,6 +439,7 @@ function Main({ specialLodges }) {
                             className="w-full h-full"
                             layout="fill"
                             objectFit="cover"
+                            unoptimized={true}
                             alt={"Large image of " + listing.name}
                             src={images[0]}
                           />
@@ -480,6 +485,7 @@ function Main({ specialLodges }) {
                         className="w-full h-full"
                         layout="fill"
                         objectFit="cover"
+                        unoptimized={true}
                         alt={"Small image of " + listing.name}
                         src={images[0]}
                       />

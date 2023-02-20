@@ -117,6 +117,7 @@ function Carousel({
               src={image}
               alt={alt}
               objectPosition={objectPosition}
+              unoptimized={true}
               layout={layout}
               objectFit="cover"
             />

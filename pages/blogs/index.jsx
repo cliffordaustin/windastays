@@ -72,6 +72,7 @@ function Blogs({ blogs, userProfile }) {
                       src={blog.header_image_src}
                       objectFit={"cover"}
                       objectPosition={"center"}
+                      unoptimized={true}
                       className="rounded-none"
                       priority
                     ></Image>

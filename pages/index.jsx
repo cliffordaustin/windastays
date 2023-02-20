@@ -235,6 +235,7 @@ export default function Home({ userProfile, specialLodges }) {
               objectFit="cover"
               src="/images/image-header.jpg"
               objectPosition={"bottom"}
+              unoptimized={true}
               sizes="380"
               alt="Image of samburu man looking at a vast landscape"
               priority
