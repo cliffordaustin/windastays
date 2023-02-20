@@ -162,7 +162,14 @@ export async function getServerSideProps(context) {
       }
     );
 
-    const stays = await axios.get(`${process.env.NEXT_PUBLIC_baseURL}/stays/`);
+    const stays = await axios.get(
+      `${process.env.NEXT_PUBLIC_baseURL}/user-stays-email/`,
+      {
+        headers: {
+          Authorization: "Token " + token,
+        },
+      }
+    );
 
     return {
       props: {
