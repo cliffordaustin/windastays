@@ -191,8 +191,6 @@ function PartnerLodges({ stays }) {
   const [showGuestStartDate, setShowGuestStartDate] = React.useState(false);
   const [showGuestEndDate, setShowGuestEndDate] = React.useState(false);
 
-  console.log(stays);
-
   return (
     <div className="relative">
       {stays.length === 0 && (
@@ -733,8 +731,6 @@ PartnerLodges.propTypes = {};
 
 export async function getServerSideProps(context) {
   try {
-    console.log("start user");
-
     const token = getToken(context);
 
     const response = await axios.get(
@@ -746,10 +742,7 @@ export async function getServerSideProps(context) {
       }
     );
 
-    console.log("user");
-
     if (response.data[0].is_partner) {
-      console.log("is partner");
       const stays = await axios.get(
         `${process.env.NEXT_PUBLIC_baseURL}/user-stays-email/`,
         {
@@ -766,13 +759,11 @@ export async function getServerSideProps(context) {
         },
       };
     } else {
-      console.log("not partner");
       return {
         notFound: true,
       };
     }
   } catch (error) {
-    console.log("an ", error);
     if (error.response.status === 401) {
       return {
         redirect: {
