@@ -744,6 +744,8 @@ export async function getServerSideProps(context) {
       }
     );
 
+    console.log("user");
+
     if (response.data[0].is_partner) {
       console.log("is partner");
       const stays = await axios.get(
