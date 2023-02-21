@@ -169,28 +169,29 @@ function SelectedListing({ listing, index }) {
   );
 
   useEffect(() => {
-    console.log("yeah");
-    setRoomTypesLoading(true);
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_baseURL}/stays/${
-          listing.slug
-        }/room-types/?num_of_rooms_resident=${residentNumberOfRooms}&num_of_rooms_non_resident=${nonResidentNumberOfRooms}&start_date=${
-          router.query.date
-        }&end_date=${moment(router.query.endDate)
-          .subtract(1, "days")
-          .format("YYYY-MM-DD")}`,
-        {
-          headers: {
-            Authorization: "Token " + Cookies.get("token"),
-          },
-        }
-      )
-      .then((res) => {
-        setRoomTypes(res.data.results);
-        setRoomTypesLoading(false);
-        setGuestOptionChanged(false);
-      });
+    if (router.query.date && router.query.endDate) {
+      setRoomTypesLoading(true);
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_baseURL}/stays/${
+            listing.slug
+          }/room-types/?num_of_rooms_resident=${residentNumberOfRooms}&num_of_rooms_non_resident=${nonResidentNumberOfRooms}&start_date=${
+            router.query.date
+          }&end_date=${moment(router.query.endDate)
+            .subtract(1, "days")
+            .format("YYYY-MM-DD")}`,
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          setRoomTypes(res.data.results);
+          setRoomTypesLoading(false);
+          setGuestOptionChanged(false);
+        });
+    }
   }, [guestOptionChanged]);
 
   const adultAgeGroup = React.useMemo(
@@ -337,7 +338,7 @@ function SelectedListing({ listing, index }) {
           }}
           className="border-b px-4 py-2 flex items-center gap-4"
         >
-          <div className="w-[30px] h-[30px] rounded-full border flex items-center justify-center">
+          <div className="w-[30px] h-[30px] cursor-pointer rounded-full border flex items-center justify-center">
             <Icon className="w-6 h-6" icon="iconoir:cancel" />
           </div>
           <h1 className="font-bold font-SourceSans">Add guests</h1>
@@ -407,6 +408,62 @@ function SelectedListing({ listing, index }) {
                 <div
                   className={
                     "flex items-center justify-between mt-2 " +
+                    (isResidentChildAvailable ? "" : "opacity-40")
+                  }
+                >
+                  <h1>
+                    Resident child{" "}
+                    {childAgeGroup && <span>({childAgeGroup})</span>}
+                  </h1>
+
+                  <div className="flex gap-2 items-center">
+                    <div
+                      onClick={() => {
+                        if (isResidentChildAvailable) {
+                          formik.setFieldValue(
+                            `rooms[${index}].residentChild`,
+                            formik.values.rooms[index].residentChild > 0
+                              ? formik.values.rooms[index].residentChild - 1
+                              : 0
+                          );
+                        }
+                      }}
+                      className={
+                        "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                        (isResidentChildAvailable
+                          ? "cursor-pointer"
+                          : "cursor-not-allowed")
+                      }
+                    >
+                      {" "}
+                      -{" "}
+                    </div>
+                    <h1 className="font-bold text-sm">{room.residentChild}</h1>
+                    <div
+                      onClick={() => {
+                        if (isResidentChildAvailable) {
+                          formik.setFieldValue(
+                            `rooms[${index}].residentChild`,
+                            formik.values.rooms[index].residentChild + 1
+                          );
+                        }
+                      }}
+                      className={
+                        "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                        (isResidentChildAvailable
+                          ? "cursor-pointer"
+                          : "cursor-not-allowed")
+                      }
+                    >
+                      {" "}
+                      +{" "}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={
+                    "flex items-center justify-between mt-2 " +
                     (isNonResidentAdultAvailable ? "" : "opacity-40")
                   }
                 >
@@ -452,62 +509,6 @@ function SelectedListing({ listing, index }) {
                       className={
                         "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
                         (isNonResidentAdultAvailable
-                          ? "cursor-pointer"
-                          : "cursor-not-allowed")
-                      }
-                    >
-                      {" "}
-                      +{" "}
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className={
-                    "flex items-center justify-between mt-2 " +
-                    (isResidentChildAvailable ? "" : "opacity-40")
-                  }
-                >
-                  <h1>
-                    Resident child{" "}
-                    {childAgeGroup && <span>({childAgeGroup})</span>}
-                  </h1>
-
-                  <div className="flex gap-2 items-center">
-                    <div
-                      onClick={() => {
-                        if (isResidentChildAvailable) {
-                          formik.setFieldValue(
-                            `rooms[${index}].residentChild`,
-                            formik.values.rooms[index].residentChild > 0
-                              ? formik.values.rooms[index].residentChild - 1
-                              : 0
-                          );
-                        }
-                      }}
-                      className={
-                        "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
-                        (isResidentChildAvailable
-                          ? "cursor-pointer"
-                          : "cursor-not-allowed")
-                      }
-                    >
-                      {" "}
-                      -{" "}
-                    </div>
-                    <h1 className="font-bold text-sm">{room.residentChild}</h1>
-                    <div
-                      onClick={() => {
-                        if (isResidentChildAvailable) {
-                          formik.setFieldValue(
-                            `rooms[${index}].residentChild`,
-                            formik.values.rooms[index].residentChild + 1
-                          );
-                        }
-                      }}
-                      className={
-                        "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
-                        (isResidentChildAvailable
                           ? "cursor-pointer"
                           : "cursor-not-allowed")
                       }

@@ -914,11 +914,15 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 roomName={room.name}
                 roomSlug={room.slug}
                 setOpenAddAvailabilityModal={() => {
-                  formikAdd.setFieldValue("residency", {
-                    value: "Resident",
-                    label: "Resident",
-                  });
-                  setOpenAddAvailabilityModal(true);
+                  if (inPartnerHomepage) {
+                    router.push(`/partner/lodges/${staySlug}/actions`);
+                  } else {
+                    formikAdd.setFieldValue("residency", {
+                      value: "Resident",
+                      label: "Resident",
+                    });
+                    setOpenAddAvailabilityModal(true);
+                  }
                 }}
                 isNonResident={false}
                 setRoomAvailabilities={setRoomAvailabilities}

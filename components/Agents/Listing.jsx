@@ -7,6 +7,7 @@ import LoadingSpinerChase from "../ui/LoadingSpinerChase";
 import styles from "../../styles/Listing.module.css";
 import Checkbox from "../ui/Checkbox";
 import { useRouter } from "next/router";
+import moment from "moment";
 
 function Listing({ listing, currentOptions, setCurrentOptions }) {
   const router = useRouter();
@@ -27,16 +28,32 @@ function Listing({ listing, currentOptions, setCurrentOptions }) {
         .replace("]", "") // remove ]
         .trim(); // remove all white space
 
-      router.replace(
-        {
-          query: {
-            ...router.query,
-            selected: allOptions,
+      if (!router.query.date || !router.query.endDate) {
+        console.log("called");
+        router.replace(
+          {
+            query: {
+              ...router.query,
+              selected: allOptions,
+              date: moment().format("YYYY-MM-DD"),
+              endDate: moment().add(3, "days").format("YYYY-MM-DD"),
+            },
           },
-        },
-        undefined,
-        { shallow: true }
-      );
+          undefined,
+          { shallow: true }
+        );
+      } else {
+        router.replace(
+          {
+            query: {
+              ...router.query,
+              selected: allOptions,
+            },
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
     } else {
       updatedList.splice(currentOptions.indexOf(event.target.value), 1);
 

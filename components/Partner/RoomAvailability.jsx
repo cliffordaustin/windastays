@@ -242,7 +242,9 @@ function RoomAvailability({
                 return (
                   <div className="flex items-center gap-2">
                     <h1 className="font-bold">
-                      {guestType ? "$" + guestType.price : "N/A"}
+                      {guestType
+                        ? (isNonResident ? "$" : "KES") + guestType.price
+                        : "N/A"}
                     </h1>
                     {guestType && <h1 className="text-gray-500">/ night</h1>}
                   </div>

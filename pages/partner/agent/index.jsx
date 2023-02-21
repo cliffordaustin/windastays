@@ -163,7 +163,7 @@ export async function getServerSideProps(context) {
     );
 
     const stays = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/user-stays-email/`,
+      `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/`,
       {
         headers: {
           Authorization: "Token " + token,

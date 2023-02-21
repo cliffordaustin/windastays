@@ -215,6 +215,7 @@ export default function Home({ userProfile, specialLodges }) {
       <div className="sticky bg-white top-0 left-0 right-0 z-50">
         <Navbar
           userProfile={userProfile}
+          showBookNowBtn={true}
           showTripWizard={!inView ? true : false}
         ></Navbar>
       </div>

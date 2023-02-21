@@ -286,7 +286,7 @@ function SelectedListingCard({ room, addedRooms }) {
     tripleNonResidentChildPriceCalc
   );
 
-  const getTotalPrice = () => {
+  const getResidentTotalPrice = () => {
     let total = 0;
 
     if (numberOfResidentAdult === 1) {
@@ -301,18 +301,6 @@ function SelectedListingCard({ room, addedRooms }) {
     if (numberOfResidentAdult > 3) {
       total += totalResidentAdultMoreThanThree;
     }
-    if (numberOfNonResidentAdult === 1) {
-      total += singleNonResidentAdultPriceCalc;
-    }
-    if (numberOfNonResidentAdult === 2) {
-      total += doubleNonResidentAdultPriceCalc;
-    }
-    if (numberOfNonResidentAdult === 3) {
-      total += tripleNonResidentAdultPriceCalc;
-    }
-    if (numberOfNonResidentAdult > 3) {
-      total += totalNonResidentAdultMoreThanThree;
-    }
     if (numberOfResidentChild === 1) {
       total += singleResidentChildPriceCalc;
     }
@@ -325,6 +313,29 @@ function SelectedListingCard({ room, addedRooms }) {
     if (numberOfResidentChild > 3) {
       total += totalResidentChildMoreThanThree;
     }
+    if (numberOfInfantResident > 0) {
+      total += infantResidentPriceCalc * numberOfInfantResident;
+    }
+
+    return total;
+  };
+
+  const getNonResidentTotalPrice = () => {
+    let total = 0;
+
+    if (numberOfNonResidentAdult === 1) {
+      total += singleNonResidentAdultPriceCalc;
+    }
+    if (numberOfNonResidentAdult === 2) {
+      total += doubleNonResidentAdultPriceCalc;
+    }
+    if (numberOfNonResidentAdult === 3) {
+      total += tripleNonResidentAdultPriceCalc;
+    }
+    if (numberOfNonResidentAdult > 3) {
+      total += totalNonResidentAdultMoreThanThree;
+    }
+
     if (numberOfNonResidentChild === 1) {
       total += singleNonResidentChildPriceCalc;
     }
@@ -340,23 +351,82 @@ function SelectedListingCard({ room, addedRooms }) {
     if (numberOfInfantResident > 0) {
       total += infantResidentPriceCalc * numberOfInfantResident;
     }
-    if (numberOfInfantNonResident > 0) {
-      total += infantNonResidentPriceCalc * numberOfInfantNonResident;
-    }
 
     return total;
   };
 
   return (
-    <div className="w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
+    <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
       <div className="text-sm absolute top-4 text-gray-600 font-bold">
         {room.name}
       </div>
 
-      <Price
-        stayPrice={getTotalPrice()}
-        className="!text-5xl !font-SourceSans !font-semibold !text-gray-600"
-      ></Price>
+      <div className="flex gap-1">
+        {getResidentTotalPrice() ? (
+          <div className="flex gap-1">
+            <Price
+              stayPrice={getResidentTotalPrice()}
+              autoCurrency={false}
+              className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+            ></Price>
+
+            <PopoverBox
+              panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[50px] border shadow-md mt-2 w-[200px] p-1"
+              btnClassName=""
+              btnPopover={
+                <div className="mt-4">
+                  <Icon
+                    className="text-gray-400 text-sm"
+                    icon="bi:info-circle-fill"
+                  />
+                </div>
+              }
+              popoverClassName=""
+            >
+              <div className="text-sm">Resident pricing</div>
+            </PopoverBox>
+          </div>
+        ) : (
+          ""
+        )}
+
+        {getNonResidentTotalPrice() && getResidentTotalPrice() ? (
+          <h1 className="!text-3xl !font-SourceSans !font-semibold !text-gray-600">
+            /
+          </h1>
+        ) : (
+          ""
+        )}
+
+        {getNonResidentTotalPrice() ? (
+          <div className="flex gap-1">
+            <Price
+              stayPrice={getNonResidentTotalPrice()}
+              currency="KES"
+              autoCurrency={false}
+              className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+            ></Price>
+
+            <PopoverBox
+              panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[50px] border shadow-md mt-2 w-[200px] p-1"
+              btnClassName=""
+              btnPopover={
+                <div className="mt-4">
+                  <Icon
+                    className="text-gray-400 text-sm"
+                    icon="bi:info-circle-fill"
+                  />
+                </div>
+              }
+              popoverClassName=""
+            >
+              <div className="text-sm">Non-resident pricing</div>
+            </PopoverBox>
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
 
       <PopoverBox
         panelClassName="bg-white rounded-xl after:!left-[40%] tooltip shadow-md mt-2 border w-[400px] -left-[100px] p-2"
@@ -382,6 +452,7 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 stayPrice={singleResidentAdultPriceCalc}
+                autoCurrency={false}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
@@ -395,6 +466,7 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 stayPrice={doubleResidentAdultPriceCalc}
+                autoCurrency={false}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
             </div>
@@ -407,6 +479,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={tripleResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -420,6 +493,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={totalResidentAdultMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -433,6 +507,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={singleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -446,6 +522,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={doubleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -459,6 +537,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={tripleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -473,6 +553,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={totalNonResidentAdultMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -486,6 +568,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={singleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -499,6 +582,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={doubleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -512,6 +596,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={tripleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -525,6 +610,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={totalResidentChildMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -538,6 +624,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={singleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -551,6 +639,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={doubleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -564,6 +654,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={tripleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -577,6 +669,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={totalNonResidentChildMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -590,6 +684,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
                 stayPrice={infantResidentPriceCalc * numberOfInfantResident}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -603,6 +698,8 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                autoCurrency={false}
+                currency="KES"
                 stayPrice={
                   infantNonResidentPriceCalc * numberOfInfantNonResident
                 }
@@ -611,14 +708,15 @@ function SelectedListingCard({ room, addedRooms }) {
             </div>
           )}
 
-          <div className="px-3 flex font-SourceSans bg-gray-100 justify-between items-center py-1 w-full">
+          {/* <div className="px-3 flex font-SourceSans bg-gray-100 justify-between items-center py-1 w-full">
             <h1 className="text-sm font-semibold">Total</h1>
 
             <Price
+              autoCurrency={false}
               className="!font-normal !text-sm !font-SourceSans"
-              stayPrice={getTotalPrice()}
+              stayPrice={getResidentTotalPrice()}
             ></Price>
-          </div>
+          </div> */}
         </div>
       </PopoverBox>
     </div>

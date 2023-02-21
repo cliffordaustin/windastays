@@ -20,7 +20,7 @@ import { InlineWidget } from "react-calendly";
 import NavbarCurrency from "./NavbarCurrency";
 import { Link as ScrollLink } from "react-scroll";
 
-function Navbar({ userProfile, showBookNowBtn = true }) {
+function Navbar({ userProfile, showBookNowBtn = false }) {
   const [curatedTripsHover, setCuratedTripsHover] = useState(true);
   const [showLocationsHover, setShowLocationsHover] = useState(false);
   const [showBeachLocationsHover, setShowBeachLocationsHover] = useState(false);

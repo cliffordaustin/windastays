@@ -7,7 +7,12 @@ import CryptoJS from "crypto-js";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 
-const Price = ({ stayPrice, className = "", currency = "$" }) => {
+const Price = ({
+  stayPrice,
+  className = "",
+  currency = "$",
+  autoCurrency = true,
+}) => {
   const priceConversion = useSelector(
     (state) => state.stay.priceConversionRate
   );
@@ -33,18 +38,30 @@ const Price = ({ stayPrice, className = "", currency = "$" }) => {
 
   return (
     <ClientOnly>
-      {(!currencySymbol || currencySymbol === "USD") && (
+      {autoCurrency && (
+        <>
+          {(!currencySymbol || currencySymbol === "USD") && (
+            <h1 className={"font-bold text-xl font-OpenSans " + className}>
+              {stayPrice >= 0
+                ? currency + Math.round(stayPrice).toLocaleString()
+                : "No data"}
+            </h1>
+          )}
+          {currencySymbol && currencySymbol === "KES" && (
+            <h1 className={"font-bold text-xl font-OpenSans " + className}>
+              {stayPrice >= 0
+                ? "KES" +
+                  Math.round(stayPrice * priceConversionRate).toLocaleString()
+                : "No data"}
+            </h1>
+          )}
+        </>
+      )}
+
+      {!autoCurrency && (
         <h1 className={"font-bold text-xl font-OpenSans " + className}>
           {stayPrice >= 0
             ? currency + Math.round(stayPrice).toLocaleString()
-            : "No data"}
-        </h1>
-      )}
-      {currencySymbol && currencySymbol === "KES" && (
-        <h1 className={"font-bold text-xl font-OpenSans " + className}>
-          {stayPrice >= 0
-            ? "KES" +
-              Math.round(stayPrice * priceConversionRate).toLocaleString()
             : "No data"}
         </h1>
       )}
