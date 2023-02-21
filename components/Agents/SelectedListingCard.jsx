@@ -366,6 +366,7 @@ function SelectedListingCard({ room, addedRooms }) {
           <div className="flex gap-1">
             <Price
               stayPrice={getResidentTotalPrice()}
+              currency="KES"
               autoCurrency={false}
               className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
             ></Price>
@@ -402,7 +403,6 @@ function SelectedListingCard({ room, addedRooms }) {
           <div className="flex gap-1">
             <Price
               stayPrice={getNonResidentTotalPrice()}
-              currency="KES"
               autoCurrency={false}
               className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
             ></Price>
@@ -451,6 +451,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 stayPrice={singleResidentAdultPriceCalc}
                 autoCurrency={false}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -465,6 +466,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 stayPrice={doubleResidentAdultPriceCalc}
                 autoCurrency={false}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -479,6 +481,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={tripleResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -493,6 +496,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={totalResidentAdultMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -508,7 +512,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={singleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -523,7 +526,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={doubleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -538,7 +540,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={tripleNonResidentAdultPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -554,7 +555,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={totalNonResidentAdultMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -568,6 +568,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={singleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -582,6 +583,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={doubleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -596,6 +598,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={tripleResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -610,6 +613,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={totalResidentChildMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -625,7 +629,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={singleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -640,7 +643,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={doubleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -655,7 +657,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={tripleNonResidentChildPriceCalc}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -670,7 +671,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={totalNonResidentChildMoreThanThree}
                 className="!font-normal !text-sm !font-SourceSans"
               ></Price>
@@ -684,6 +684,7 @@ function SelectedListingCard({ room, addedRooms }) {
               </h1>
 
               <Price
+                currency="KES"
                 autoCurrency={false}
                 stayPrice={infantResidentPriceCalc * numberOfInfantResident}
                 className="!font-normal !text-sm !font-SourceSans"
@@ -699,7 +700,6 @@ function SelectedListingCard({ room, addedRooms }) {
 
               <Price
                 autoCurrency={false}
-                currency="KES"
                 stayPrice={
                   infantNonResidentPriceCalc * numberOfInfantNonResident
                 }

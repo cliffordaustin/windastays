@@ -282,8 +282,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
           <h1 className="font-bold">{room.name}</h1>
 
           <div className="text-sm font-bold px-2 py-0.5 rounded-md bg-gray-200">
-            Capacity:{" "}
-            {room.capacity + room.child_capacity + room.infant_capacity}
+            Capacity: {room.capacity}
           </div>
         </div>
 

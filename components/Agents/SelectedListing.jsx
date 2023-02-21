@@ -102,12 +102,68 @@ function SelectedListing({ listing, index }) {
     [dates]
   );
 
+  useEffect(() => {
+    if (router.query.date && router.query.endDate) {
+      setRoomTypesLoading(true);
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_baseURL}/stays/${
+            listing.slug
+          }/room-types/?num_of_rooms_resident=${residentNumberOfRooms}&num_of_rooms_non_resident=${nonResidentNumberOfRooms}&start_date=${
+            router.query.date
+          }&end_date=${moment(router.query.endDate)
+            .subtract(1, "days")
+            .format("YYYY-MM-DD")}`,
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          setRoomTypes(res.data.results);
+          setRoomTypesLoading(false);
+          setGuestOptionChanged(false);
+        });
+    }
+  }, [guestOptionChanged]);
+
+  const isResidentAdultAvailable = React.useMemo(
+    () => pricing.isResidentAdultAvailable(roomTypes),
+    [roomTypes]
+  );
+
+  const isResidentChildAvailable = React.useMemo(
+    () => pricing.isResidentChildAvailable(roomTypes),
+    [roomTypes]
+  );
+
+  const isNonResidentAdultAvailable = React.useMemo(
+    () => pricing.isNonResidentAdultAvailable(roomTypes),
+    [roomTypes]
+  );
+
+  const isNonResidentChildAvailable = React.useMemo(
+    () => pricing.isNonResidentChildAvailable(roomTypes),
+    [roomTypes]
+  );
+
+  const isResidentInfantAvailable = React.useMemo(
+    () => pricing.isResidentInfantAvailable(roomTypes),
+    [roomTypes]
+  );
+
+  const isNonResidentInfantAvailable = React.useMemo(
+    () => pricing.isNonResidentInfantAvailable(roomTypes),
+    [roomTypes]
+  );
+
   const formik = useFormik({
     initialValues: {
       rooms: [
         {
           residentAdult: 1,
-          nonResidentAdult: 0,
+          nonResidentAdult: 1,
           residentChild: 0,
           nonResidentChild: 0,
           infantResident: 0,
@@ -168,32 +224,6 @@ function SelectedListing({ listing, index }) {
     [formik.values.rooms]
   );
 
-  useEffect(() => {
-    if (router.query.date && router.query.endDate) {
-      setRoomTypesLoading(true);
-      axios
-        .get(
-          `${process.env.NEXT_PUBLIC_baseURL}/stays/${
-            listing.slug
-          }/room-types/?num_of_rooms_resident=${residentNumberOfRooms}&num_of_rooms_non_resident=${nonResidentNumberOfRooms}&start_date=${
-            router.query.date
-          }&end_date=${moment(router.query.endDate)
-            .subtract(1, "days")
-            .format("YYYY-MM-DD")}`,
-          {
-            headers: {
-              Authorization: "Token " + Cookies.get("token"),
-            },
-          }
-        )
-        .then((res) => {
-          setRoomTypes(res.data.results);
-          setRoomTypesLoading(false);
-          setGuestOptionChanged(false);
-        });
-    }
-  }, [guestOptionChanged]);
-
   const adultAgeGroup = React.useMemo(
     () => pricing.adultAgeGroup(roomTypes),
     [roomTypes]
@@ -249,36 +279,6 @@ function SelectedListing({ listing, index }) {
       curr.infantNonResident
     );
   }, 0);
-
-  const isResidentAdultAvailable = React.useMemo(
-    () => pricing.isResidentAdultAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isResidentChildAvailable = React.useMemo(
-    () => pricing.isResidentChildAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentAdultAvailable = React.useMemo(
-    () => pricing.isNonResidentAdultAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentChildAvailable = React.useMemo(
-    () => pricing.isNonResidentChildAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isResidentInfantAvailable = React.useMemo(
-    () => pricing.isResidentInfantAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentInfantAvailable = React.useMemo(
-    () => pricing.isNonResidentInfantAvailable(roomTypes),
-    [roomTypes]
-  );
 
   const [openGuestModal, setOpenGuestModal] = React.useState(false);
   return (
