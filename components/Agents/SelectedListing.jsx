@@ -16,7 +16,9 @@ import Dialogue from "../Home/Dialogue";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Button from "../ui/Button";
+import Switch from "../ui/Switch";
 import pricing from "../../lib/pricingCalc";
+import Input from "../ui/Input";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -281,6 +283,35 @@ function SelectedListing({ listing, index }) {
   }, 0);
 
   const [openGuestModal, setOpenGuestModal] = React.useState(false);
+
+  const [parkFees, setParkFees] = React.useState(false);
+
+  const [conservancyFees, setConservancyFees] = React.useState(false);
+
+  const [gameDriveFees, setGameDriveFees] = React.useState(false);
+
+  const formikFees = useFormik({
+    initialValues: {
+      commision: 0,
+      fees: [],
+    },
+
+    validationSchema: Yup.object({
+      rooms: Yup.array().of(
+        Yup.object().shape({
+          name: Yup.string("Please enter a valid text of name"),
+          price: Yup.number("Please enter a valid number of price"),
+        })
+      ),
+      commision: Yup.number("Please enter a valid number of commision"),
+    }),
+
+    onSubmit: (values) => {
+      setGuestOptionChanged(true);
+      setOpenGuestModal(false);
+    },
+  });
+
   return (
     <div className="px-4 py-2 bg-gray-100 rounded-md">
       <GlobalStyle />
@@ -741,9 +772,25 @@ function SelectedListing({ listing, index }) {
         </div>
       </Dialogue>
 
+      <div className="mt-4 flex gap-4 items-center justify-self-start">
+        <h1 className="text-4xl font-SourceSans text-gray-600 font-semibold">
+          {moment(router.query.date).format("MMM Do")}
+        </h1>
+
+        <div className="w-fit flex items-center">
+          <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+          <div className="h-[2px] w-[70px] bg-gray-200"></div>
+          <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+        </div>
+
+        <h1 className="text-4xl font-SourceSans font-semibold text-gray-600">
+          {moment(router.query.endDate).format("MMM Do")}
+        </h1>
+      </div>
+
       <div className="px-2 py-2 flex h-[160px] w-full rounded-xl bg-white mt-2">
         <div className="w-fit flex flex-col justify-around">
-          <div>
+          <div className="flex flex-col gap-4">
             {/* <div className="flex items-center gap-1 px-2 py-1 text-gray-500 bg-gray-100 rounded-md border w-fit">
               {router.query.residentAdult && (
                 <h1 className="font-bold text-sm">
@@ -792,7 +839,7 @@ function SelectedListing({ listing, index }) {
               onClick={() => {
                 setOpenGuestModal(true);
               }}
-              className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-3xl w-[350px] border shadow-lg"
+              className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border"
             >
               <Icon
                 className="w-6 h-6 text-gray-500"
@@ -800,29 +847,214 @@ function SelectedListing({ listing, index }) {
               />
 
               <div className="flex flex-col gap-0.5">
-                <h1 className="font-bold text-sm font-SourceSans">Guests</h1>
+                <h1 className="font-bold text-sm font-SourceSans">
+                  Add guests
+                </h1>
                 <h1 className="font-normal font-SourceSans">
                   {totalNumberOfGuests} Guests, {formik.values.rooms.length}{" "}
                   rooms
                 </h1>
               </div>
             </div>
-          </div>
 
-          <div className="mt-4 flex gap-4 items-center justify-self-start">
-            <h1 className="text-4xl font-SourceSans text-gray-600 font-semibold">
-              {moment(router.query.date).format("MMM Do")}
-            </h1>
+            <div className="flex w-[350px] justify-between">
+              <PopoverBox
+                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip left-[0px] border shadow-md mt-2 w-[280px] p-1"
+                btnClassName="w-full"
+                btnPopover={
+                  <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-full border">
+                    <Icon
+                      className="w-6 h-6 text-gray-500"
+                      icon="material-symbols:group-rounded"
+                    />
 
-            <div className="w-fit flex items-center">
-              <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
-              <div className="h-[2px] w-[70px] bg-gray-200"></div>
-              <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+                    <div className="flex flex-col items-start gap-0.5">
+                      <h1 className="font-bold text-sm font-SourceSans">
+                        Extras
+                      </h1>
+                      <h1 className="font-normal font-SourceSans">
+                        Select fees
+                      </h1>
+                    </div>
+                  </div>
+                }
+                popoverClassName="w-[48%]"
+              >
+                <div className="flex flex-col gap-1 font-SourceSans">
+                  <div className="flex bg-gray-100 px-2 py-2 justify-between items-center">
+                    <h1 className="font-semibold text-sm">Park fees - $20</h1>
+                    <Switch
+                      switchButton={parkFees}
+                      changeSwitchButtonState={() => {
+                        setParkFees(!parkFees);
+                      }}
+                      switchButtonCircle="w-5 h-5"
+                      switchButtonContainer="!w-[52px] !h-6"
+                    ></Switch>
+                  </div>
+
+                  <div className="flex px-2 py-2 justify-between items-center">
+                    <h1 className="font-semibold text-sm">
+                      Conservancy fees - $10
+                    </h1>
+                    <Switch
+                      switchButton={conservancyFees}
+                      changeSwitchButtonState={() => {
+                        setConservancyFees(!conservancyFees);
+                      }}
+                      switchButtonCircle="w-5 h-5"
+                      switchButtonContainer="!w-[52px] !h-6"
+                    ></Switch>
+                  </div>
+
+                  <div className="flex bg-gray-100 px-2 py-2 justify-between items-center">
+                    <h1 className="font-semibold text-sm">Game Drives - $30</h1>
+                    <Switch
+                      switchButton={gameDriveFees}
+                      changeSwitchButtonState={() => {
+                        setGameDriveFees(!gameDriveFees);
+                      }}
+                      switchButtonCircle="w-5 h-5"
+                      switchButtonContainer="!w-[52px] !h-6"
+                    ></Switch>
+                  </div>
+                </div>
+              </PopoverBox>
+
+              <PopoverBox
+                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-1"
+                btnClassName="w-full"
+                btnPopover={
+                  <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-full border">
+                    <Icon
+                      className="w-6 h-6 text-gray-500"
+                      icon="material-symbols:group-rounded"
+                    />
+
+                    <div className="flex flex-col gap-0.5">
+                      <h1 className="font-bold text-sm font-SourceSans">
+                        Other fees
+                      </h1>
+                      <h1 className="font-normal font-SourceSans">
+                        2 selected
+                      </h1>
+                    </div>
+                  </div>
+                }
+                popoverClassName="w-[48%]"
+              >
+                <div className="flex flex-col gap-1 font-SourceSans">
+                  <div className="flex px-2 py-2 justify-between items-center">
+                    <h1 className="font-semibold text-sm">Your commission</h1>
+
+                    <div className="flex items-center w-[50%]">
+                      <Input
+                        name="commision"
+                        type="number"
+                        value={formikFees.values.commision}
+                        placeholder="0"
+                        onChange={(e) => {
+                          formikFees.handleChange(e);
+                        }}
+                        className={
+                          "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-md !h-full placeholder:text-sm "
+                        }
+                        inputClassName="!text-sm !border-none "
+                      ></Input>
+                      <h1 className="font-semibold text-sm">%</h1>
+                    </div>
+                  </div>
+                  {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
+                  {formikFees.values.fees.map((item, index) => {
+                    return (
+                      <div
+                        key={item}
+                        className="flex px-2 py-2 justify-between items-center"
+                      >
+                        {/* <h1 className="font-semibold text-sm">{item.name}</h1> */}
+
+                        <div className="flex items-center w-[48%]">
+                          <Input
+                            name="name"
+                            type="text"
+                            value={item.name}
+                            placeholder="Name"
+                            onChange={(e) => {
+                              formikFees.setFieldValue(
+                                `fees[${index}].name`,
+                                e.target.value
+                              );
+                            }}
+                            className={
+                              "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
+                            }
+                            inputClassName="!text-sm !border-none "
+                          ></Input>
+                        </div>
+
+                        <div className="flex justify-between items-center w-[50%]">
+                          <Input
+                            name="price"
+                            type="number"
+                            value={item.price}
+                            placeholder="Price"
+                            onChange={(e) => {
+                              formikFees.setFieldValue(
+                                `fees[${index}].price`,
+                                e.target.value
+                              );
+                            }}
+                            className={
+                              "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
+                            }
+                            inputClassName="!text-sm !border-none "
+                          ></Input>
+
+                          <div className="px-1 flex items-center gap-2">
+                            {/* <span className="text-sm font-semibold text-green-600">
+                              &#10004;
+                            </span> */}
+                            <span
+                              onClick={() => {
+                                formikFees.setFieldValue(
+                                  "fees",
+                                  formikFees.values.fees.filter(
+                                    (item, i) => i !== index
+                                  )
+                                );
+                              }}
+                              className="text-xl cursor-pointer font-mono font-semibold text-red-600"
+                            >
+                              &#120;
+                            </span>
+
+                            {/* <Icon
+                              className="text-red-600"
+                              icon="material-symbols:cancel-outline-rounded"
+                            />
+                            <Icon
+                              className="text-green-600"
+                              icon="material-symbols:check-small-sharp"
+                            /> */}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div
+                    onClick={() => {
+                      formikFees.setFieldValue("fees", [
+                        ...formikFees.values.fees,
+                        { name: "", price: "" },
+                      ]);
+                    }}
+                    className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 bg-gray-100 w-fit text-xs font-semibold border"
+                  >
+                    Add a fee
+                  </div>
+                </div>
+              </PopoverBox>
             </div>
-
-            <h1 className="text-4xl font-SourceSans font-semibold text-gray-600">
-              {moment(router.query.endDate).format("MMM Do")}
-            </h1>
           </div>
         </div>
 
