@@ -943,7 +943,7 @@ function SelectedListing({ listing, index }) {
                 }
                 popoverClassName="w-[48%]"
               >
-                <div className="flex flex-col gap-1 font-SourceSans">
+                <div className="flex flex-col gap-0.5 font-SourceSans">
                   <div className="flex px-2 py-2 justify-between items-center">
                     <h1 className="font-semibold text-sm">Your commission</h1>
 
@@ -1011,10 +1011,7 @@ function SelectedListing({ listing, index }) {
                           ></Input>
 
                           <div className="px-1 flex items-center gap-2">
-                            {/* <span className="text-sm font-semibold text-green-600">
-                              &#10004;
-                            </span> */}
-                            <span
+                            <div
                               onClick={() => {
                                 formikFees.setFieldValue(
                                   "fees",
@@ -1023,19 +1020,13 @@ function SelectedListing({ listing, index }) {
                                   )
                                 );
                               }}
-                              className="text-xl cursor-pointer font-mono font-semibold text-red-600"
+                              className="w-[18px] cursor-pointer h-[18px] bg-red-500 rounded-full flex items-center justify-center"
                             >
-                              &#120;
-                            </span>
-
-                            {/* <Icon
-                              className="text-red-600"
-                              icon="material-symbols:cancel-outline-rounded"
-                            />
-                            <Icon
-                              className="text-green-600"
-                              icon="material-symbols:check-small-sharp"
-                            /> */}
+                              <Icon
+                                className="text-white text-lg"
+                                icon="octicon:dash-16"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
