@@ -46,12 +46,6 @@ function RoomAvailability({
     { value: "INFANT", label: "Infant" },
   ];
 
-  const otherFees = [
-    { value: "PARK FEES", label: "Park fees" },
-    { value: "CONSERVANCY/BEDNIGHT FEES", label: "Conservancy/bednight fees" },
-    { value: "CONTRIBUTION", label: "Contribution" },
-  ];
-
   const formikEdit = useFormik({
     initialValues: {
       number_of_available_rooms: "",
@@ -60,12 +54,6 @@ function RoomAvailability({
         {
           name: "",
           age_group: "",
-          price: "",
-        },
-      ],
-      otherFees: [
-        {
-          name: "",
           price: "",
         },
       ],
@@ -86,12 +74,6 @@ function RoomAvailability({
             .max(100, "Age group must be less than 100 characters"),
         })
       ),
-      otherFees: Yup.array().of(
-        Yup.object().shape({
-          name: Yup.string().required("Fee name is required"),
-          price: Yup.number().required("Price is required"),
-        })
-      ),
     }),
     onSubmit: async (values) => {
       setEditAvailabilityLoading(true);
@@ -103,7 +85,6 @@ function RoomAvailability({
             date: values.date,
             num_of_available_rooms: values.number_of_available_rooms,
             room_non_resident_guest_availabilities: values.guestTypes,
-            non_resident_other_fees: values.otherFees,
           },
         ];
         await axios
@@ -143,7 +124,6 @@ function RoomAvailability({
             date: values.date,
             num_of_available_rooms: values.number_of_available_rooms,
             room_resident_guest_availabilities: values.guestTypes,
-            resident_other_fees: values.otherFees,
           },
         ];
         await axios
@@ -363,10 +343,6 @@ function RoomAvailability({
       isNonResident
         ? row.room_non_resident_guest_availabilities
         : row.room_resident_guest_availabilities
-    );
-    formikEdit.setFieldValue(
-      "otherFees",
-      isNonResident ? row.non_resident_other_fees : row.resident_other_fees
     );
     formikEdit.setFieldValue("id", row.id);
     formikEdit.setFieldValue("rowSlug", row.slug);
@@ -776,114 +752,6 @@ function RoomAvailability({
                     ...formikEdit.values.guestTypes,
                     { name: "", price: "" },
                   ]);
-                }}
-                className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
-              >
-                Add more
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2 mt-3">
-              {formikEdit.values.otherFees.map((fee, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center"
-                  >
-                    <div className="w-[47%] flex flex-col gap-1.5">
-                      <Input
-                        name="name"
-                        type="text"
-                        value={fee.name}
-                        placeholder="Enter name of fee"
-                        errorStyle={
-                          formikEdit.touched.otherFees &&
-                          formikEdit.errors.otherFees
-                            ? true
-                            : false
-                        }
-                        onChange={(e) => {
-                          formikEdit.setFieldValue(
-                            `otherFees[${index}].name`,
-                            e.target.value
-                          );
-                        }}
-                        className={"w-full placeholder:text-sm "}
-                        inputClassName="!text-sm "
-                        label="Add the type of fee"
-                      ></Input>
-                      {formikEdit.touched.otherFees &&
-                      formikEdit.errors.otherFees ? (
-                        <span className="text-sm font-bold text-red-400">
-                          {formikEdit.errors.otherFees[index].name}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div className="w-[47%] gap-2 flex items-center">
-                      <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
-                        <Input
-                          name="price"
-                          type="number"
-                          value={fee.price}
-                          placeholder="Price"
-                          errorStyle={
-                            formikEdit.touched.otherFees &&
-                            formikEdit.errors.otherFees
-                              ? true
-                              : false
-                          }
-                          onChange={(e) => {
-                            formikEdit.setFieldValue(
-                              `otherFees[${index}].price`,
-                              e.target.value
-                            );
-                          }}
-                          className={"w-full placeholder:text-sm "}
-                          inputClassName="!text-sm "
-                          label="Add the price of the fee"
-                        ></Input>
-
-                        {formikEdit.touched.otherFees &&
-                        formikEdit.errors.otherFees ? (
-                          <span className="text-sm font-bold text-red-400">
-                            {formikEdit.errors.otherFees[index].price}
-                          </span>
-                        ) : null}
-                      </div>
-
-                      {index > 0 && (
-                        <div
-                          onClick={() => {
-                            formikEdit.setFieldValue(
-                              "otherFees",
-                              formikEdit.values.otherFees.filter(
-                                (_, i) => i !== index
-                              )
-                            );
-                          }}
-                          className="w-[24px] cursor-pointer h-[24px] bg-red-500 mt-6 rounded-full flex items-center justify-center"
-                        >
-                          <Icon
-                            className="text-white text-lg"
-                            icon="octicon:dash-16"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-
-              <div
-                onClick={() => {
-                  formikEdit.setFieldValue(
-                    "otherFees",
-                    formikEdit.values.otherFees.concat({
-                      name: "",
-                      price: "",
-                    })
-                  );
                 }}
                 className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
               >

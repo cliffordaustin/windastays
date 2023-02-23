@@ -18,6 +18,8 @@ import LoadingSpinerChase from "../ui/LoadingSpinerChase";
 import ListItem from "../ui/ListItem";
 import Cookies from "js-cookie";
 import SelectInput from "../ui/SelectInput";
+import Price from "../Stay/Price";
+import { Popover, Transition } from "@headlessui/react";
 
 function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
   const router = useRouter();
@@ -93,12 +95,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
     { value: "INFANT", label: "Infant" },
   ];
 
-  const otherFees = [
-    { value: "PARK FEES", label: "Park fees" },
-    { value: "CONSERVANCY/BEDNIGHT FEES", label: "Conservancy/bednight fees" },
-    { value: "CONTRIBUTION", label: "Contribution" },
-  ];
-
   const formikAdd = useFormik({
     initialValues: {
       number_of_available_rooms: "",
@@ -114,13 +110,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
         {
           name: "",
           age_group: "",
-          price: "",
-        },
-      ],
-
-      otherFees: [
-        {
-          name: "",
           price: "",
         },
       ],
@@ -145,12 +134,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             .max(100, "Age group must be less than 100 characters"),
         })
       ),
-      otherFees: Yup.array().of(
-        Yup.object().shape({
-          name: Yup.string().required("Fee name is required"),
-          price: Yup.number().required("Price is required"),
-        })
-      ),
     }),
     onSubmit: async (values) => {
       setAddAvailabilityLoading(true);
@@ -173,7 +156,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             num_of_available_rooms: values.number_of_available_rooms,
             date: date,
             room_resident_guest_availabilities: values.guestTypes,
-            resident_other_fees: values.otherFees,
           };
 
           data.push(obj);
@@ -211,7 +193,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             num_of_available_rooms: values.number_of_available_rooms,
             date: date,
             room_non_resident_guest_availabilities: values.guestTypes,
-            non_resident_other_fees: values.otherFees,
           };
 
           data.push(obj);
@@ -257,6 +238,141 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
         setOpenDeleteRoomModal(false);
       });
   };
+
+  const [nonResidentFeesLoading, setNonResidentFeesLoading] =
+    React.useState(false);
+
+  const [residentFeesLoading, setResidentFeesLoading] = React.useState(false);
+
+  const formikNonResidentFees = useFormik({
+    initialValues: {
+      name: "",
+      price: "",
+      fees: [],
+    },
+
+    validationSchema: Yup.object({
+      rooms: Yup.array().of(
+        Yup.object().shape({
+          name: Yup.string("Please enter a valid text of name"),
+          price: Yup.number("Please enter a valid number of price"),
+        })
+      ),
+      name: Yup.string("Please enter a valid text of name").required(
+        "Name is required"
+      ),
+      price: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+    }),
+
+    onSubmit: async (values) => {
+      setNonResidentFeesLoading(true);
+      await axios
+        .post(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/nonresident-other-fees/`,
+          {
+            name: values.name,
+            price: values.price,
+          },
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          values.fees.push({
+            name: values.name,
+            price: values.price,
+          });
+          setNonResidentFeesLoading(false);
+          formikNonResidentFees.resetForm();
+        })
+        .catch((err) => {
+          setNonResidentFeesLoading(false);
+        });
+    },
+  });
+
+  const formikResidentFees = useFormik({
+    initialValues: {
+      name: "",
+      price: "",
+      fees: [],
+    },
+
+    validationSchema: Yup.object({
+      rooms: Yup.array().of(
+        Yup.object().shape({
+          name: Yup.string("Please enter a valid text of name"),
+          price: Yup.number("Please enter a valid number of price"),
+        })
+      ),
+      name: Yup.string("Please enter a valid text of name").required(
+        "Name is required"
+      ),
+      price: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+    }),
+
+    onSubmit: async (values) => {
+      setResidentFeesLoading(true);
+      await axios
+        .post(
+          `${process.env.NEXT_PUBLIC_baseURL}/room-types/${room.slug}/resident-other-fees/`,
+          {
+            name: values.name,
+            price: values.price,
+          },
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          values.fees.push({
+            name: values.name,
+            price: values.price,
+          });
+          setResidentFeesLoading(false);
+          formikResidentFees.resetForm();
+        })
+        .catch((err) => {
+          setResidentFeesLoading(false);
+        });
+    },
+  });
+
+  useEffect(() => {
+    if (room) {
+      if (room.other_fees_resident.length > 0) {
+        formikResidentFees.setFieldValue(
+          "fees",
+          room.other_fees_resident.map((fee) => {
+            return {
+              name: fee.name,
+              price: fee.price,
+            };
+          })
+        );
+      }
+
+      if (room.other_fees_non_resident.length > 0) {
+        formikNonResidentFees.setFieldValue(
+          "fees",
+          room.other_fees_non_resident.map((fee) => {
+            return {
+              name: fee.name,
+              price: fee.price,
+            };
+          })
+        );
+      }
+    }
+  }, []);
 
   return (
     <div className="">
@@ -614,114 +730,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 mt-3">
-                {formikAdd.values.otherFees.map((fee, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center"
-                    >
-                      <div className="w-[47%] flex flex-col gap-1.5">
-                        <Input
-                          name="name"
-                          type="text"
-                          value={fee.name}
-                          placeholder="Enter name of fee"
-                          errorStyle={
-                            formikAdd.touched.otherFees &&
-                            formikAdd.errors.otherFees
-                              ? true
-                              : false
-                          }
-                          onChange={(e) => {
-                            formikAdd.setFieldValue(
-                              `otherFees[${index}].name`,
-                              e.target.value
-                            );
-                          }}
-                          className={"w-full placeholder:text-sm "}
-                          inputClassName="!text-sm "
-                          label="Add the type of fee"
-                        ></Input>
-                        {formikAdd.touched.otherFees &&
-                        formikAdd.errors.otherFees ? (
-                          <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.otherFees[index].name}
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div className="w-[47%] gap-2 flex items-center">
-                        <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
-                          <Input
-                            name="price"
-                            type="number"
-                            value={fee.price}
-                            placeholder="Price"
-                            errorStyle={
-                              formikAdd.touched.otherFees &&
-                              formikAdd.errors.otherFees
-                                ? true
-                                : false
-                            }
-                            onChange={(e) => {
-                              formikAdd.setFieldValue(
-                                `otherFees[${index}].price`,
-                                e.target.value
-                              );
-                            }}
-                            className={"w-full placeholder:text-sm "}
-                            inputClassName="!text-sm "
-                            label="Add the price of the fee"
-                          ></Input>
-
-                          {formikAdd.touched.otherFees &&
-                          formikAdd.errors.otherFees ? (
-                            <span className="text-sm font-bold text-red-400">
-                              {formikAdd.errors.otherFees[index].price}
-                            </span>
-                          ) : null}
-                        </div>
-
-                        {index > 0 && (
-                          <div
-                            onClick={() => {
-                              formikAdd.setFieldValue(
-                                "otherFees",
-                                formikAdd.values.otherFees.filter(
-                                  (_, i) => i !== index
-                                )
-                              );
-                            }}
-                            className="w-[24px] cursor-pointer h-[24px] bg-red-500 mt-6 rounded-full flex items-center justify-center"
-                          >
-                            <Icon
-                              className="text-white text-lg"
-                              icon="octicon:dash-16"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div
-                  onClick={() => {
-                    formikAdd.setFieldValue(
-                      "otherFees",
-                      formikAdd.values.otherFees.concat({
-                        name: "",
-                        price: "",
-                      })
-                    );
-                  }}
-                  className="font-bold w-fit text-sm text-blue-500 cursor-pointer"
-                >
-                  Add more
-                </div>
-              </div>
-
               <div className="flex flex-col gap-1">
                 <h1 className="text-sm font-bold">Residency</h1>
 
@@ -779,18 +787,6 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 ) : null}
               </div>
             </div>
-
-            {/* <p className="font-bold mb-2 mt-4 text-sm">Note:</p>
-            <div className="mb-3 flex flex-col gap-1">
-              <ListItem>
-                You can only add availability for 20 days at a time.
-              </ListItem>
-              <ListItem>If date is already added, it will be updated.</ListItem>
-              <ListItem>
-                Price and number of available rooms can be changed at anytime.
-              </ListItem>
-              <ListItem>Price is in USD.</ListItem>
-            </div> */}
 
             <div className="flex items-center gap-4 mt-6">
               <button
@@ -907,25 +903,173 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
               </div>
             </div>
             {residentIsOpen && (
-              <RoomAvailability
-                availability={roomAvailabilities}
-                inPartnerHomepage={inPartnerHomepage}
-                roomName={room.name}
-                roomSlug={room.slug}
-                setOpenAddAvailabilityModal={() => {
-                  if (inPartnerHomepage) {
-                    router.push(`/partner/lodges/${staySlug}/actions`);
-                  } else {
-                    formikAdd.setFieldValue("residency", {
-                      value: "Resident",
-                      label: "Resident",
-                    });
-                    setOpenAddAvailabilityModal(true);
-                  }
-                }}
-                isNonResident={false}
-                setRoomAvailabilities={setRoomAvailabilities}
-              ></RoomAvailability>
+              <>
+                <RoomAvailability
+                  availability={roomAvailabilities}
+                  inPartnerHomepage={inPartnerHomepage}
+                  roomName={room.name}
+                  roomSlug={room.slug}
+                  setOpenAddAvailabilityModal={() => {
+                    if (inPartnerHomepage) {
+                      router.push(`/partner/lodges/${staySlug}/actions`);
+                    } else {
+                      formikAdd.setFieldValue("residency", {
+                        value: "Resident",
+                        label: "Resident",
+                      });
+                      setOpenAddAvailabilityModal(true);
+                    }
+                  }}
+                  isNonResident={false}
+                  setRoomAvailabilities={setRoomAvailabilities}
+                ></RoomAvailability>
+
+                {roomAvailabilities.length > 0 && (
+                  <div className="flex mt-5 flex-wrap gap-3">
+                    {formikResidentFees.values.fees.map((fee, index) => {
+                      return (
+                        <div key={index}>
+                          {fee.name && fee.price && (
+                            <div className="px-4 min-w-[150px] h-[120px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+                              <div className="text-sm text-gray-600 font-bold">
+                                {fee.name}
+                              </div>
+
+                              <div className="flex gap-1">
+                                <Price
+                                  stayPrice={fee.price}
+                                  autoCurrency={false}
+                                  currency="KES"
+                                  className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+                                ></Price>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    <div className="bg-blue-600 w-[150px] bg-opacity-30 px-1 py-2 border-2 border-blue-600 border-dashed rounded-lg flex gap-2 flex-col items-center justify-center">
+                      <h1 className="font-SourceSans text-sm font-bold text-center">
+                        Add your fee(for resdient)
+                      </h1>
+
+                      <Popover className="relative z-20 ">
+                        <Popover.Button className="outline-none ">
+                          <div className="w-[32px] h-[32px] cursor-pointer flex items-center justify-center rounded-full bg-blue-600">
+                            <Icon
+                              className="w-6 h-6 text-white"
+                              icon="material-symbols:add"
+                            />
+                          </div>
+                        </Popover.Button>
+
+                        <Transition
+                          as={React.Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel
+                            className={
+                              "absolute z-[30] bg-white rounded-md after:!left-[27%] bottom-[100%] mb-2 after:!border-b-transparent after:!border-t-white tooltip after:!top-[100%] -left-[100px] border shadow-md mt-2 w-[400px] !p-0"
+                            }
+                          >
+                            <div className="w-full bg-gray-200 px-3 py-2">
+                              <h1 className="font-semibold font-SourceSans">
+                                Add fees
+                              </h1>
+                            </div>
+
+                            <div className="px-2 mb-2 mt-2">
+                              <div>
+                                <Input
+                                  name="name"
+                                  type="text"
+                                  value={formikResidentFees.values.name}
+                                  placeholder="Enter the name of the fee. eg. Park fees"
+                                  errorStyle={
+                                    formikResidentFees.touched.name &&
+                                    formikResidentFees.errors.name
+                                      ? true
+                                      : false
+                                  }
+                                  onChange={(e) => {
+                                    formikResidentFees.handleChange(e);
+                                  }}
+                                  className={"w-full placeholder:text-sm "}
+                                  inputClassName="!text-sm "
+                                  label="Fee name"
+                                ></Input>
+                                {formikResidentFees.touched.name &&
+                                formikResidentFees.errors.name ? (
+                                  <span className="text-sm font-bold text-red-400">
+                                    {formikResidentFees.errors.name}
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <div className="mt-2">
+                                <Input
+                                  name="price"
+                                  type="number"
+                                  value={formikResidentFees.values.price}
+                                  placeholder="Enter the price of the fee."
+                                  errorStyle={
+                                    formikResidentFees.touched.price &&
+                                    formikResidentFees.errors.price
+                                      ? true
+                                      : false
+                                  }
+                                  onChange={(e) => {
+                                    formikResidentFees.handleChange(e);
+                                  }}
+                                  className={"w-full placeholder:text-sm "}
+                                  inputClassName="!text-sm "
+                                  label="Fee price"
+                                ></Input>
+                                {formikResidentFees.touched.price &&
+                                formikResidentFees.errors.price ? (
+                                  <span className="text-sm font-bold text-red-400">
+                                    {formikResidentFees.errors.price}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end mt-4 mb-3 mr-2">
+                              <Popover.Button className="bg-gray-200 text-sm font-bold px-6 py-1.5 rounded-md">
+                                Cancel
+                              </Popover.Button>
+
+                              <button
+                                onClick={() => {
+                                  formikResidentFees.handleSubmit();
+                                }}
+                                className="bg-blue-500 flex justify-center items-center gap-2 text-white text-sm font-bold ml-2 px-6 py-1.5 rounded-md"
+                              >
+                                Post{" "}
+                                {residentFeesLoading && (
+                                  <div>
+                                    <LoadingSpinerChase
+                                      color="white"
+                                      width={12}
+                                      height={12}
+                                    ></LoadingSpinerChase>
+                                  </div>
+                                )}
+                              </button>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </Popover>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -948,25 +1092,172 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
               </div>
             </div>
             {nonResidentIsOpen && (
-              <RoomAvailability
-                availability={roomAvailabilitiesNonResident}
-                roomName={room.name}
-                roomSlug={room.slug}
-                inPartnerHomepage={inPartnerHomepage}
-                setOpenAddAvailabilityModal={() => {
-                  if (inPartnerHomepage) {
-                    router.push(`/partner/lodges/${staySlug}/actions`);
-                  } else {
-                    formikAdd.setFieldValue("residency", {
-                      value: "Non-resident",
-                      label: "Non-resident",
-                    });
-                    setOpenAddAvailabilityModal(true);
-                  }
-                }}
-                isNonResident={true}
-                setRoomAvailabilities={setRoomAvailabilitiesNonResident}
-              ></RoomAvailability>
+              <>
+                <RoomAvailability
+                  availability={roomAvailabilitiesNonResident}
+                  roomName={room.name}
+                  roomSlug={room.slug}
+                  inPartnerHomepage={inPartnerHomepage}
+                  setOpenAddAvailabilityModal={() => {
+                    if (inPartnerHomepage) {
+                      router.push(`/partner/lodges/${staySlug}/actions`);
+                    } else {
+                      formikAdd.setFieldValue("residency", {
+                        value: "Non-resident",
+                        label: "Non-resident",
+                      });
+                      setOpenAddAvailabilityModal(true);
+                    }
+                  }}
+                  isNonResident={true}
+                  setRoomAvailabilities={setRoomAvailabilitiesNonResident}
+                ></RoomAvailability>
+
+                {roomAvailabilitiesNonResident.length > 0 && (
+                  <div className="flex mt-5 flex-wrap gap-3">
+                    {formikNonResidentFees.values.fees.map((fee, index) => {
+                      return (
+                        <div key={index}>
+                          {fee.name && fee.price && (
+                            <div className="px-4 min-w-[150px] h-[120px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+                              <div className="text-sm text-gray-600 font-bold">
+                                {fee.name}
+                              </div>
+
+                              <div className="flex gap-1">
+                                <Price
+                                  stayPrice={fee.price}
+                                  autoCurrency={false}
+                                  className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+                                ></Price>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    <div className="bg-blue-600 w-[150px] bg-opacity-30 px-1 py-2 border-2 border-blue-600 border-dashed rounded-lg flex gap-2 flex-col items-center justify-center">
+                      <h1 className="font-SourceSans text-sm font-bold text-center">
+                        Add your fee(for non-resdient)
+                      </h1>
+
+                      <Popover className="relative z-20 ">
+                        <Popover.Button className="outline-none ">
+                          <div className="w-[32px] h-[32px] cursor-pointer flex items-center justify-center rounded-full bg-blue-600">
+                            <Icon
+                              className="w-6 h-6 text-white"
+                              icon="material-symbols:add"
+                            />
+                          </div>
+                        </Popover.Button>
+
+                        <Transition
+                          as={React.Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel
+                            className={
+                              "absolute z-[30] bg-white rounded-md after:!left-[27%] bottom-[100%] mb-2 after:!border-b-transparent after:!border-t-white tooltip after:!top-[100%] -left-[100px] border shadow-md mt-2 w-[400px] !p-0"
+                            }
+                          >
+                            <div className="w-full bg-gray-200 px-3 py-2">
+                              <h1 className="font-semibold font-SourceSans">
+                                Add fees
+                              </h1>
+                            </div>
+
+                            <div className="px-2 mb-2 mt-2">
+                              <div>
+                                <Input
+                                  name="name"
+                                  type="text"
+                                  value={formikNonResidentFees.values.name}
+                                  placeholder="Enter the name of the fee. eg. Park fees"
+                                  errorStyle={
+                                    formikNonResidentFees.touched.name &&
+                                    formikNonResidentFees.errors.name
+                                      ? true
+                                      : false
+                                  }
+                                  onChange={(e) => {
+                                    formikNonResidentFees.handleChange(e);
+                                  }}
+                                  className={"w-full placeholder:text-sm "}
+                                  inputClassName="!text-sm "
+                                  label="Fee name"
+                                ></Input>
+                                {formikNonResidentFees.touched.name &&
+                                formikNonResidentFees.errors.name ? (
+                                  <span className="text-sm font-bold text-red-400">
+                                    {formikNonResidentFees.errors.name}
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <div className="mt-2">
+                                <Input
+                                  name="price"
+                                  type="number"
+                                  value={formikNonResidentFees.values.price}
+                                  placeholder="Enter the price of the fee."
+                                  errorStyle={
+                                    formikNonResidentFees.touched.price &&
+                                    formikNonResidentFees.errors.price
+                                      ? true
+                                      : false
+                                  }
+                                  onChange={(e) => {
+                                    formikNonResidentFees.handleChange(e);
+                                  }}
+                                  className={"w-full placeholder:text-sm "}
+                                  inputClassName="!text-sm "
+                                  label="Fee price"
+                                ></Input>
+                                {formikNonResidentFees.touched.price &&
+                                formikNonResidentFees.errors.price ? (
+                                  <span className="text-sm font-bold text-red-400">
+                                    {formikNonResidentFees.errors.price}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end mt-4 mb-3 mr-2">
+                              <Popover.Button className="bg-gray-200 text-sm font-bold px-6 py-1.5 rounded-md">
+                                Cancel
+                              </Popover.Button>
+
+                              <button
+                                onClick={() => {
+                                  formikNonResidentFees.handleSubmit();
+                                }}
+                                className="bg-blue-500 flex justify-center items-center gap-2 text-white text-sm font-bold ml-2 px-6 py-1.5 rounded-md"
+                              >
+                                Post{" "}
+                                {nonResidentFeesLoading && (
+                                  <div>
+                                    <LoadingSpinerChase
+                                      color="white"
+                                      width={12}
+                                      height={12}
+                                    ></LoadingSpinerChase>
+                                  </div>
+                                )}
+                              </button>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </Popover>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

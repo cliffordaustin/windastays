@@ -857,8 +857,8 @@ function SelectedListing({ listing, index }) {
               </div>
             </div>
 
-            <div className="flex w-[350px] justify-between">
-              <PopoverBox
+            <div className="flex justify-between">
+              {/* <PopoverBox
                 panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip left-[0px] border shadow-md mt-2 w-[280px] p-1"
                 btnClassName="w-full"
                 btnPopover={
@@ -919,31 +919,36 @@ function SelectedListing({ listing, index }) {
                     ></Switch>
                   </div>
                 </div>
-              </PopoverBox>
+              </PopoverBox> */}
 
               <PopoverBox
-                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-1"
+                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
                 btnClassName="w-full"
                 btnPopover={
-                  <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-full border">
+                  <div className="px-3 w-[350px] cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
                     <Icon
-                      className="w-6 h-6 text-gray-500"
-                      icon="material-symbols:group-rounded"
+                      className="w-6 h-7 text-gray-500"
+                      icon="material-symbols:feed"
                     />
 
                     <div className="flex flex-col gap-0.5">
-                      <h1 className="font-bold text-sm font-SourceSans">
+                      <h1 className="font-bold self-start text-sm font-SourceSans">
                         Other fees
                       </h1>
                       <h1 className="font-normal font-SourceSans">
-                        2 selected
+                        Add yout fees
                       </h1>
                     </div>
                   </div>
                 }
                 popoverClassName="w-[48%]"
               >
-                <div className="flex flex-col gap-0.5 font-SourceSans">
+                <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
+                  <h1 className="font-semibold font-SourceSans text-base">
+                    Add your fees
+                  </h1>
+                </div>
+                <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
                   <div className="flex px-2 py-2 justify-between items-center">
                     <h1 className="font-semibold text-sm">Your commission</h1>
 
@@ -1039,7 +1044,7 @@ function SelectedListing({ listing, index }) {
                         { name: "", price: "" },
                       ]);
                     }}
-                    className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 bg-gray-100 w-fit text-xs font-semibold border"
+                    className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 text-blue-600 w-fit text-sm font-semibold hover:bg-blue-600 hover:bg-opacity-20"
                   >
                     Add a fee
                   </div>

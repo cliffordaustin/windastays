@@ -8,6 +8,8 @@ import Cookies from "js-cookie";
 import pricing from "../../lib/pricingCalc";
 import Price from "../Stay/Price";
 import moment from "moment";
+import { Switch } from "@headlessui/react";
+import Checkbox from "../ui/Checkbox";
 
 function SelectedListingCard({ room, addedRooms }) {
   const router = useRouter();
@@ -166,6 +168,20 @@ function SelectedListingCard({ room, addedRooms }) {
     [addedRooms]
   );
 
+  const totalNumberOfGuests = React.useMemo(
+    () =>
+      numberOfResidentAdult +
+      numberOfNonResidentAdult +
+      numberOfResidentChild +
+      numberOfNonResidentChild,
+    [
+      numberOfResidentAdult,
+      numberOfNonResidentAdult,
+      numberOfResidentChild,
+      numberOfNonResidentChild,
+    ]
+  );
+
   const singleResidentAdultPriceCalc = singleResidentAdultPrice;
 
   const doubleResidentAdultPriceCalc = doubleResidentAdultPrice
@@ -293,29 +309,33 @@ function SelectedListingCard({ room, addedRooms }) {
       total += singleResidentAdultPriceCalc;
     }
     if (numberOfResidentAdult === 2) {
-      total += doubleResidentAdultPriceCalc;
+      total += doubleResidentAdultPriceCalc * numberOfResidentAdult;
     }
     if (numberOfResidentAdult === 3) {
-      total += tripleResidentAdultPriceCalc;
+      total += tripleResidentAdultPriceCalc * numberOfResidentAdult;
     }
     if (numberOfResidentAdult > 3) {
-      total += totalResidentAdultMoreThanThree;
+      total += totalResidentAdultMoreThanThree * numberOfResidentAdult;
     }
     if (numberOfResidentChild === 1) {
       total += singleResidentChildPriceCalc;
     }
     if (numberOfResidentChild === 2) {
-      total += doubleResidentChildPriceCalc;
+      total += doubleResidentChildPriceCalc * numberOfResidentChild;
     }
     if (numberOfResidentChild === 3) {
-      total += tripleResidentChildPriceCalc;
+      total += tripleResidentChildPriceCalc * numberOfResidentChild;
     }
     if (numberOfResidentChild > 3) {
-      total += totalResidentChildMoreThanThree;
+      total += totalResidentChildMoreThanThree * numberOfResidentChild;
     }
     if (numberOfInfantResident > 0) {
       total += infantResidentPriceCalc * numberOfInfantResident;
     }
+
+    residentFeesOptions.forEach((fee) => {
+      total += fee.price * totalNumberOfGuests;
+    });
 
     return total;
   };
@@ -327,32 +347,74 @@ function SelectedListingCard({ room, addedRooms }) {
       total += singleNonResidentAdultPriceCalc;
     }
     if (numberOfNonResidentAdult === 2) {
-      total += doubleNonResidentAdultPriceCalc;
+      total += doubleNonResidentAdultPriceCalc * numberOfNonResidentAdult;
     }
     if (numberOfNonResidentAdult === 3) {
-      total += tripleNonResidentAdultPriceCalc;
+      total += tripleNonResidentAdultPriceCalc * numberOfNonResidentAdult;
     }
     if (numberOfNonResidentAdult > 3) {
-      total += totalNonResidentAdultMoreThanThree;
+      total += totalNonResidentAdultMoreThanThree * numberOfNonResidentAdult;
     }
 
     if (numberOfNonResidentChild === 1) {
-      total += singleNonResidentChildPriceCalc;
+      total += singleNonResidentChildPriceCalc * numberOfNonResidentChild;
     }
     if (numberOfNonResidentChild === 2) {
-      total += doubleNonResidentChildPriceCalc;
+      total += doubleNonResidentChildPriceCalc * numberOfNonResidentChild;
     }
     if (numberOfNonResidentChild === 3) {
-      total += tripleNonResidentChildPriceCalc;
+      total += tripleNonResidentChildPriceCalc * numberOfNonResidentChild;
     }
     if (numberOfNonResidentChild > 3) {
-      total += totalNonResidentChildMoreThanThree;
+      total += totalNonResidentChildMoreThanThree * numberOfNonResidentChild;
     }
     if (numberOfInfantResident > 0) {
       total += infantResidentPriceCalc * numberOfInfantResident;
     }
 
+    nonResidentFeesOptions.forEach((fee) => {
+      total += fee.price * totalNumberOfGuests;
+    });
+
     return total;
+  };
+
+  const [enabled, setEnabled] = React.useState(false);
+
+  const residentFees = room.other_fees_resident;
+  const nonResidentFees = room.other_fees_non_resident;
+
+  const [residentFeesOptions, setResidentFeesOptions] = React.useState([]);
+  const [nonResidentFeesOptions, setNonResidentFeesOptions] = React.useState(
+    []
+  );
+
+  const handleResidentCheck = (event, fee) => {
+    var updatedList = [...residentFeesOptions];
+    if (event.target.checked) {
+      updatedList = [...updatedList, fee];
+    } else {
+      updatedList.splice(residentFeesOptions.indexOf(fee), 1);
+    }
+    setResidentFeesOptions(updatedList);
+  };
+
+  const handleNonResidentCheck = (event, fee) => {
+    var updatedList = [...nonResidentFeesOptions];
+    if (event.target.checked) {
+      updatedList = [...updatedList, fee];
+    } else {
+      updatedList.splice(nonResidentFeesOptions.indexOf(fee), 1);
+    }
+    setNonResidentFeesOptions(updatedList);
+  };
+
+  const containsResidentOption = (option) => {
+    return residentFeesOptions.some((item) => item.id === option.id);
+  };
+
+  const containsNonResidentOption = (option) => {
+    return nonResidentFeesOptions.some((item) => item.id === option.id);
   };
 
   return (
@@ -428,287 +490,361 @@ function SelectedListingCard({ room, addedRooms }) {
         )}
       </div>
 
-      <PopoverBox
-        panelClassName="bg-white rounded-xl after:!left-[40%] tooltip shadow-md mt-2 border w-[400px] -left-[100px] p-2"
-        btnClassName=""
-        btnPopover={
-          <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full">
-            Price breakdown
-            <Icon
-              className="w-6 h-6"
-              icon="material-symbols:arrow-drop-down-rounded"
-            />
+      <div className="flex items-center gap-2 absolute bottom-2">
+        <PopoverBox
+          panelClassName="bg-white rounded-xl after:!left-[40%] tooltip shadow-md mt-2 border w-[400px] -left-[100px] p-2"
+          btnClassName=""
+          btnPopover={
+            <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full">
+              Price breakdown
+              <Icon
+                className="w-6 h-6"
+                icon="material-symbols:arrow-drop-down-rounded"
+              />
+            </div>
+          }
+          popoverClassName=""
+        >
+          <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1>
+
+          <div className="mb-2 mt-2 w-fit">
+            <h1 className="text-gray-600 text-sm border-b border-b-gray-400 border-dashed">
+              (PP = Per Person)
+            </h1>
           </div>
-        }
-        popoverClassName="!absolute bottom-2"
-      >
-        <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1>
-        <div className="flex flex-col gap-2">
-          {numberOfResidentAdult === 1 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Single resident adult ({nights} nights)
-              </h1>
+          <div className="flex flex-col gap-2">
+            {numberOfResidentAdult === 1 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Single resident adult ({nights} nights)
+                </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    stayPrice={singleResidentAdultPriceCalc}
+                    autoCurrency={false}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>{" "}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                currency="KES"
-                stayPrice={singleResidentAdultPriceCalc}
-                autoCurrency={false}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfResidentAdult === 2 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Double resident adult ({nights} nights)
+                </h1>
 
-          {numberOfResidentAdult === 2 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Double resident adult ({nights} nights)
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    stayPrice={doubleResidentAdultPriceCalc}
+                    autoCurrency={false}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>{" "}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                currency="KES"
-                stayPrice={doubleResidentAdultPriceCalc}
-                autoCurrency={false}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfResidentAdult === 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Triple resident adult ({nights} nights)
+                </h1>
 
-          {numberOfResidentAdult === 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Triple resident adult ({nights} nights)
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={tripleResidentAdultPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={tripleResidentAdultPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfResidentAdult > 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Resident adult ({nights} nights) x {numberOfResidentAdult}
+                </h1>
 
-          {numberOfResidentAdult > 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident adult ({nights} nights) x {numberOfResidentAdult}
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={totalResidentAdultMoreThanThree}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={totalResidentAdultMoreThanThree}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfNonResidentAdult === 1 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Single non-resident adult ({nights} nights)
-              </h1>
+            {numberOfNonResidentAdult === 1 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Single non-resident adult ({nights} nights)
+                </h1>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={singleNonResidentAdultPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={singleNonResidentAdultPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfNonResidentAdult === 2 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Double non-resident adult ({nights} nights)
-              </h1>
+            {numberOfNonResidentAdult === 2 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Double non-resident adult ({nights} nights)
+                </h1>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={doubleNonResidentAdultPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={doubleNonResidentAdultPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-          {numberOfNonResidentAdult === 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Triple non-resident adult ({nights} nights)
-              </h1>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                autoCurrency={false}
-                stayPrice={tripleNonResidentAdultPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfNonResidentAdult === 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Triple non-resident adult ({nights} nights)
+                </h1>
 
-          {numberOfNonResidentAdult > 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Non-resident adult ({nights} nights) x{" "}
-                {numberOfNonResidentAdult}
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={tripleNonResidentAdultPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={totalNonResidentAdultMoreThanThree}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfResidentChild === 1 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Single resident child ({nights} nights)
-              </h1>
+            {numberOfNonResidentAdult > 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Non-resident adult ({nights} nights) x{" "}
+                  {numberOfNonResidentAdult}
+                </h1>
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={singleResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={totalNonResidentAdultMoreThanThree}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-          {numberOfResidentChild === 2 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Double resident child ({nights} nights)
-              </h1>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={doubleResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfResidentChild === 1 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Single resident child ({nights} nights)
+                </h1>
 
-          {numberOfResidentChild === 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Triple resident child ({nights} nights)
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={singleResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={tripleResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfResidentChild > 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident child ({nights} nights) x {numberOfResidentChild}
-              </h1>
+            {numberOfResidentChild === 2 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Double resident child ({nights} nights)
+                </h1>
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={totalResidentChildMoreThanThree}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={doubleResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-          {numberOfNonResidentChild === 1 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Single non-resident child ({nights} nights)
-              </h1>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                autoCurrency={false}
-                stayPrice={singleNonResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfResidentChild === 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Triple resident child ({nights} nights)
+                </h1>
 
-          {numberOfNonResidentChild === 2 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Double resident child ({nights} nights)
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={tripleResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={doubleNonResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfNonResidentChild === 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Triple resident child ({nights} nights)
-              </h1>
+            {numberOfResidentChild > 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Resident child ({nights} nights) x {numberOfResidentChild}
+                </h1>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={tripleNonResidentChildPriceCalc}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={totalResidentChildMoreThanThree}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-          {numberOfNonResidentChild > 3 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident child ({nights} nights) x {numberOfNonResidentChild}
-              </h1>
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-              <Price
-                autoCurrency={false}
-                stayPrice={totalNonResidentChildMoreThanThree}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+            {numberOfNonResidentChild === 1 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Single non-resident child ({nights} nights)
+                </h1>
 
-          {numberOfInfantResident > 0 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident infant ({nights} nights)
-              </h1>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={singleNonResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-              <Price
-                currency="KES"
-                autoCurrency={false}
-                stayPrice={infantResidentPriceCalc * numberOfInfantResident}
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
 
-          {numberOfInfantNonResident > 0 && (
-            <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-              <h1 className="text-sm font-semibold">
-                Resident infant ({nights} nights)
-              </h1>
+            {numberOfNonResidentChild === 2 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Double resident child ({nights} nights)
+                </h1>
 
-              <Price
-                autoCurrency={false}
-                stayPrice={
-                  infantNonResidentPriceCalc * numberOfInfantNonResident
-                }
-                className="!font-normal !text-sm !font-SourceSans"
-              ></Price>
-            </div>
-          )}
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={doubleNonResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
 
-          {/* <div className="px-3 flex font-SourceSans bg-gray-100 justify-between items-center py-1 w-full">
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
+
+            {numberOfNonResidentChild === 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Triple resident child ({nights} nights)
+                </h1>
+
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={tripleNonResidentChildPriceCalc}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
+
+            {numberOfNonResidentChild > 3 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Resident child ({nights} nights) x {numberOfNonResidentChild}
+                </h1>
+
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={totalNonResidentChildMoreThanThree}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
+
+            {numberOfInfantResident > 0 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Resident infant ({nights} nights)
+                </h1>
+
+                <div className="flex gap-1 items-center">
+                  <Price
+                    currency="KES"
+                    autoCurrency={false}
+                    stayPrice={infantResidentPriceCalc * numberOfInfantResident}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
+
+            {numberOfInfantNonResident > 0 && (
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <h1 className="text-sm font-semibold">
+                  Resident infant ({nights} nights)
+                </h1>
+
+                <div className="flex gap-1 items-center">
+                  <Price
+                    autoCurrency={false}
+                    stayPrice={
+                      infantNonResidentPriceCalc * numberOfInfantNonResident
+                    }
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>
+
+                  <span className="font-semibold mb-1">pp</span>
+                </div>
+              </div>
+            )}
+
+            {/* <div className="px-3 flex font-SourceSans bg-gray-100 justify-between items-center py-1 w-full">
             <h1 className="text-sm font-semibold">Total</h1>
 
             <Price
@@ -717,8 +853,90 @@ function SelectedListingCard({ room, addedRooms }) {
               stayPrice={getResidentTotalPrice()}
             ></Price>
           </div> */}
-        </div>
-      </PopoverBox>
+          </div>
+        </PopoverBox>
+
+        {(residentFees.length > 0 || nonResidentFees.length > 0) && (
+          <PopoverBox
+            panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[100px] !p-0"
+            btnClassName=""
+            btnPopover={
+              <div className="bg-red-200 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full">
+                Extra fees
+                <Icon
+                  className="w-6 h-6"
+                  icon="material-symbols:arrow-drop-down-rounded"
+                />
+              </div>
+            }
+            popoverClassName=""
+          >
+            <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
+              <h1 className="font-semibold font-SourceSans text-base">
+                Add extra fees
+              </h1>
+            </div>
+            <div className="flex flex-col">
+              {residentFees.map((fee, index) => (
+                <div key={index} className="px-2 py-2">
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-sm">
+                      {fee.name}{" "}
+                      <span className="font-normal">(For resident)</span>
+                      <span className="font-normal">
+                        {" "}
+                        ={" "}
+                        <Price
+                          stayPrice={fee.price}
+                          autoCurrency={false}
+                          currency="KES"
+                          className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                        ></Price>{" "}
+                        pp
+                      </span>
+                    </h1>
+
+                    <Checkbox
+                      checked={containsResidentOption(fee)}
+                      value={fee}
+                      onChange={(event) => handleResidentCheck(event, fee)}
+                    ></Checkbox>
+                  </div>
+                </div>
+              ))}
+
+              <hr />
+
+              {nonResidentFees.map((fee, index) => (
+                <div key={index} className="px-2 py-2">
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-sm">
+                      {fee.name}{" "}
+                      <span className="font-normal">(For non-resident)</span>
+                      <span className="font-normal">
+                        {" "}
+                        ={" "}
+                        <Price
+                          stayPrice={fee.price}
+                          autoCurrency={false}
+                          className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                        ></Price>{" "}
+                        pp
+                      </span>
+                    </h1>
+
+                    <Checkbox
+                      checked={containsNonResidentOption(fee)}
+                      value={fee}
+                      onChange={(event) => handleNonResidentCheck(event, fee)}
+                    ></Checkbox>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </PopoverBox>
+        )}
+      </div>
     </div>
   );
 }
