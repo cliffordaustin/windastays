@@ -923,9 +923,9 @@ function SelectedListing({ listing, index }) {
 
               <PopoverBox
                 panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
-                btnClassName="w-full"
+                btnClassName="w-[350px]"
                 btnPopover={
-                  <div className="px-3 w-[350px] cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
+                  <div className="px-3 w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
                     <Icon
                       className="w-6 h-7 text-gray-500"
                       icon="material-symbols:feed"
