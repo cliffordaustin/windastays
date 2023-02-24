@@ -8,10 +8,18 @@ import Cookies from "js-cookie";
 import pricing from "../../lib/pricingCalc";
 import Price from "../Stay/Price";
 import moment from "moment";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { Switch } from "@headlessui/react";
 import Checkbox from "../ui/Checkbox";
+import Dialogue from "../Home/Dialogue";
+import Button from "../ui/Button";
 
-function SelectedListingCard({ room, addedRooms }) {
+function SelectedListingCard({
+  room,
+  residentFeesOptions,
+  nonResidentFeesOptions,
+}) {
   const router = useRouter();
 
   const [roomAvailabilities, setRoomAvailabilities] = React.useState([]);
@@ -131,41 +139,88 @@ function SelectedListingCard({ room, addedRooms }) {
     [roomAvailabilitiesNonResident]
   );
 
+  const formik = useFormik({
+    initialValues: {
+      rooms: [
+        {
+          residentAdult: 1,
+          nonResidentAdult: 1,
+          residentChild: 0,
+          nonResidentChild: 0,
+          infantResident: 0,
+          infantNonResident: 0,
+        },
+      ],
+    },
+
+    validationSchema: Yup.object({
+      rooms: Yup.array().of(
+        Yup.object().shape({
+          residentAdult: Yup.number(
+            "Please enter a valid number of resident adults"
+          ),
+          nonResidentAdult: Yup.number(
+            "Please enter a valid number of non-resident adults"
+          ),
+          residentChild: Yup.number(
+            "Please enter a valid number of resident children"
+          ),
+          nonResidentChild: Yup.number(
+            "Please enter a valid number of non-resident children"
+          ),
+          infantResident: Yup.number(
+            "Please enter a valid number of resident infants"
+          ),
+          infantNonResident: Yup.number(
+            "Please enter a valid number of non-resident infants"
+          ),
+        })
+      ),
+    }),
+
+    onSubmit: (values) => {
+      setOpenGuestModal(false);
+    },
+  });
+
   const nights = moment
     .duration(moment(router.query.endDate).diff(moment(router.query.date)))
     .asDays();
 
   const numberOfResidentAdult = React.useMemo(
     () =>
-      addedRooms.reduce((acc, cur) => {
+      formik.values.rooms.reduce((acc, cur) => {
         return acc + cur.residentAdult;
       }, 0),
-    [addedRooms]
+    [formik.values.rooms]
   );
 
   const numberOfNonResidentAdult = React.useMemo(
-    () => addedRooms.reduce((acc, cur) => acc + cur.nonResidentAdult, 0),
-    [addedRooms]
+    () =>
+      formik.values.rooms.reduce((acc, cur) => acc + cur.nonResidentAdult, 0),
+    [formik.values.rooms]
   );
 
   const numberOfResidentChild = React.useMemo(
-    () => addedRooms.reduce((acc, cur) => acc + cur.residentChild, 0),
-    [addedRooms]
+    () => formik.values.rooms.reduce((acc, cur) => acc + cur.residentChild, 0),
+    [formik.values.rooms]
   );
 
   const numberOfNonResidentChild = React.useMemo(
-    () => addedRooms.reduce((acc, cur) => acc + cur.nonResidentChild, 0),
-    [addedRooms]
+    () =>
+      formik.values.rooms.reduce((acc, cur) => acc + cur.nonResidentChild, 0),
+    [formik.values.rooms]
   );
 
   const numberOfInfantResident = React.useMemo(
-    () => addedRooms.reduce((acc, cur) => acc + cur.infantResident, 0),
-    [addedRooms]
+    () => formik.values.rooms.reduce((acc, cur) => acc + cur.infantResident, 0),
+    [formik.values.rooms]
   );
 
   const numberOfInfantNonResident = React.useMemo(
-    () => addedRooms.reduce((acc, cur) => acc + cur.infantNonResident, 0),
-    [addedRooms]
+    () =>
+      formik.values.rooms.reduce((acc, cur) => acc + cur.infantNonResident, 0),
+    [formik.values.rooms]
   );
 
   const totalNumberOfGuests = React.useMemo(
@@ -190,8 +245,8 @@ function SelectedListingCard({ room, addedRooms }) {
 
   const tripleResidentAdultPriceCalc = tripleResidentAdultPrice
     ? tripleResidentAdultPrice
-    : singleResidentAdultPriceCalc && doubleResidentAdultPriceCalc
-    ? doubleResidentAdultPriceCalc + singleResidentAdultPriceCalc
+    : doubleResidentAdultPriceCalc
+    ? doubleResidentAdultPriceCalc * 3
     : singleResidentAdultPriceCalc * 3;
 
   const singleNonResidentAdultPriceCalc = singleNonResidentAdultPrice;
@@ -202,8 +257,8 @@ function SelectedListingCard({ room, addedRooms }) {
 
   const tripleNonResidentAdultPriceCalc = tripleNonResidentAdultPrice
     ? tripleNonResidentAdultPrice
-    : singleNonResidentAdultPriceCalc && doubleNonResidentAdultPriceCalc
-    ? doubleNonResidentAdultPriceCalc + singleNonResidentAdultPriceCalc
+    : doubleNonResidentAdultPriceCalc
+    ? doubleNonResidentAdultPriceCalc * 3
     : singleNonResidentAdultPriceCalc * 3;
 
   const singleResidentChildPriceCalc = singleResidentChildPrice;
@@ -214,8 +269,8 @@ function SelectedListingCard({ room, addedRooms }) {
 
   const tripleResidentChildPriceCalc = tripleResidentChildPrice
     ? tripleResidentChildPrice
-    : singleResidentChildPriceCalc && doubleResidentChildPriceCalc
-    ? doubleResidentChildPriceCalc + singleResidentChildPriceCalc
+    : doubleResidentChildPriceCalc
+    ? doubleResidentChildPriceCalc * 3
     : singleResidentChildPriceCalc * 3;
 
   const singleNonResidentChildPriceCalc = singleNonResidentChildPrice;
@@ -226,8 +281,8 @@ function SelectedListingCard({ room, addedRooms }) {
 
   const tripleNonResidentChildPriceCalc = tripleNonResidentChildPrice
     ? tripleNonResidentChildPrice
-    : singleNonResidentChildPriceCalc && doubleNonResidentChildPriceCalc
-    ? doubleNonResidentChildPriceCalc + singleNonResidentChildPriceCalc
+    : doubleNonResidentChildPriceCalc
+    ? doubleNonResidentChildPriceCalc * 3
     : singleNonResidentChildPriceCalc * 3;
 
   const infantResidentPriceCalc = infantResidentPrice;
@@ -305,33 +360,38 @@ function SelectedListingCard({ room, addedRooms }) {
   const getResidentTotalPrice = () => {
     let total = 0;
 
-    if (numberOfResidentAdult === 1) {
-      total += singleResidentAdultPriceCalc;
-    }
-    if (numberOfResidentAdult === 2) {
-      total += doubleResidentAdultPriceCalc * numberOfResidentAdult;
-    }
-    if (numberOfResidentAdult === 3) {
-      total += tripleResidentAdultPriceCalc * numberOfResidentAdult;
-    }
-    if (numberOfResidentAdult > 3) {
-      total += totalResidentAdultMoreThanThree * numberOfResidentAdult;
-    }
-    if (numberOfResidentChild === 1) {
-      total += singleResidentChildPriceCalc;
-    }
-    if (numberOfResidentChild === 2) {
-      total += doubleResidentChildPriceCalc * numberOfResidentChild;
-    }
-    if (numberOfResidentChild === 3) {
-      total += tripleResidentChildPriceCalc * numberOfResidentChild;
-    }
-    if (numberOfResidentChild > 3) {
-      total += totalResidentChildMoreThanThree * numberOfResidentChild;
-    }
-    if (numberOfInfantResident > 0) {
-      total += infantResidentPriceCalc * numberOfInfantResident;
-    }
+    formik.values.rooms.forEach((room) => {
+      const sumOfGuests =
+        room.residentAdult +
+        room.nonResidentAdult +
+        room.residentChild +
+        room.nonResidentChild +
+        room.infantResident +
+        room.infantNonResident;
+
+      if (sumOfGuests === 1) {
+        if (room.residentAdult > 0) {
+          total += singleResidentAdultPriceCalc;
+        }
+        if (room.residentChild > 0) {
+          total += singleResidentChildPriceCalc;
+        }
+      } else if (sumOfGuests === 2) {
+        if (room.residentAdult > 0) {
+          total += doubleResidentAdultPriceCalc * room.residentAdult;
+        }
+        if (room.residentChild > 0) {
+          total += doubleResidentChildPriceCalc * room.residentChild;
+        }
+      } else if (sumOfGuests === 3) {
+        if (room.residentAdult > 0) {
+          total += tripleResidentAdultPriceCalc * room.residentAdult;
+        }
+        if (room.residentChild > 0) {
+          total += tripleResidentChildPriceCalc * room.residentChild;
+        }
+      }
+    });
 
     residentFeesOptions.forEach((fee) => {
       total += fee.price * totalNumberOfGuests;
@@ -343,34 +403,38 @@ function SelectedListingCard({ room, addedRooms }) {
   const getNonResidentTotalPrice = () => {
     let total = 0;
 
-    if (numberOfNonResidentAdult === 1) {
-      total += singleNonResidentAdultPriceCalc;
-    }
-    if (numberOfNonResidentAdult === 2) {
-      total += doubleNonResidentAdultPriceCalc * numberOfNonResidentAdult;
-    }
-    if (numberOfNonResidentAdult === 3) {
-      total += tripleNonResidentAdultPriceCalc * numberOfNonResidentAdult;
-    }
-    if (numberOfNonResidentAdult > 3) {
-      total += totalNonResidentAdultMoreThanThree * numberOfNonResidentAdult;
-    }
+    formik.values.rooms.forEach((room) => {
+      const sumOfGuests =
+        room.residentAdult +
+        room.nonResidentAdult +
+        room.residentChild +
+        room.nonResidentChild +
+        room.infantResident +
+        room.infantNonResident;
 
-    if (numberOfNonResidentChild === 1) {
-      total += singleNonResidentChildPriceCalc * numberOfNonResidentChild;
-    }
-    if (numberOfNonResidentChild === 2) {
-      total += doubleNonResidentChildPriceCalc * numberOfNonResidentChild;
-    }
-    if (numberOfNonResidentChild === 3) {
-      total += tripleNonResidentChildPriceCalc * numberOfNonResidentChild;
-    }
-    if (numberOfNonResidentChild > 3) {
-      total += totalNonResidentChildMoreThanThree * numberOfNonResidentChild;
-    }
-    if (numberOfInfantResident > 0) {
-      total += infantResidentPriceCalc * numberOfInfantResident;
-    }
+      if (sumOfGuests === 1) {
+        if (room.nonResidentAdult > 0) {
+          total += singleNonResidentAdultPriceCalc;
+        }
+        if (room.nonResidentChild > 0) {
+          total += singleNonResidentChildPriceCalc;
+        }
+      } else if (sumOfGuests === 2) {
+        if (room.nonResidentAdult > 0) {
+          total += doubleNonResidentAdultPriceCalc * room.nonResidentAdult;
+        }
+        if (room.nonResidentChild > 0) {
+          total += doubleNonResidentChildPriceCalc * room.nonResidentChild;
+        }
+      } else if (sumOfGuests === 3) {
+        if (room.nonResidentAdult > 0) {
+          total += tripleNonResidentAdultPriceCalc * room.nonResidentAdult;
+        }
+        if (room.nonResidentChild > 0) {
+          total += tripleNonResidentChildPriceCalc * room.nonResidentChild;
+        }
+      }
+    });
 
     nonResidentFeesOptions.forEach((fee) => {
       total += fee.price * totalNumberOfGuests;
@@ -379,47 +443,56 @@ function SelectedListingCard({ room, addedRooms }) {
     return total;
   };
 
-  const [enabled, setEnabled] = React.useState(false);
+  const [openGuestModal, setOpenGuestModal] = React.useState(false);
 
-  const residentFees = room.other_fees_resident;
-  const nonResidentFees = room.other_fees_non_resident;
-
-  const [residentFeesOptions, setResidentFeesOptions] = React.useState([]);
-  const [nonResidentFeesOptions, setNonResidentFeesOptions] = React.useState(
-    []
+  const isResidentAdultAvailable = React.useMemo(
+    () => pricing.isResidentAdultAvailable(room),
+    [room]
   );
 
-  const handleResidentCheck = (event, fee) => {
-    var updatedList = [...residentFeesOptions];
-    if (event.target.checked) {
-      updatedList = [...updatedList, fee];
-    } else {
-      updatedList.splice(residentFeesOptions.indexOf(fee), 1);
-    }
-    setResidentFeesOptions(updatedList);
-  };
+  const isResidentChildAvailable = React.useMemo(
+    () => pricing.isResidentChildAvailable(room),
+    [room]
+  );
 
-  const handleNonResidentCheck = (event, fee) => {
-    var updatedList = [...nonResidentFeesOptions];
-    if (event.target.checked) {
-      updatedList = [...updatedList, fee];
-    } else {
-      updatedList.splice(nonResidentFeesOptions.indexOf(fee), 1);
-    }
-    setNonResidentFeesOptions(updatedList);
-  };
+  const isNonResidentAdultAvailable = React.useMemo(
+    () => pricing.isNonResidentAdultAvailable(room),
+    [room]
+  );
 
-  const containsResidentOption = (option) => {
-    return residentFeesOptions.some((item) => item.id === option.id);
-  };
+  const isNonResidentChildAvailable = React.useMemo(
+    () => pricing.isNonResidentChildAvailable(room),
+    [room]
+  );
 
-  const containsNonResidentOption = (option) => {
-    return nonResidentFeesOptions.some((item) => item.id === option.id);
-  };
+  const isResidentInfantAvailable = React.useMemo(
+    () => pricing.isResidentInfantAvailable(room),
+    [room]
+  );
+
+  const isNonResidentInfantAvailable = React.useMemo(
+    () => pricing.isNonResidentInfantAvailable(room),
+    [room]
+  );
+
+  const adultAgeGroup = React.useMemo(
+    () => pricing.adultAgeGroup(room),
+    [room]
+  );
+
+  const childAgeGroup = React.useMemo(
+    () => pricing.childAgeGroup(room),
+    [room]
+  );
+
+  const infantAgeGroup = React.useMemo(
+    () => pricing.infantAgeGroup(room),
+    [room]
+  );
 
   return (
     <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
-      <div className="text-sm absolute top-4 text-gray-600 font-bold">
+      <div className="text-sm text-gray-600 font-bold absolute top-4">
         {room.name}
       </div>
 
@@ -492,7 +565,7 @@ function SelectedListingCard({ room, addedRooms }) {
 
       <div className="flex items-center gap-2 absolute bottom-2">
         <PopoverBox
-          panelClassName="bg-white rounded-xl after:!left-[40%] tooltip shadow-md mt-2 border w-[400px] -left-[100px] p-2"
+          panelClassName="bg-white rounded-xl after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[100px]"
           btnClassName=""
           btnPopover={
             <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full">
@@ -505,358 +578,267 @@ function SelectedListingCard({ room, addedRooms }) {
           }
           popoverClassName=""
         >
-          <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1>
+          {/* <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1> */}
 
-          <div className="mb-2 mt-2 w-fit">
+          <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
+            <h1 className="font-semibold font-SourceSans text-base">
+              Price breakdown
+            </h1>
+          </div>
+
+          <div className="mb-2 mt-2 w-fit px-2">
             <h1 className="text-gray-600 text-sm border-b border-b-gray-400 border-dashed">
               (PP = Per Person)
             </h1>
           </div>
-          <div className="flex flex-col gap-2">
-            {numberOfResidentAdult === 1 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Single resident adult ({nights} nights)
+          {formik.values.rooms.map((room, index) => {
+            const sumOfGuests =
+              room.residentAdult +
+              room.nonResidentAdult +
+              room.residentChild +
+              room.nonResidentChild +
+              room.infantResident +
+              room.infantNonResident;
+
+            return (
+              <div key={index} className="flex flex-col gap-2 px-2 mb-3">
+                <h1 className="font-semibold font-SourceSans text-sm">
+                  Room {index + 1}
                 </h1>
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    stayPrice={singleResidentAdultPriceCalc}
-                    autoCurrency={false}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>{" "}
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
+                {sumOfGuests === 1 && (
+                  <div className="flex flex-col pl-3 gap-2">
+                    {room.residentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Single resident adult ({nights} nights)
+                        </h1>
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            stayPrice={singleResidentAdultPriceCalc}
+                            autoCurrency={false}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>{" "}
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Single non-resident adult ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={singleNonResidentAdultPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.residentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Single resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            autoCurrency={false}
+                            stayPrice={singleResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Single non-resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={singleNonResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {sumOfGuests === 2 && (
+                  <div className="flex flex-col pl-3 gap-2">
+                    {room.residentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Double resident adult ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            stayPrice={doubleResidentAdultPriceCalc}
+                            autoCurrency={false}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>{" "}
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Double non-resident adult ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={doubleNonResidentAdultPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.residentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Double resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            autoCurrency={false}
+                            stayPrice={doubleResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Double resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={doubleNonResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {sumOfGuests === 3 && (
+                  <div className="flex flex-col pl-3 gap-2">
+                    {room.residentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Triple resident adult ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            autoCurrency={false}
+                            stayPrice={tripleResidentAdultPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentAdult > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Triple non-resident adult ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={tripleNonResidentAdultPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.residentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Triple resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            currency="KES"
+                            autoCurrency={false}
+                            stayPrice={tripleResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {room.nonResidentChild > 0 && (
+                      <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                        <h1 className="text-sm font-semibold">
+                          Triple resident child ({nights} nights)
+                        </h1>
+
+                        <div className="flex gap-1 items-center">
+                          <Price
+                            autoCurrency={false}
+                            stayPrice={tripleNonResidentChildPriceCalc}
+                            className="!font-normal !text-sm !font-SourceSans"
+                          ></Price>
+
+                          <span className="font-semibold mb-1">pp</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-
-            {numberOfResidentAdult === 2 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Double resident adult ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    stayPrice={doubleResidentAdultPriceCalc}
-                    autoCurrency={false}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>{" "}
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentAdult === 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Triple resident adult ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={tripleResidentAdultPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentAdult > 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Resident adult ({nights} nights) x {numberOfResidentAdult}
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={totalResidentAdultMoreThanThree}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentAdult === 1 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Single non-resident adult ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={singleNonResidentAdultPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentAdult === 2 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Double non-resident adult ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={doubleNonResidentAdultPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentAdult === 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Triple non-resident adult ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={tripleNonResidentAdultPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentAdult > 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Non-resident adult ({nights} nights) x{" "}
-                  {numberOfNonResidentAdult}
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={totalNonResidentAdultMoreThanThree}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentChild === 1 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Single resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={singleResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentChild === 2 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Double resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={doubleResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentChild === 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Triple resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={tripleResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfResidentChild > 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Resident child ({nights} nights) x {numberOfResidentChild}
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={totalResidentChildMoreThanThree}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentChild === 1 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Single non-resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={singleNonResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentChild === 2 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Double resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={doubleNonResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentChild === 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Triple resident child ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={tripleNonResidentChildPriceCalc}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfNonResidentChild > 3 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Resident child ({nights} nights) x {numberOfNonResidentChild}
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={totalNonResidentChildMoreThanThree}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfInfantResident > 0 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Resident infant ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    currency="KES"
-                    autoCurrency={false}
-                    stayPrice={infantResidentPriceCalc * numberOfInfantResident}
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {numberOfInfantNonResident > 0 && (
-              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                <h1 className="text-sm font-semibold">
-                  Resident infant ({nights} nights)
-                </h1>
-
-                <div className="flex gap-1 items-center">
-                  <Price
-                    autoCurrency={false}
-                    stayPrice={
-                      infantNonResidentPriceCalc * numberOfInfantNonResident
-                    }
-                    className="!font-normal !text-sm !font-SourceSans"
-                  ></Price>
-
-                  <span className="font-semibold mb-1">pp</span>
-                </div>
-              </div>
-            )}
-
-            {/* <div className="px-3 flex font-SourceSans bg-gray-100 justify-between items-center py-1 w-full">
-            <h1 className="text-sm font-semibold">Total</h1>
-
-            <Price
-              autoCurrency={false}
-              className="!font-normal !text-sm !font-SourceSans"
-              stayPrice={getResidentTotalPrice()}
-            ></Price>
-          </div> */}
-          </div>
+            );
+          })}
         </PopoverBox>
 
-        {(residentFees.length > 0 || nonResidentFees.length > 0) && (
+        {/* {(residentFees.length > 0 || nonResidentFees.length > 0) && (
           <PopoverBox
             panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[100px] !p-0"
             btnClassName=""
@@ -935,7 +917,487 @@ function SelectedListingCard({ room, addedRooms }) {
               ))}
             </div>
           </PopoverBox>
-        )}
+        )} */}
+
+        <div
+          onClick={() => {
+            setOpenGuestModal(true);
+          }}
+          className="bg-red-200 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full"
+        >
+          Add guest
+          <Icon
+            className="w-6 h-6"
+            icon="material-symbols:arrow-drop-down-rounded"
+          />
+        </div>
+
+        <Dialogue
+          isOpen={openGuestModal}
+          closeModal={() => {
+            setOpenGuestModal(false);
+          }}
+          dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
+          outsideDialogueClass="!p-0"
+          dialoguePanelClassName={
+            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-2xl screen-height-safari md:!min-h-0 md:!max-h-[550px] "
+          }
+        >
+          <div
+            onClick={() => {
+              setOpenGuestModal(false);
+            }}
+            className="border-b px-4 py-2 bg-gray-200 flex items-center gap-4"
+          >
+            <div className="w-[30px] h-[30px] cursor-pointer rounded-full border border-gray-400 flex items-center justify-center">
+              <Icon className="w-6 h-6" icon="iconoir:cancel" />
+            </div>
+            <h1 className="font-bold font-SourceSans">
+              Add guests to {room.name}
+            </h1>
+          </div>
+
+          <div className="py-0.5 border-b border-gray-400 border-dashed my-2 text-sm flex gap-1 w-fit mx-4">
+            <Icon
+              className="w-5 h-5 text-gray-500"
+              icon="material-symbols:group-rounded"
+            />
+            <span>Room has a capacity of {room.capacity}</span>
+          </div>
+
+          <div className="px-4 my-2 gap-2 flex flex-col">
+            {formik.values.rooms.map((item, index) => {
+              const sumOfGuests =
+                item.residentAdult +
+                item.nonResidentAdult +
+                item.residentChild +
+                item.nonResidentChild +
+                item.infantResident +
+                item.infantNonResident;
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col font-SourceSans gap-2"
+                >
+                  <h1 className="font-bold">Room {index + 1}</h1>
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isResidentAdultAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Resident adult{" "}
+                      {adultAgeGroup && <span>({adultAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isResidentAdultAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].residentAdult`,
+                              formik.values.rooms[index].residentAdult > 0
+                                ? formik.values.rooms[index].residentAdult - 1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentAdultAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.residentAdult}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isResidentAdultAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].residentAdult`,
+                              formik.values.rooms[index].residentAdult + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentAdultAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isResidentChildAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Resident child{" "}
+                      {childAgeGroup && <span>({childAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isResidentChildAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].residentChild`,
+                              formik.values.rooms[index].residentChild > 0
+                                ? formik.values.rooms[index].residentChild - 1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentChildAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.residentChild}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isResidentChildAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].residentChild`,
+                              formik.values.rooms[index].residentChild + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentChildAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isNonResidentAdultAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Non-resident adult{" "}
+                      {adultAgeGroup && <span>({adultAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isNonResidentAdultAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].nonResidentAdult`,
+                              formik.values.rooms[index].nonResidentAdult > 0
+                                ? formik.values.rooms[index].nonResidentAdult -
+                                    1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentAdultAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.nonResidentAdult}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isNonResidentAdultAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].nonResidentAdult`,
+                              formik.values.rooms[index].nonResidentAdult + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentAdultAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isNonResidentChildAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Non-resident child{" "}
+                      {childAgeGroup && <span>({childAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isNonResidentChildAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].nonResidentChild`,
+                              formik.values.rooms[index].nonResidentChild > 0
+                                ? formik.values.rooms[index].nonResidentChild -
+                                    1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentChildAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.nonResidentChild}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isNonResidentChildAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].nonResidentChild`,
+                              formik.values.rooms[index].nonResidentChild + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentChildAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isResidentInfantAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Resident infant{" "}
+                      {infantAgeGroup && <span>({infantAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isResidentInfantAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].infantResident`,
+                              formik.values.rooms[index].infantResident > 0
+                                ? formik.values.rooms[index].infantResident - 1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentInfantAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.infantResident}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isResidentInfantAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].infantResident`,
+                              formik.values.rooms[index].infantResident + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isResidentInfantAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      "flex items-center justify-between mt-2 " +
+                      (isNonResidentInfantAvailable ? "" : "opacity-40")
+                    }
+                  >
+                    <h1>
+                      Non-resident infant{" "}
+                      {infantAgeGroup && <span>({infantAgeGroup})</span>}
+                    </h1>
+
+                    <div className="flex gap-2 items-center">
+                      <div
+                        onClick={() => {
+                          if (isNonResidentInfantAvailable) {
+                            formik.setFieldValue(
+                              `rooms[${index}].infantNonResident`,
+                              formik.values.rooms[index].infantNonResident > 0
+                                ? formik.values.rooms[index].infantNonResident -
+                                    1
+                                : 0
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentInfantAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        -{" "}
+                      </div>
+                      <h1 className="font-bold text-sm">
+                        {item.infantNonResident}
+                      </h1>
+                      <div
+                        onClick={() => {
+                          if (
+                            isNonResidentInfantAvailable &&
+                            sumOfGuests < room.capacity
+                          ) {
+                            formik.setFieldValue(
+                              `rooms[${index}].infantNonResident`,
+                              formik.values.rooms[index].infantNonResident + 1
+                            );
+                          }
+                        }}
+                        className={
+                          "w-[32px] font-bold text-lg h-[32px] rounded-full border flex items-center justify-center " +
+                          (isNonResidentInfantAvailable
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed")
+                        }
+                      >
+                        {" "}
+                        +{" "}
+                      </div>
+                    </div>
+                  </div>
+
+                  {index > 0 && (
+                    <div
+                      onClick={() => {
+                        formik.setFieldValue(
+                          "rooms",
+                          formik.values.rooms.filter((_, i) => i !== index)
+                        );
+                      }}
+                      className="cursor-pointer font-semibold w-fit ml-auto font-SourceSans text-red-500 mt-2"
+                    >
+                      Remove room
+                    </div>
+                  )}
+
+                  <div className="mt-2 h-[1px] w-full bg-gray-200"></div>
+                </div>
+              );
+            })}
+
+            <h1
+              onClick={() => {
+                formik.setFieldValue("rooms", [
+                  ...formik.values.rooms,
+                  {
+                    residentAdult: 1,
+                    nonResidentAdult: 0,
+                    residentChild: 0,
+                    nonResidentChild: 0,
+                    infantResident: 0,
+                    infantNonResident: 0,
+                  },
+                ]);
+              }}
+              className="font-semibold text-blue-600 font-SourceSans mt-2 cursor-pointer w-fit"
+            >
+              Add another room
+            </h1>
+
+            <Button
+              onClick={() => {
+                formik.handleSubmit();
+              }}
+              type={"submit"}
+              className="!w-full mt-4 btn-gradient-2 !h-full !rounded-3xl font-bold"
+            >
+              Done
+            </Button>
+          </div>
+        </Dialogue>
       </div>
     </div>
   );

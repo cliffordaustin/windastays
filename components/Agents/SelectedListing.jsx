@@ -19,6 +19,8 @@ import Button from "../ui/Button";
 import Switch from "../ui/Switch";
 import pricing from "../../lib/pricingCalc";
 import Input from "../ui/Input";
+import Checkbox from "../ui/Checkbox";
+import Price from "../Stay/Price";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -111,9 +113,9 @@ function SelectedListing({ listing, index }) {
         .get(
           `${process.env.NEXT_PUBLIC_baseURL}/stays/${
             listing.slug
-          }/room-types/?num_of_rooms_resident=${residentNumberOfRooms}&num_of_rooms_non_resident=${nonResidentNumberOfRooms}&start_date=${
-            router.query.date
-          }&end_date=${moment(router.query.endDate)
+          }/room-types/?start_date=${router.query.date}&end_date=${moment(
+            router.query.endDate
+          )
             .subtract(1, "days")
             .format("YYYY-MM-DD")}`,
           {
@@ -130,116 +132,9 @@ function SelectedListing({ listing, index }) {
     }
   }, [guestOptionChanged]);
 
-  const isResidentAdultAvailable = React.useMemo(
-    () => pricing.isResidentAdultAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isResidentChildAvailable = React.useMemo(
-    () => pricing.isResidentChildAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentAdultAvailable = React.useMemo(
-    () => pricing.isNonResidentAdultAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentChildAvailable = React.useMemo(
-    () => pricing.isNonResidentChildAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isResidentInfantAvailable = React.useMemo(
-    () => pricing.isResidentInfantAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const isNonResidentInfantAvailable = React.useMemo(
-    () => pricing.isNonResidentInfantAvailable(roomTypes),
-    [roomTypes]
-  );
-
-  const formik = useFormik({
-    initialValues: {
-      rooms: [
-        {
-          residentAdult: 1,
-          nonResidentAdult: 1,
-          residentChild: 0,
-          nonResidentChild: 0,
-          infantResident: 0,
-          infantNonResident: 0,
-        },
-      ],
-    },
-
-    validationSchema: Yup.object({
-      rooms: Yup.array().of(
-        Yup.object().shape({
-          residentAdult: Yup.number(
-            "Please enter a valid number of resident adults"
-          ),
-          nonResidentAdult: Yup.number(
-            "Please enter a valid number of non-resident adults"
-          ),
-          residentChild: Yup.number(
-            "Please enter a valid number of resident children"
-          ),
-          nonResidentChild: Yup.number(
-            "Please enter a valid number of non-resident children"
-          ),
-          infantResident: Yup.number(
-            "Please enter a valid number of resident infants"
-          ),
-          infantNonResident: Yup.number(
-            "Please enter a valid number of non-resident infants"
-          ),
-        })
-      ),
-    }),
-
-    onSubmit: (values) => {
-      setGuestOptionChanged(true);
-      setOpenGuestModal(false);
-    },
-  });
-
   const [residentNumberOfRooms, setResidentNumberOfRooms] = React.useState(0);
   const [nonResidentNumberOfRooms, setNonResidentNumberOfRooms] =
     React.useState(0);
-
-  React.useMemo(
-    () =>
-      formik.values.rooms.forEach((room) => {
-        if (room.residentAdult > 0) {
-          setResidentNumberOfRooms(formik.values.rooms.length);
-        } else if (room.residentAdult === 0) {
-          setResidentNumberOfRooms(0);
-        }
-        if (room.nonResidentAdult > 0) {
-          setNonResidentNumberOfRooms(formik.values.rooms.length);
-        } else if (room.nonResidentAdult === 0) {
-          setNonResidentNumberOfRooms(0);
-        }
-      }),
-    [formik.values.rooms]
-  );
-
-  const adultAgeGroup = React.useMemo(
-    () => pricing.adultAgeGroup(roomTypes),
-    [roomTypes]
-  );
-
-  const childAgeGroup = React.useMemo(
-    () => pricing.childAgeGroup(roomTypes),
-    [roomTypes]
-  );
-
-  const infantAgeGroup = React.useMemo(
-    () => pricing.infantAgeGroup(roomTypes),
-    [roomTypes]
-  );
 
   const [isOpen, setIsOpen] = React.useState(index === 0 ? true : false);
 
@@ -270,26 +165,6 @@ function SelectedListing({ listing, index }) {
     }
   `;
 
-  const totalNumberOfGuests = formik.values.rooms.reduce((acc, curr) => {
-    return (
-      acc +
-      curr.residentAdult +
-      curr.nonResidentAdult +
-      curr.residentChild +
-      curr.nonResidentChild +
-      curr.infantResident +
-      curr.infantNonResident
-    );
-  }, 0);
-
-  const [openGuestModal, setOpenGuestModal] = React.useState(false);
-
-  const [parkFees, setParkFees] = React.useState(false);
-
-  const [conservancyFees, setConservancyFees] = React.useState(false);
-
-  const [gameDriveFees, setGameDriveFees] = React.useState(false);
-
   const formikFees = useFormik({
     initialValues: {
       commision: 0,
@@ -311,6 +186,42 @@ function SelectedListing({ listing, index }) {
       setOpenGuestModal(false);
     },
   });
+
+  const residentFees = listing.other_fees_resident;
+  const nonResidentFees = listing.other_fees_non_resident;
+
+  const [residentFeesOptions, setResidentFeesOptions] = React.useState([]);
+  const [nonResidentFeesOptions, setNonResidentFeesOptions] = React.useState(
+    []
+  );
+
+  const handleResidentCheck = (event, fee) => {
+    var updatedList = [...residentFeesOptions];
+    if (event.target.checked) {
+      updatedList = [...updatedList, fee];
+    } else {
+      updatedList.splice(residentFeesOptions.indexOf(fee), 1);
+    }
+    setResidentFeesOptions(updatedList);
+  };
+
+  const handleNonResidentCheck = (event, fee) => {
+    var updatedList = [...nonResidentFeesOptions];
+    if (event.target.checked) {
+      updatedList = [...updatedList, fee];
+    } else {
+      updatedList.splice(nonResidentFeesOptions.indexOf(fee), 1);
+    }
+    setNonResidentFeesOptions(updatedList);
+  };
+
+  const containsResidentOption = (option) => {
+    return residentFeesOptions.some((item) => item.id === option.id);
+  };
+
+  const containsNonResidentOption = (option) => {
+    return nonResidentFeesOptions.some((item) => item.id === option.id);
+  };
 
   return (
     <div className="px-4 py-2 bg-gray-100 rounded-md">
@@ -352,7 +263,7 @@ function SelectedListing({ listing, index }) {
         </div>
       )} */}
 
-      <Dialogue
+      {/* <Dialogue
         isOpen={openGuestModal}
         closeModal={() => {
           setOpenGuestModal(false);
@@ -770,7 +681,7 @@ function SelectedListing({ listing, index }) {
             Done
           </Button>
         </div>
-      </Dialogue>
+      </Dialogue> */}
 
       <div className="mt-4 flex gap-4 items-center justify-self-start">
         <h1 className="text-4xl font-SourceSans text-gray-600 font-semibold">
@@ -835,27 +746,92 @@ function SelectedListing({ listing, index }) {
               )}
             </div> */}
 
-            <div
-              onClick={() => {
-                setOpenGuestModal(true);
-              }}
-              className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border"
-            >
-              <Icon
-                className="w-6 h-6 text-gray-500"
-                icon="material-symbols:group-rounded"
-              />
+            <PopoverBox
+              panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[0px] !p-0"
+              btnClassName=""
+              btnPopover={
+                <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border">
+                  <Icon
+                    className="w-6 h-6 text-gray-500"
+                    icon="material-symbols:group-rounded"
+                  />
 
-              <div className="flex flex-col gap-0.5">
-                <h1 className="font-bold text-sm font-SourceSans">
-                  Add guests
-                </h1>
-                <h1 className="font-normal font-SourceSans">
-                  {totalNumberOfGuests} Guests, {formik.values.rooms.length}{" "}
-                  rooms
+                  <div className="flex flex-col gap-0.5">
+                    <h1 className="font-bold text-sm self-start font-SourceSans">
+                      Extra fees from lodge
+                    </h1>
+                    <h1 className="font-normal self-start font-SourceSans">
+                      2 selected
+                    </h1>
+                  </div>
+                </div>
+              }
+              popoverClassName=""
+            >
+              <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
+                <h1 className="font-semibold font-SourceSans text-base">
+                  Add extra fees
                 </h1>
               </div>
-            </div>
+              <div className="flex flex-col">
+                {residentFees.map((fee, index) => (
+                  <div key={index} className="px-2 py-2">
+                    <div className="flex justify-between items-center">
+                      <h1 className="text-sm">
+                        {fee.name}{" "}
+                        <span className="font-normal">(For resident)</span>
+                        <span className="font-normal">
+                          {" "}
+                          ={" "}
+                          <Price
+                            stayPrice={fee.price}
+                            autoCurrency={false}
+                            currency="KES"
+                            className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                          ></Price>{" "}
+                          pp
+                        </span>
+                      </h1>
+
+                      <Checkbox
+                        checked={containsResidentOption(fee)}
+                        value={fee}
+                        onChange={(event) => handleResidentCheck(event, fee)}
+                      ></Checkbox>
+                    </div>
+                  </div>
+                ))}
+
+                <hr />
+
+                {nonResidentFees.map((fee, index) => (
+                  <div key={index} className="px-2 py-2">
+                    <div className="flex justify-between items-center">
+                      <h1 className="text-sm">
+                        {fee.name}{" "}
+                        <span className="font-normal">(For non-resident)</span>
+                        <span className="font-normal">
+                          {" "}
+                          ={" "}
+                          <Price
+                            stayPrice={fee.price}
+                            autoCurrency={false}
+                            className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                          ></Price>{" "}
+                          pp
+                        </span>
+                      </h1>
+
+                      <Checkbox
+                        checked={containsNonResidentOption(fee)}
+                        value={fee}
+                        onChange={(event) => handleNonResidentCheck(event, fee)}
+                      ></Checkbox>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </PopoverBox>
 
             <div className="flex justify-between">
               {/* <PopoverBox
@@ -933,9 +909,9 @@ function SelectedListing({ listing, index }) {
 
                     <div className="flex flex-col gap-0.5">
                       <h1 className="font-bold self-start text-sm font-SourceSans">
-                        Other fees
+                        Other fees from you
                       </h1>
-                      <h1 className="font-normal font-SourceSans">
+                      <h1 className="font-normal self-start font-SourceSans">
                         Add yout fees
                       </h1>
                     </div>
@@ -1063,7 +1039,8 @@ function SelectedListing({ listing, index }) {
                 <SelectedListingCard
                   key={index}
                   room={item}
-                  addedRooms={formik.values.rooms}
+                  residentFeesOptions={residentFeesOptions}
+                  nonResidentFeesOptions={nonResidentFeesOptions}
                 ></SelectedListingCard>
               );
             })}

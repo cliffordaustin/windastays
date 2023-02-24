@@ -15,6 +15,7 @@ import Cookies from "js-cookie";
 import { DayPicker } from "react-day-picker";
 import moment from "moment";
 import Dropdown from "../../../../../components/ui/Dropdown";
+import OtherFees from "../../../../../components/Partner/OtherFees";
 
 function AddAvailability({ stay }) {
   const router = useRouter();
@@ -317,6 +318,11 @@ function AddAvailability({ stay }) {
             stay.room_types.map((room, index) => (
               <RoomTypes key={index} room={room} index={index}></RoomTypes>
             ))}
+
+          <OtherFees
+            nonResidentFees={stay.other_fees_non_resident}
+            residentFees={stay.other_fees_resident}
+          ></OtherFees>
 
           {stay.room_types.length === 0 && (
             <div className="absolute flex flex-col items-center gap-2 top-[40%] left-[50%] -translate-x-[50%]">

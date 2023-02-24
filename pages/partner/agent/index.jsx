@@ -99,7 +99,7 @@ function Agents({ userProfile, stays }) {
           className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-40"
         ></div>
       </Transition>
-      <div className="w-full fixed h-fit bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
+      <div className="w-full fixed h-fit overflow-y-scroll bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
         {!showPopup && (
           <div className="flex justify-between items-center">
             <div></div>
