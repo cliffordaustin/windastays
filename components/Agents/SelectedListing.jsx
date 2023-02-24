@@ -21,6 +21,7 @@ import pricing from "../../lib/pricingCalc";
 import Input from "../ui/Input";
 import Checkbox from "../ui/Checkbox";
 import Price from "../Stay/Price";
+import ReactJoyride from "react-joyride";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -223,10 +224,34 @@ function SelectedListing({ listing, index }) {
     return nonResidentFeesOptions.some((item) => item.id === option.id);
   };
 
+  const steps = [
+    {
+      target: "#step1",
+      content:
+        "Name of the lodge selected and you can click on the arrow to collapse or expand the section. You can also click on the trash icon to remove the selected lodge",
+      title: "Help",
+    },
+    {
+      target: "#step2",
+      title: "Help",
+      content: "This is the date you selected",
+    },
+    {
+      target: "#step3",
+      title: "Help",
+      content: "Available rooms for the selected date are displayed here.",
+    },
+    {
+      target: "#step4",
+      title: "Help",
+      content: "Click on add guest to the selected room to calculate the price",
+    },
+  ];
+
   return (
     <div className="px-4 py-2 bg-gray-100 rounded-md">
       <GlobalStyle />
-      <div className="flex justify-between items-center">
+      <div id="step1" className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
           <div
             onClick={() => setIsOpen(!isOpen)}
@@ -683,158 +708,161 @@ function SelectedListing({ listing, index }) {
         </div>
       </Dialogue> */}
 
-      <div className="mt-4 flex gap-4 items-center justify-self-start">
-        <h1 className="text-4xl font-SourceSans text-gray-600 font-semibold">
+      <ReactJoyride
+        continuous
+        hideCloseButton
+        scrollToFirstStep
+        showProgress
+        showSkipButton
+        steps={steps}
+      />
+
+      <div
+        id="step2"
+        className="mt-4 flex gap-4 items-center justify-self-start"
+      >
+        <h1 className="text-2xl font-SourceSans text-gray-600 font-semibold">
           {moment(router.query.date).format("MMM Do")}
         </h1>
 
         <div className="w-fit flex items-center">
-          <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
-          <div className="h-[2px] w-[70px] bg-gray-200"></div>
-          <div className="w-[15px] h-[15px] rounded-full bg-gray-300"></div>
+          <div className="w-[5px] h-[5px] rounded-full bg-gray-300"></div>
+          <div className="h-[2px] w-[30px] bg-gray-200"></div>
+          <div className="w-[5px] h-[5px] rounded-full bg-gray-300"></div>
         </div>
 
-        <h1 className="text-4xl font-SourceSans font-semibold text-gray-600">
+        <h1 className="text-2xl font-SourceSans font-semibold text-gray-600">
           {moment(router.query.endDate).format("MMM Do")}
         </h1>
       </div>
 
-      <div className="px-2 py-2 flex h-[160px] w-full rounded-xl bg-white mt-2">
-        <div className="w-fit flex flex-col justify-around">
-          <div className="flex flex-col gap-4">
-            {/* <div className="flex items-center gap-1 px-2 py-1 text-gray-500 bg-gray-100 rounded-md border w-fit">
-              {router.query.residentAdult && (
-                <h1 className="font-bold text-sm">
-                  {router.query.residentAdult}{" "}
-                  {router.query.residentAdult > 1
-                    ? "Resident adults"
-                    : "Resident adult"}
-                </h1>
-              )}
+      <div
+        id="step3"
+        className="py-2 flex h-[190px] w-full rounded-xl bg-white mt-2"
+      >
+        <div className="flex gap-4 w-full h-full px-4">
+          {!roomTypesLoading &&
+            roomTypes.map((item, index) => {
+              return (
+                <SelectedListingCard
+                  steps={steps}
+                  key={index}
+                  room={item}
+                  residentFeesOptions={residentFeesOptions}
+                  nonResidentFeesOptions={nonResidentFeesOptions}
+                ></SelectedListingCard>
+              );
+            })}
 
-              <h1> | </h1>
+          {roomTypesLoading &&
+            [...Array(2)].map((_, index) => {
+              return (
+                <div key={index} className="w-[250px]">
+                  <Skeleton count={1} className="h-[100px]"></Skeleton>
+                  <Skeleton
+                    count={1}
+                    className="!w-[40%] !rounded-3xl mt-2 h-[24px]"
+                  ></Skeleton>
+                </div>
+              );
+            })}
+        </div>
+      </div>
 
-              {router.query.residentChild && (
-                <h1 className="font-bold text-sm">
-                  {router.query.residentChild}{" "}
-                  {router.query.residentChild > 1
-                    ? "Resident children"
-                    : "Resident child"}
-                </h1>
-              )}
+      <div className="w-fit mt-4 bg-white px-4 py-2 rounded-lg flex flex-col justify-around">
+        <h1 className="font-black mb-2 font-SourceSans text-sm">
+          Add fee to pricing
+        </h1>
+        <div className="flex gap-4">
+          <PopoverBox
+            panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[0px] !p-0"
+            btnClassName=""
+            btnPopover={
+              <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border">
+                <Icon
+                  className="w-6 h-6 text-gray-500"
+                  icon="material-symbols:group-rounded"
+                />
 
-              <h1> | </h1>
-
-              {router.query.nonResidentAdult && (
-                <h1 className="font-bold text-sm">
-                  {router.query.nonResidentAdult}{" "}
-                  {router.query.nonResidentAdult > 1
-                    ? "Non-resident adults"
-                    : "Non-resident adult"}
-                </h1>
-              )}
-
-              <h1> | </h1>
-
-              {router.query.nonResidentChild && (
-                <h1 className="font-bold text-sm">
-                  {router.query.nonResidentChild}{" "}
-                  {router.query.nonResidentChild > 1
-                    ? "Non-resident children"
-                    : "Non-resident child"}
-                </h1>
-              )}
-            </div> */}
-
-            <PopoverBox
-              panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[0px] !p-0"
-              btnClassName=""
-              btnPopover={
-                <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border">
-                  <Icon
-                    className="w-6 h-6 text-gray-500"
-                    icon="material-symbols:group-rounded"
-                  />
-
-                  <div className="flex flex-col gap-0.5">
-                    <h1 className="font-bold text-sm self-start font-SourceSans">
-                      Extra fees from lodge
+                <div className="flex flex-col gap-0.5">
+                  <h1 className="font-bold text-sm self-start font-SourceSans">
+                    Extra fees from lodge
+                  </h1>
+                  <h1 className="font-normal self-start font-SourceSans">
+                    2 selected
+                  </h1>
+                </div>
+              </div>
+            }
+            popoverClassName=""
+          >
+            <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
+              <h1 className="font-semibold font-SourceSans text-base">
+                Add extra fees
+              </h1>
+            </div>
+            <div className="flex flex-col">
+              {residentFees.map((fee, index) => (
+                <div key={index} className="px-2 py-2">
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-sm">
+                      {fee.name}{" "}
+                      <span className="font-normal">(For resident)</span>
+                      <span className="font-normal">
+                        {" "}
+                        ={" "}
+                        <Price
+                          stayPrice={fee.price}
+                          autoCurrency={false}
+                          currency="KES"
+                          className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                        ></Price>{" "}
+                        pp
+                      </span>
                     </h1>
-                    <h1 className="font-normal self-start font-SourceSans">
-                      2 selected
-                    </h1>
+
+                    <Checkbox
+                      checked={containsResidentOption(fee)}
+                      value={fee}
+                      onChange={(event) => handleResidentCheck(event, fee)}
+                    ></Checkbox>
                   </div>
                 </div>
-              }
-              popoverClassName=""
-            >
-              <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
-                <h1 className="font-semibold font-SourceSans text-base">
-                  Add extra fees
-                </h1>
-              </div>
-              <div className="flex flex-col">
-                {residentFees.map((fee, index) => (
-                  <div key={index} className="px-2 py-2">
-                    <div className="flex justify-between items-center">
-                      <h1 className="text-sm">
-                        {fee.name}{" "}
-                        <span className="font-normal">(For resident)</span>
-                        <span className="font-normal">
-                          {" "}
-                          ={" "}
-                          <Price
-                            stayPrice={fee.price}
-                            autoCurrency={false}
-                            currency="KES"
-                            className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
-                          ></Price>{" "}
-                          pp
-                        </span>
-                      </h1>
+              ))}
 
-                      <Checkbox
-                        checked={containsResidentOption(fee)}
-                        value={fee}
-                        onChange={(event) => handleResidentCheck(event, fee)}
-                      ></Checkbox>
-                    </div>
+              <hr />
+
+              {nonResidentFees.map((fee, index) => (
+                <div key={index} className="px-2 py-2">
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-sm">
+                      {fee.name}{" "}
+                      <span className="font-normal">(For non-resident)</span>
+                      <span className="font-normal">
+                        {" "}
+                        ={" "}
+                        <Price
+                          stayPrice={fee.price}
+                          autoCurrency={false}
+                          className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
+                        ></Price>{" "}
+                        pp
+                      </span>
+                    </h1>
+
+                    <Checkbox
+                      checked={containsNonResidentOption(fee)}
+                      value={fee}
+                      onChange={(event) => handleNonResidentCheck(event, fee)}
+                    ></Checkbox>
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </PopoverBox>
 
-                <hr />
-
-                {nonResidentFees.map((fee, index) => (
-                  <div key={index} className="px-2 py-2">
-                    <div className="flex justify-between items-center">
-                      <h1 className="text-sm">
-                        {fee.name}{" "}
-                        <span className="font-normal">(For non-resident)</span>
-                        <span className="font-normal">
-                          {" "}
-                          ={" "}
-                          <Price
-                            stayPrice={fee.price}
-                            autoCurrency={false}
-                            className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
-                          ></Price>{" "}
-                          pp
-                        </span>
-                      </h1>
-
-                      <Checkbox
-                        checked={containsNonResidentOption(fee)}
-                        value={fee}
-                        onChange={(event) => handleNonResidentCheck(event, fee)}
-                      ></Checkbox>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </PopoverBox>
-
-            <div className="flex justify-between">
-              {/* <PopoverBox
+          <div className="flex justify-between">
+            {/* <PopoverBox
                 panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip left-[0px] border shadow-md mt-2 w-[280px] p-1"
                 btnClassName="w-full"
                 btnPopover={
@@ -897,166 +925,136 @@ function SelectedListing({ listing, index }) {
                 </div>
               </PopoverBox> */}
 
-              <PopoverBox
-                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
-                btnClassName="w-[350px]"
-                btnPopover={
-                  <div className="px-3 w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
-                    <Icon
-                      className="w-6 h-7 text-gray-500"
-                      icon="material-symbols:feed"
-                    />
+            <PopoverBox
+              panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
+              btnClassName="w-[350px]"
+              btnPopover={
+                <div className="px-3 w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
+                  <Icon
+                    className="w-6 h-7 text-gray-500"
+                    icon="material-symbols:feed"
+                  />
 
-                    <div className="flex flex-col gap-0.5">
-                      <h1 className="font-bold self-start text-sm font-SourceSans">
-                        Other fees from you
-                      </h1>
-                      <h1 className="font-normal self-start font-SourceSans">
-                        Add yout fees
-                      </h1>
-                    </div>
+                  <div className="flex flex-col gap-0.5">
+                    <h1 className="font-bold self-start text-sm font-SourceSans">
+                      Other fees from you
+                    </h1>
+                    <h1 className="font-normal self-start font-SourceSans">
+                      Add yout fees
+                    </h1>
                   </div>
-                }
-                popoverClassName="w-[48%]"
-              >
-                <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
-                  <h1 className="font-semibold font-SourceSans text-base">
-                    Add your fees
-                  </h1>
                 </div>
-                <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
-                  <div className="flex px-2 py-2 justify-between items-center">
-                    <h1 className="font-semibold text-sm">Your commission</h1>
+              }
+              popoverClassName="w-[48%]"
+            >
+              <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
+                <h1 className="font-semibold font-SourceSans text-base">
+                  Add your fees
+                </h1>
+              </div>
+              <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
+                <div className="flex px-2 py-2 justify-between items-center">
+                  <h1 className="font-semibold text-sm">Your commission</h1>
 
-                    <div className="flex items-center w-[50%]">
-                      <Input
-                        name="commision"
-                        type="number"
-                        value={formikFees.values.commision}
-                        placeholder="0"
-                        onChange={(e) => {
-                          formikFees.handleChange(e);
-                        }}
-                        className={
-                          "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-md !h-full placeholder:text-sm "
-                        }
-                        inputClassName="!text-sm !border-none "
-                      ></Input>
-                      <h1 className="font-semibold text-sm">%</h1>
-                    </div>
+                  <div className="flex items-center w-[50%]">
+                    <Input
+                      name="commision"
+                      type="number"
+                      value={formikFees.values.commision}
+                      placeholder="0"
+                      onChange={(e) => {
+                        formikFees.handleChange(e);
+                      }}
+                      className={
+                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-md !h-full placeholder:text-sm "
+                      }
+                      inputClassName="!text-sm !border-none "
+                    ></Input>
+                    <h1 className="font-semibold text-sm">%</h1>
                   </div>
-                  {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
-                  {formikFees.values.fees.map((item, index) => {
-                    return (
-                      <div
-                        key={item}
-                        className="flex px-2 py-2 justify-between items-center"
-                      >
-                        {/* <h1 className="font-semibold text-sm">{item.name}</h1> */}
+                </div>
+                {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
+                {formikFees.values.fees.map((item, index) => {
+                  return (
+                    <div
+                      key={item}
+                      className="flex px-2 py-2 justify-between items-center"
+                    >
+                      {/* <h1 className="font-semibold text-sm">{item.name}</h1> */}
 
-                        <div className="flex items-center w-[48%]">
-                          <Input
-                            name="name"
-                            type="text"
-                            value={item.name}
-                            placeholder="Name"
-                            onChange={(e) => {
+                      <div className="flex items-center w-[48%]">
+                        <Input
+                          name="name"
+                          type="text"
+                          value={item.name}
+                          placeholder="Name"
+                          onChange={(e) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].name`,
+                              e.target.value
+                            );
+                          }}
+                          className={
+                            "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
+                          }
+                          inputClassName="!text-sm !border-none "
+                        ></Input>
+                      </div>
+
+                      <div className="flex justify-between items-center w-[50%]">
+                        <Input
+                          name="price"
+                          type="number"
+                          value={item.price}
+                          placeholder="Price"
+                          onChange={(e) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].price`,
+                              e.target.value
+                            );
+                          }}
+                          className={
+                            "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
+                          }
+                          inputClassName="!text-sm !border-none "
+                        ></Input>
+
+                        <div className="px-1 flex items-center gap-2">
+                          <div
+                            onClick={() => {
                               formikFees.setFieldValue(
-                                `fees[${index}].name`,
-                                e.target.value
+                                "fees",
+                                formikFees.values.fees.filter(
+                                  (item, i) => i !== index
+                                )
                               );
                             }}
-                            className={
-                              "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
-                            }
-                            inputClassName="!text-sm !border-none "
-                          ></Input>
-                        </div>
-
-                        <div className="flex justify-between items-center w-[50%]">
-                          <Input
-                            name="price"
-                            type="number"
-                            value={item.price}
-                            placeholder="Price"
-                            onChange={(e) => {
-                              formikFees.setFieldValue(
-                                `fees[${index}].price`,
-                                e.target.value
-                              );
-                            }}
-                            className={
-                              "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 placeholder:font-semibold !rounded-md !h-full placeholder:text-xs "
-                            }
-                            inputClassName="!text-sm !border-none "
-                          ></Input>
-
-                          <div className="px-1 flex items-center gap-2">
-                            <div
-                              onClick={() => {
-                                formikFees.setFieldValue(
-                                  "fees",
-                                  formikFees.values.fees.filter(
-                                    (item, i) => i !== index
-                                  )
-                                );
-                              }}
-                              className="w-[18px] cursor-pointer h-[18px] bg-red-500 rounded-full flex items-center justify-center"
-                            >
-                              <Icon
-                                className="text-white text-lg"
-                                icon="octicon:dash-16"
-                              />
-                            </div>
+                            className="w-[18px] cursor-pointer h-[18px] bg-red-500 rounded-full flex items-center justify-center"
+                          >
+                            <Icon
+                              className="text-white text-lg"
+                              icon="octicon:dash-16"
+                            />
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                  <div
-                    onClick={() => {
-                      formikFees.setFieldValue("fees", [
-                        ...formikFees.values.fees,
-                        { name: "", price: "" },
-                      ]);
-                    }}
-                    className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 text-blue-600 w-fit text-sm font-semibold hover:bg-blue-600 hover:bg-opacity-20"
-                  >
-                    Add a fee
-                  </div>
+                    </div>
+                  );
+                })}
+                <div
+                  onClick={() => {
+                    formikFees.setFieldValue("fees", [
+                      ...formikFees.values.fees,
+                      { name: "", price: "" },
+                    ]);
+                  }}
+                  className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 text-blue-600 w-fit text-sm font-semibold hover:bg-blue-600 hover:bg-opacity-20"
+                >
+                  Add a fee
                 </div>
-              </PopoverBox>
-            </div>
+              </div>
+            </PopoverBox>
           </div>
-        </div>
-
-        <div className="bg-gray-200 w-[1px] h-full ml-6"></div>
-
-        <div className="flex gap-4 w-[60%] h-full px-6">
-          {!roomTypesLoading &&
-            roomTypes.map((item, index) => {
-              return (
-                <SelectedListingCard
-                  key={index}
-                  room={item}
-                  residentFeesOptions={residentFeesOptions}
-                  nonResidentFeesOptions={nonResidentFeesOptions}
-                ></SelectedListingCard>
-              );
-            })}
-
-          {roomTypesLoading &&
-            [...Array(2)].map((_, index) => {
-              return (
-                <div key={index} className="w-[250px]">
-                  <Skeleton count={1} className="h-[100px]"></Skeleton>
-                  <Skeleton
-                    count={1}
-                    className="!w-[40%] !rounded-3xl mt-2 h-[24px]"
-                  ></Skeleton>
-                </div>
-              );
-            })}
         </div>
       </div>
     </div>

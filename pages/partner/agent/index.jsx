@@ -63,6 +63,7 @@ function Agents({ userProfile, stays }) {
       ? router.query.selected.includes(listing.id)
       : null;
   });
+
   return (
     <div>
       <Search formik={formik}></Search>

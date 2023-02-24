@@ -14,11 +14,13 @@ import { Switch } from "@headlessui/react";
 import Checkbox from "../ui/Checkbox";
 import Dialogue from "../Home/Dialogue";
 import Button from "../ui/Button";
+import ReactJoyride from "react-joyride";
 
 function SelectedListingCard({
   room,
   residentFeesOptions,
   nonResidentFeesOptions,
+  steps,
 }) {
   const router = useRouter();
 
@@ -492,11 +494,32 @@ function SelectedListingCard({
 
   return (
     <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
-      <div className="text-sm text-gray-600 font-bold absolute top-4">
+      <ReactJoyride
+        continuous
+        hideCloseButton
+        scrollToFirstStep
+        showProgress
+        showSkipButton
+        steps={steps}
+      />
+      <div className="text-sm text-gray-600 flex flex-col gap-1 font-bold absolute top-4">
+        <div
+          onClick={() => {
+            setOpenGuestModal(true);
+          }}
+          id="step4"
+          className="bg-red-200 flex items-center justify-center px-2 py-1 font-bold cursor-pointer rounded-md"
+        >
+          Add a guest to calculate
+          <Icon
+            className="w-6 h-6"
+            icon="material-symbols:arrow-drop-down-rounded"
+          />
+        </div>
         {room.name}
       </div>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1 mb-4">
         {getResidentTotalPrice() ? (
           <div className="flex gap-1">
             <Price
@@ -565,10 +588,10 @@ function SelectedListingCard({
 
       <div className="flex items-center gap-2 absolute bottom-2">
         <PopoverBox
-          panelClassName="bg-white rounded-xl after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[100px]"
+          panelClassName="bg-white rounded-xl after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px]"
           btnClassName=""
           btnPopover={
-            <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full">
+            <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-md">
               Price breakdown
               <Icon
                 className="w-6 h-6"
@@ -918,19 +941,6 @@ function SelectedListingCard({
             </div>
           </PopoverBox>
         )} */}
-
-        <div
-          onClick={() => {
-            setOpenGuestModal(true);
-          }}
-          className="bg-red-200 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-full"
-        >
-          Add guest
-          <Icon
-            className="w-6 h-6"
-            icon="material-symbols:arrow-drop-down-rounded"
-          />
-        </div>
 
         <Dialogue
           isOpen={openGuestModal}

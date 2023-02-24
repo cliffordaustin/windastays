@@ -172,7 +172,7 @@ function Listing({ listing, currentOptions, setCurrentOptions }) {
             htmlFor={"btn" + listing.id}
             className="btn-gradient-2 flex items-center justify-center !h-full font-bold !w-full !py-2 rounded-lg cursor-pointer !px-1.5"
           >
-            <span className="text-white text-sm">Compare price</span>
+            <span className="text-white text-sm">Calculate price</span>
           </label>
 
           <input
