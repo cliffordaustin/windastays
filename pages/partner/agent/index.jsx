@@ -10,6 +10,7 @@ import { Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import SelectedListings from "../../../components/Agents/SelectedListings";
 import moment from "moment";
+import ReactJoyride from "react-joyride";
 
 function Agents({ userProfile, stays }) {
   const router = useRouter();
@@ -64,6 +65,32 @@ function Agents({ userProfile, stays }) {
       : null;
   });
 
+  const [showTour, setShowTour] = React.useState(true);
+
+  const steps = [
+    {
+      target: "#step1",
+      content:
+        "Name of the lodge selected and you can click on the arrow to collapse or expand the section. You can also click on the trash icon to remove the selected lodge",
+      title: "Help",
+    },
+    {
+      target: "#step2",
+      title: "Help",
+      content: "This is the date you selected",
+    },
+    {
+      target: "#step3",
+      title: "Help",
+      content: "Available rooms for the selected date are displayed here.",
+    },
+    {
+      target: "#step4",
+      title: "Help",
+      content: "Click on add guest to the selected room to calculate the price",
+    },
+  ];
+
   return (
     <div>
       <Search formik={formik}></Search>
@@ -91,16 +118,17 @@ function Agents({ userProfile, stays }) {
         leave="transition-all duration-300"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
+        run={showTour}
         show={showPopup}
       >
         <div
           onClick={() => {
             setShowPopup(false);
           }}
-          className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-40"
+          className="fixed top-0 !overflow-y-scroll left-0 right-0 bottom-0 bg-black bg-opacity-40"
         ></div>
       </Transition>
-      <div className="w-full fixed h-fit overflow-y-scroll bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
+      <div className="w-full fixed h-fit !overflow-y-scroll bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
         {!showPopup && (
           <div className="flex justify-between items-center">
             <div></div>
@@ -134,6 +162,26 @@ function Agents({ userProfile, stays }) {
           leaveTo="h-0 opacity-0"
           show={showPopup}
         >
+          <ReactJoyride
+            continuous
+            scrollToFirstStep
+            showProgress
+            showSkipButton
+            steps={steps}
+            beaconComponent={() => (
+              <div
+                onClick={() => {
+                  setShowTour(true);
+                }}
+                className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
+              >
+                <Icon
+                  className="w-8 h-8 text-white"
+                  icon="ic:baseline-question-mark"
+                />
+              </div>
+            )}
+          />
           <SelectedListings listings={listings}></SelectedListings>
 
           <div

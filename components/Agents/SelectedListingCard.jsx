@@ -20,7 +20,6 @@ function SelectedListingCard({
   room,
   residentFeesOptions,
   nonResidentFeesOptions,
-  steps,
 }) {
   const router = useRouter();
 
@@ -145,8 +144,8 @@ function SelectedListingCard({
     initialValues: {
       rooms: [
         {
-          residentAdult: 1,
-          nonResidentAdult: 1,
+          residentAdult: 0,
+          nonResidentAdult: 0,
           residentChild: 0,
           nonResidentChild: 0,
           infantResident: 0,
@@ -494,14 +493,6 @@ function SelectedListingCard({
 
   return (
     <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
-      <ReactJoyride
-        continuous
-        hideCloseButton
-        scrollToFirstStep
-        showProgress
-        showSkipButton
-        steps={steps}
-      />
       <div className="text-sm text-gray-600 flex flex-col gap-1 font-bold absolute top-4">
         <div
           onClick={() => {
@@ -519,7 +510,7 @@ function SelectedListingCard({
         {room.name}
       </div>
 
-      <div className="flex gap-1 mb-4">
+      <div className="flex gap-1 mt-4">
         {getResidentTotalPrice() ? (
           <div className="flex gap-1">
             <Price
@@ -584,6 +575,14 @@ function SelectedListingCard({
         ) : (
           ""
         )}
+
+        {!getNonResidentTotalPrice() && !getResidentTotalPrice() ? (
+          <div className="!text-3xl !font-SourceSans !font-semibold !text-gray-600">
+            $0
+          </div>
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="flex items-center gap-2 absolute bottom-2">
@@ -626,7 +625,12 @@ function SelectedListingCard({
             return (
               <div key={index} className="flex flex-col gap-2 px-2 mb-3">
                 <h1 className="font-semibold font-SourceSans text-sm">
-                  Room {index + 1}
+                  Room {index + 1} -{" "}
+                  <span className="font-medium">
+                    {room.residentAdult > 0
+                      ? `${room.residentAdult} resident adult`
+                      : ""}
+                  </span>
                 </h1>
                 {sumOfGuests === 1 && (
                   <div className="flex flex-col pl-3 gap-2">
@@ -859,6 +863,57 @@ function SelectedListingCard({
               </div>
             );
           })}
+          <div className="flex flex-col gap-2 px-2 mb-3">
+            {residentFeesOptions.length > 0 && (
+              <div className="flex flex-col gap-4 mt-2">
+                <div className="w-full h-[1px] bg-gray-200"></div>
+                <h1 className="font-semibold text-sm font-SourceSans">
+                  Resident Fees
+                </h1>
+              </div>
+            )}
+            {residentFeesOptions.map((fee, index) => {
+              return (
+                <div key={index} className="flex flex-col gap-2 px-2">
+                  <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                    <h1 className="text-sm font-semibold">{fee.name}</h1>
+                    <div className="flex gap-1 items-center">
+                      <Price
+                        currency="KES"
+                        stayPrice={fee.price}
+                        autoCurrency={false}
+                        className="!font-normal !text-sm !font-SourceSans"
+                      ></Price>{" "}
+                      <span className="font-semibold mb-1">pp</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {nonResidentFeesOptions.length > 0 && (
+              <h1 className="font-semibold text-sm font-SourceSans">
+                Non-resident Fees
+              </h1>
+            )}
+            {nonResidentFeesOptions.map((fee, index) => {
+              return (
+                <div key={index} className="flex flex-col gap-2 px-2">
+                  <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                    <h1 className="text-sm font-semibold">{fee.name}</h1>
+                    <div className="flex gap-1 items-center">
+                      <Price
+                        stayPrice={fee.price}
+                        autoCurrency={false}
+                        className="!font-normal !text-sm !font-SourceSans"
+                      ></Price>{" "}
+                      <span className="font-semibold mb-1">pp</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </PopoverBox>
 
         {/* {(residentFees.length > 0 || nonResidentFees.length > 0) && (
