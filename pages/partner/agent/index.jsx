@@ -168,19 +168,20 @@ function Agents({ userProfile, stays }) {
             showProgress
             showSkipButton
             steps={steps}
-            beaconComponent={() => (
-              <div
-                onClick={() => {
-                  setShowTour(true);
-                }}
-                className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
-              >
-                <Icon
-                  className="w-8 h-8 text-white"
-                  icon="ic:baseline-question-mark"
-                />
-              </div>
-            )}
+            // beaconComponent={() => (
+            //   <div
+            //     onClick={() => {
+            //       setShowTour(true);
+            //     }}
+            //     className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
+            //   >
+            //     <Icon
+            //       className="w-8 h-8 text-white"
+            //       icon="ic:baseline-question-mark"
+            //     />
+            //   </div>
+            // )}
+            beaconComponent={() => null}
           />
           <SelectedListings listings={listings}></SelectedListings>
 
