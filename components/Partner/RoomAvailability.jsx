@@ -81,14 +81,13 @@ function RoomAvailability({
       if (isNonResident) {
         const data = [
           {
-            id: values.id,
             date: values.date,
             num_of_available_rooms: values.number_of_available_rooms,
             room_non_resident_guest_availabilities: values.guestTypes,
           },
         ];
         await axios
-          .patch(
+          .post(
             `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/nonresident-availabilities/`,
             data,
             {
@@ -117,17 +116,47 @@ function RoomAvailability({
           .catch((err) => {
             setEditAvailabilityLoading(false);
           });
+
+        // await axios
+        //   .patch(
+        //     `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/nonresident-availabilities/`,
+        //     data,
+        //     {
+        //       headers: {
+        //         Authorization: "Token " + Cookies.get("token"),
+        //       },
+        //     }
+        //   )
+        //   .then((res) => {
+        //     setRoomAvailabilities(
+        //       roomAvailability.map((item) => {
+        //         if (item.id === values.id) {
+        //           return {
+        //             ...item,
+        //             date: values.date,
+        //             num_of_available_rooms: values.number_of_available_rooms,
+        //             room_non_resident_guest_availabilities: values.guestTypes,
+        //           };
+        //         }
+        //         return item;
+        //       })
+        //     );
+        //     setEditAvailabilityLoading(false);
+        //     setOpenEditAvailabilityModal(false);
+        //   })
+        //   .catch((err) => {
+        //     setEditAvailabilityLoading(false);
+        //   });
       } else {
         const data = [
           {
-            id: values.id,
             date: values.date,
             num_of_available_rooms: values.number_of_available_rooms,
             room_resident_guest_availabilities: values.guestTypes,
           },
         ];
         await axios
-          .patch(
+          .post(
             `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/resident-availabilities/`,
             data,
             {
@@ -156,6 +185,37 @@ function RoomAvailability({
           .catch((err) => {
             setEditAvailabilityLoading(false);
           });
+
+        // await axios
+        //   .patch(
+        //     `${process.env.NEXT_PUBLIC_baseURL}/room-types/${roomSlug}/resident-availabilities/`,
+        //     data,
+        //     {
+        //       headers: {
+        //         Authorization: "Token " + Cookies.get("token"),
+        //       },
+        //     }
+        //   )
+        //   .then((res) => {
+        //     setRoomAvailabilities(
+        //       roomAvailability.map((item) => {
+        //         if (item.id === values.id) {
+        //           return {
+        //             ...item,
+        //             date: values.date,
+        //             num_of_available_rooms: values.number_of_available_rooms,
+        //             room_resident_guest_availabilities: values.guestTypes,
+        //           };
+        //         }
+        //         return item;
+        //       })
+        //     );
+        //     setEditAvailabilityLoading(false);
+        //     setOpenEditAvailabilityModal(false);
+        //   })
+        //   .catch((err) => {
+        //     setEditAvailabilityLoading(false);
+        //   });
       }
     },
   });

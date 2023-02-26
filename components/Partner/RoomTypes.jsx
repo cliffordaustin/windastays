@@ -239,6 +239,9 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
       });
   };
 
+  const [showBulkAvailabilityModal, setShowBulkAvailabilityModal] =
+    React.useState(false);
+
   return (
     <div className="">
       <div
@@ -271,6 +274,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
+                setShowBulkAvailabilityModal(false);
                 setOpenAddAvailabilityModal(true);
               }}
               className="bg-white shadow-lg flex items-center justify-center text-lg font-bold text-black w-8 h-8 rounded-full"
@@ -305,9 +309,22 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
         >
           <div className="px-4 py-2">
             <h1 className="font-bold font-SourceSans text-lg truncate">
-              <span className="text-gray-600">Add availability to </span>
+              <span className="text-gray-600">
+                {showBulkAvailabilityModal ? "Bulk Edit" : "Add"} availability
+                to{" "}
+              </span>
               {room.name}
             </h1>
+
+            {showBulkAvailabilityModal && (
+              <div className="px-2 py-1 flex font-bold items-center text-sm rounded-md mt-2 gap-1 bg-green-600 bg-opacity-30">
+                <Icon icon="ph:info-bold" />
+                <h1>
+                  This will replace all changes made for all dates in the
+                  selected range.
+                </h1>
+              </div>
+            )}
 
             <div className="mt-4 flex gap-3 flex-col">
               <div className="flex flex-col gap-2">
@@ -766,6 +783,22 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 </div>
                 <h1 className="font-bold">Resident guests calendar</h1>
               </div>
+
+              <button
+                onClick={() => {
+                  if (!inPartnerHomepage) {
+                    formikAdd.setFieldValue("residency", {
+                      value: "Resident",
+                      label: "Resident",
+                    });
+                    setShowBulkAvailabilityModal(true);
+                    setOpenAddAvailabilityModal(true);
+                  }
+                }}
+                className="bg-blue-500 flex items-center gap-0.5 text-sm font-bold text-white px-3 py-1 rounded-md"
+              >
+                <span>Bulk edit</span>
+              </button>
             </div>
             {residentIsOpen && (
               <>
@@ -782,6 +815,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         value: "Resident",
                         label: "Resident",
                       });
+                      setShowBulkAvailabilityModal(false);
                       setOpenAddAvailabilityModal(true);
                     }
                   }}
@@ -809,6 +843,22 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 </div>
                 <h1 className="font-bold">Non-resident guests calendar</h1>
               </div>
+
+              <button
+                onClick={() => {
+                  if (!inPartnerHomepage) {
+                    formikAdd.setFieldValue("residency", {
+                      value: "Non-resident",
+                      label: "Non-resident",
+                    });
+                    setShowBulkAvailabilityModal(true);
+                    setOpenAddAvailabilityModal(true);
+                  }
+                }}
+                className="bg-blue-500 flex items-center gap-0.5 text-sm font-bold text-white px-3 py-1 rounded-md"
+              >
+                <span>Bulk edit</span>
+              </button>
             </div>
             {nonResidentIsOpen && (
               <>
@@ -825,6 +875,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         value: "Non-resident",
                         label: "Non-resident",
                       });
+                      setShowBulkAvailabilityModal(false);
                       setOpenAddAvailabilityModal(true);
                     }
                   }}

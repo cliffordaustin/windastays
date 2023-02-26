@@ -201,48 +201,50 @@ function Agents({ userProfile, stays }) {
 
 export async function getServerSideProps(context) {
   try {
-    const token = getToken(context);
+    // const token = getToken(context);
 
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/user/`,
-      {
-        headers: {
-          Authorization: "Token " + token,
-        },
-      }
-    );
+    // const response = await axios.get(
+    //   `${process.env.NEXT_PUBLIC_baseURL}/user/`,
+    //   {
+    //     headers: {
+    //       Authorization: "Token " + token,
+    //     },
+    //   }
+    // );
 
     const stays = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/`,
-      {
-        headers: {
-          Authorization: "Token " + token,
-        },
-      }
+      `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/`
     );
 
     return {
       props: {
-        userProfile: response.data[0],
+        // userProfile: response.data[0],
         stays: stays.data.results,
       },
     };
   } catch (error) {
-    if (error.response.status === 401) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: `/login?redirect=/partner/agent`,
-        },
-      };
-    } else {
-      return {
-        props: {
-          userProfile: "",
-          stays: [],
-        },
-      };
-    }
+    // if (error.response.status === 401) {
+    //   return {
+    //     redirect: {
+    //       permanent: false,
+    //       destination: `/login?redirect=/partner/agent`,
+    //     },
+    //   };
+    // } else {
+    //   return {
+    //     props: {
+    //       userProfile: "",
+    //       stays: [],
+    //     },
+    //   };
+    // }
+
+    return {
+      props: {
+        userProfile: "",
+        stays: [],
+      },
+    };
   }
 }
 
