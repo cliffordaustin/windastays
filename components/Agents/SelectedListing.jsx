@@ -169,6 +169,7 @@ function SelectedListing({ listing, index }) {
   const formikFees = useFormik({
     initialValues: {
       commision: 0,
+      nonResidentCommission: 0,
       fees: [],
     },
 
@@ -180,11 +181,14 @@ function SelectedListing({ listing, index }) {
         })
       ),
       commision: Yup.number("Please enter a valid number of commision"),
+      nonResidentCommission: Yup.number(
+        "Please enter a valid number of commision"
+      ),
     }),
 
     onSubmit: (values) => {
-      setGuestOptionChanged(true);
-      setOpenGuestModal(false);
+      // setGuestOptionChanged(true);
+      // setOpenGuestModal(false);
     },
   });
 
@@ -241,7 +245,7 @@ function SelectedListing({ listing, index }) {
               icon="tabler:chevron-down"
             />
           </div>
-          <h1 className="font-bold">{listing.name}</h1>
+          <h1 className="font-bold">{listing.property_name || listing.name}</h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -295,6 +299,8 @@ function SelectedListing({ listing, index }) {
                   key={index}
                   room={item}
                   residentFeesOptions={residentFeesOptions}
+                  residentCommision={formikFees.values.commision}
+                  nonResidentCommision={formikFees.values.nonResidentCommission}
                   nonResidentFeesOptions={nonResidentFeesOptions}
                 ></SelectedListingCard>
               );
@@ -321,7 +327,7 @@ function SelectedListing({ listing, index }) {
         </h1>
         <div className="flex gap-4">
           <PopoverBox
-            panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] -left-[0px] !p-0"
+            panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px] !p-0"
             btnClassName=""
             btnPopover={
               <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border">
@@ -376,7 +382,13 @@ function SelectedListing({ listing, index }) {
                           currency="KES"
                           className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
                         ></Price>{" "}
-                        pp
+                        (
+                        {fee.resident_fee_type === "WHOLE GROUP"
+                          ? "Whole group"
+                          : fee.resident_fee_type === "PER PERSON PER NIGHT"
+                          ? "Per person per night"
+                          : "Per person"}
+                        )
                       </span>
                     </h1>
 
@@ -405,7 +417,13 @@ function SelectedListing({ listing, index }) {
                           autoCurrency={false}
                           className="!text-sm !font-SourceSans inline !font-semibold !text-gray-600"
                         ></Price>{" "}
-                        pp
+                        (
+                        {fee.nonresident_fee_type === "WHOLE GROUP"
+                          ? "Whole group"
+                          : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
+                          ? "Per person per night"
+                          : "Per person"}
+                        )
                       </span>
                     </h1>
 
@@ -496,10 +514,10 @@ function SelectedListing({ listing, index }) {
 
                   <div className="flex flex-col gap-0.5">
                     <h1 className="font-bold self-start text-sm font-SourceSans">
-                      Other fees from you
+                      Your commission
                     </h1>
                     <h1 className="font-normal self-start font-SourceSans">
-                      Add yout fees
+                      Add your commission
                     </h1>
                   </div>
                 </div>
@@ -508,14 +526,39 @@ function SelectedListing({ listing, index }) {
             >
               <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
                 <h1 className="font-semibold font-SourceSans text-base">
-                  Add your fees
+                  Add your commission
                 </h1>
               </div>
               <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
                 <div className="flex px-2 py-2 justify-between items-center">
-                  <h1 className="font-semibold text-sm">Your commission</h1>
+                  <h1 className="font-semibold text-sm font-SourceSans">
+                    Non-resident commission
+                  </h1>
 
-                  <div className="flex items-center w-[50%]">
+                  <div className="flex items-center w-[30%]">
+                    <Input
+                      name="nonResidentCommission"
+                      type="number"
+                      value={formikFees.values.nonResidentCommission}
+                      placeholder="0"
+                      onChange={(e) => {
+                        formikFees.handleChange(e);
+                      }}
+                      className={
+                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
+                      }
+                      inputClassName="!text-sm !border-none "
+                    ></Input>
+                    <h1 className="font-semibold">%</h1>
+                  </div>
+                </div>
+
+                <div className="flex px-2 py-2 justify-between items-center">
+                  <h1 className="font-semibold text-sm font-SourceSans">
+                    Resident commission
+                  </h1>
+
+                  <div className="flex items-center w-[30%]">
                     <Input
                       name="commision"
                       type="number"
@@ -525,23 +568,22 @@ function SelectedListing({ listing, index }) {
                         formikFees.handleChange(e);
                       }}
                       className={
-                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-md !h-full placeholder:text-sm "
+                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
                       }
                       inputClassName="!text-sm !border-none "
                     ></Input>
-                    <h1 className="font-semibold text-sm">%</h1>
+                    <h1 className="font-semibold">%</h1>
                   </div>
                 </div>
                 {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
-                {formikFees.values.fees.map((item, index) => {
+                {/* {formikFees.values.fees.map((item, index) => {
                   return (
                     <div
                       key={item}
                       className="flex px-2 py-2 justify-between items-center"
                     >
-                      {/* <h1 className="font-semibold text-sm">{item.name}</h1> */}
 
-                      <div className="flex items-center w-[48%]">
+                      <div className="flex items-center w-[28%]">
                         <Input
                           name="name"
                           type="text"
@@ -599,8 +641,8 @@ function SelectedListing({ listing, index }) {
                       </div>
                     </div>
                   );
-                })}
-                <div
+                })} */}
+                {/* <div
                   onClick={() => {
                     formikFees.setFieldValue("fees", [
                       ...formikFees.values.fees,
@@ -610,7 +652,7 @@ function SelectedListing({ listing, index }) {
                   className="px-1 cursor-pointer py-0.5 rounded-sm ml-2 text-blue-600 w-fit text-sm font-semibold hover:bg-blue-600 hover:bg-opacity-20"
                 >
                   Add a fee
-                </div>
+                </div> */}
               </div>
             </PopoverBox>
           </div>

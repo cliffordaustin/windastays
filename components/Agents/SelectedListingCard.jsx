@@ -20,6 +20,8 @@ function SelectedListingCard({
   room,
   residentFeesOptions,
   nonResidentFeesOptions,
+  residentCommision,
+  nonResidentCommision,
 }) {
   const router = useRouter();
 
@@ -395,8 +397,16 @@ function SelectedListingCard({
     });
 
     residentFeesOptions.forEach((fee) => {
-      total += fee.price * totalNumberOfGuests;
+      if (fee.resident_fee_type === "WHOLE GROUP") {
+        total += fee.price;
+      } else if (fee.resident_fee_type === "PER PERSON PER NIGHT") {
+        total += fee.price * numberOfResidentAdult * nights;
+      } else {
+        total += fee.price * numberOfResidentAdult;
+      }
     });
+
+    total += total * (residentCommision / 100);
 
     return total;
   };
@@ -438,8 +448,16 @@ function SelectedListingCard({
     });
 
     nonResidentFeesOptions.forEach((fee) => {
-      total += fee.price * totalNumberOfGuests;
+      if (fee.resident_fee_type === "WHOLE GROUP") {
+        total += fee.price;
+      } else if (fee.resident_fee_type === "PER PERSON PER NIGHT") {
+        total += fee.price * numberOfNonResidentAdult * nights;
+      } else {
+        total += fee.price * numberOfNonResidentAdult;
+      }
     });
+
+    total += total * (nonResidentCommision / 100);
 
     return total;
   };
@@ -625,7 +643,7 @@ function SelectedListingCard({
             return (
               <div key={index} className="flex flex-col gap-2 px-2 mb-3">
                 <h1 className="font-semibold font-SourceSans text-sm">
-                  Room {index + 1} -{" "}
+                  Room {index + 1} :{" "}
                   <span className="font-medium">
                     {room.residentAdult > 0
                       ? `${room.residentAdult} resident adult`

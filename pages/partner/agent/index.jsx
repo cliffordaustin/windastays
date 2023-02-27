@@ -11,6 +11,8 @@ import { useRouter } from "next/router";
 import SelectedListings from "../../../components/Agents/SelectedListings";
 import moment from "moment";
 import ReactJoyride from "react-joyride";
+import Dialogue from "../../../components/Home/Dialogue";
+import Cookies from "js-cookie";
 
 function Agents({ userProfile, stays }) {
   const router = useRouter();
@@ -67,6 +69,14 @@ function Agents({ userProfile, stays }) {
 
   const [showTour, setShowTour] = React.useState(true);
 
+  const handleClickStart = (event) => {
+    event.preventDefault();
+
+    setShowTour(true);
+  };
+
+  const [showTourModal, setShowTourModal] = React.useState(true);
+
   const steps = [
     {
       target: "#step1",
@@ -84,16 +94,26 @@ function Agents({ userProfile, stays }) {
       title: "Help",
       content: "Available rooms for the selected date are displayed here.",
     },
+  ];
+
+  const homeSteps = [
     {
-      target: "#step4",
-      title: "Help",
-      content: "Click on add guest to the selected room to calculate the price",
+      target: "#step5",
+      title: "Selected lodges",
+      content: "The selected lodges will be displayed here",
+    },
+    {
+      target: "#step6",
+      title: "Click to expand",
+      content: "Click on the button to expand the section",
     },
   ];
 
   return (
     <div>
-      <Search formik={formik}></Search>
+      <div className="bg-white">
+        <Search formik={formik}></Search>
+      </div>
 
       <h1 className="font-bold mt-4 mb-2 ml-4 text-2xl font-SourceSans">
         Showing results for {stays.length}{" "}
@@ -111,6 +131,59 @@ function Agents({ userProfile, stays }) {
           );
         })}
       </div>
+
+      {/* <Dialogue
+        isOpen={showTourModal}
+        closeModal={() => {
+          setShowTourModal(false);
+        }}
+        dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
+        outsideDialogueClass="!p-0"
+        dialoguePanelClassName="screen-height-safari !p-0 !rounded-none md:!rounded-md md:!min-h-0 md:max-h-[700px] !px-0 !max-w-lg overflow-y-scroll remove-scroll"
+      >
+        <div
+          onClick={() => {
+            setShowTourModal(false);
+          }}
+          className="absolute top-2 left-4 cursor-pointer"
+        >
+          <Icon className="w-6 h-6" icon="material-symbols:close" />
+        </div>
+
+        <h1 className="font-SourceSans font-black text-4xl mt-6 text-center">
+          Hello!
+        </h1>
+
+        <div className="mt-4 px-6">
+          <h1 className="text-center">
+            Ready to see how easy it is to calculate and compare prices across
+            lodges?
+          </h1>
+        </div>
+
+        <div
+          onClick={() => {
+            setShowTourModal(false);
+            setShowTour(true);
+          }}
+          className="py-3 border-t px-4 mt-6"
+        >
+          <button className="bg-blue-500 font-bold text-white rounded-md py-2 w-full">
+            Let&apos;s go!
+          </button>
+        </div>
+      </Dialogue> */}
+
+      {/* <ReactJoyride
+        continuous
+        scrollToFirstStep
+        showProgress
+        showSkipButton
+        steps={homeSteps}
+        run={showTour}
+        beaconComponent={() => null}
+      /> */}
+
       <Transition
         enter="transition-all duration-300"
         enterFrom="opacity-0"
@@ -118,19 +191,19 @@ function Agents({ userProfile, stays }) {
         leave="transition-all duration-300"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
-        run={showTour}
         show={showPopup}
       >
         <div
           onClick={() => {
             setShowPopup(false);
           }}
+          id="step5"
           className="fixed top-0 !overflow-y-scroll left-0 right-0 bottom-0 bg-black bg-opacity-40"
         ></div>
       </Transition>
       <div className="w-full fixed h-fit !overflow-y-scroll bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
         {!showPopup && (
-          <div className="flex justify-between items-center">
+          <div id="step6" className="flex justify-between items-center">
             <div></div>
             {listings.length === 0 && (
               <h1 className="font-bold font-SourceSans">
@@ -162,28 +235,17 @@ function Agents({ userProfile, stays }) {
           leaveTo="h-0 opacity-0"
           show={showPopup}
         >
-          <ReactJoyride
-            continuous
-            scrollToFirstStep
-            showProgress
-            showSkipButton
-            steps={steps}
-            // beaconComponent={() => (
-            //   <div
-            //     onClick={() => {
-            //       setShowTour(true);
-            //     }}
-            //     className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
-            //   >
-            //     <Icon
-            //       className="w-8 h-8 text-white"
-            //       icon="ic:baseline-question-mark"
-            //     />
-            //   </div>
-            // )}
-            beaconComponent={() => null}
-          />
           <SelectedListings listings={listings}></SelectedListings>
+
+          {/* <div
+            onClick={handleClickStart}
+            className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
+          >
+            <Icon
+              className="w-8 h-8 text-white"
+              icon="ic:baseline-question-mark"
+            />
+          </div> */}
 
           <div
             onClick={() => {

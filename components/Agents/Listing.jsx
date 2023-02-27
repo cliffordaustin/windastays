@@ -8,6 +8,7 @@ import styles from "../../styles/Listing.module.css";
 import Checkbox from "../ui/Checkbox";
 import { useRouter } from "next/router";
 import moment from "moment";
+import { Icon } from "@iconify/react";
 
 function Listing({ listing, currentOptions, setCurrentOptions }) {
   const router = useRouter();
@@ -90,7 +91,7 @@ function Listing({ listing, currentOptions, setCurrentOptions }) {
   };
 
   return (
-    <div className="w-[325px]">
+    <div className="w-[325px] relative">
       <Card
         imagePaths={images}
         carouselClassName="h-44"
@@ -170,9 +171,14 @@ function Listing({ listing, currentOptions, setCurrentOptions }) {
         <div className="mt-2">
           <label
             htmlFor={"btn" + listing.id}
-            className="btn-gradient-2 flex items-center justify-center !h-full font-bold !w-full !py-2 rounded-lg cursor-pointer !px-1.5"
+            className="button-expand btn-gradient-2 absolute top-[45%] cursor-pointer"
           >
-            <span className="text-white text-sm">Calculate price</span>
+            <>
+              <span className="button-expand-icon">+</span>
+              <span className="button-expand-text font-bold mr-2">
+                Calculate pricing
+              </span>
+            </>
           </label>
 
           <input

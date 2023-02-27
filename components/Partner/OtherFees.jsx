@@ -10,6 +10,7 @@ import LoadingSpinerChase from "../ui/LoadingSpinerChase";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
+import SelectInput from "../ui/SelectInput";
 
 function OtherFees({ residentFees, nonResidentFees }) {
   const router = useRouter();
@@ -18,11 +19,18 @@ function OtherFees({ residentFees, nonResidentFees }) {
 
   const [residentFeesLoading, setResidentFeesLoading] = React.useState(false);
 
+  const feeOptions = [
+    { value: "PER PERSON", label: "Per person" },
+    { value: "PER PERSON PER NIGHT", label: "Per person per night" },
+    { value: "WHOLE GROUP", label: "Whole group" },
+  ];
+
   const formikNonResidentFees = useFormik({
     initialValues: {
       name: "",
       price: "",
       fees: [],
+      fee_option: { value: "PER PERSON", label: "Per person" },
     },
 
     validationSchema: Yup.object({
@@ -38,6 +46,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       price: Yup.number("Please enter a valid number of price").required(
         "Price is required"
       ),
+      fee_option: Yup.object().required("Fee option is required"),
     }),
 
     onSubmit: async (values) => {
@@ -48,6 +57,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           {
             name: values.name,
             price: values.price,
+            nonresident_fee_type: values.fee_option.value,
           },
           {
             headers: {
@@ -59,6 +69,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           values.fees.push({
             name: values.name,
             price: values.price,
+            nonresident_fee_type: values.fee_option.value,
           });
           setNonResidentFeesLoading(false);
           formikNonResidentFees.resetForm();
@@ -74,6 +85,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       name: "",
       price: "",
       fees: [],
+      fee_option: { value: "PER PERSON", label: "Per person" },
     },
 
     validationSchema: Yup.object({
@@ -89,6 +101,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       price: Yup.number("Please enter a valid number of price").required(
         "Price is required"
       ),
+      fee_option: Yup.object().required("Fee option is required"),
     }),
 
     onSubmit: async (values) => {
@@ -99,6 +112,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           {
             name: values.name,
             price: values.price,
+            resident_fee_type: values.fee_option.value,
           },
           {
             headers: {
@@ -110,6 +124,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           values.fees.push({
             name: values.name,
             price: values.price,
+            fee_option: values.fee_option.value,
           });
           setResidentFeesLoading(false);
           formikResidentFees.resetForm();
@@ -128,6 +143,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           return {
             name: fee.name,
             price: fee.price,
+            resident_fee_type: fee.resident_fee_type,
           };
         })
       );
@@ -140,6 +156,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
           return {
             name: fee.name,
             price: fee.price,
+            nonresident_fee_type: fee.nonresident_fee_type,
           };
         })
       );
@@ -157,7 +174,14 @@ function OtherFees({ residentFees, nonResidentFees }) {
             return (
               <div key={index}>
                 {fee.name && fee.price && (
-                  <div className="px-4 min-w-[150px] h-[120px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+                  <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+                    <div className="px-2 py-1 w-fit mt-2 bg-gray-100 text-sm font-bold rounded-3xl">
+                      {fee.resident_fee_type === "WHOLE GROUP"
+                        ? "Whole group"
+                        : fee.resident_fee_type === "PER PERSON PER NIGHT"
+                        ? "Per person per night"
+                        : "Per person"}
+                    </div>
                     <div className="text-sm text-gray-600 font-bold">
                       {fee.name}
                     </div>
@@ -263,6 +287,32 @@ function OtherFees({ residentFees, nonResidentFees }) {
                         </span>
                       ) : null}
                     </div>
+
+                    <div className="mt-2">
+                      <h1 className="text-sm font-bold mb-1">
+                        Enter a fee option. eg. Per person
+                      </h1>
+                      <SelectInput
+                        options={feeOptions}
+                        selectedOption={formikResidentFees.values.fee_option}
+                        instanceId="fee_option"
+                        setSelectedOption={(selected) => {
+                          formikResidentFees.setFieldValue(
+                            "fee_option",
+                            selected
+                          );
+                        }}
+                        className={
+                          "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                          (formikResidentFees.touched.fee_option &&
+                          formikResidentFees.errors.fee_option
+                            ? "border-red-500"
+                            : "")
+                        }
+                        placeholder="Select fee option"
+                        isSearchable={false}
+                      ></SelectInput>
+                    </div>
                   </div>
 
                   <div className="flex justify-end mt-4 mb-3 mr-2">
@@ -305,7 +355,14 @@ function OtherFees({ residentFees, nonResidentFees }) {
             return (
               <div key={index}>
                 {fee.name && fee.price && (
-                  <div className="px-4 min-w-[150px] h-[120px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+                  <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 py-2 border rounded-lg">
+                    <div className="px-2 py-1 w-fit mt-2 bg-gray-100 text-sm font-bold rounded-3xl">
+                      {fee.nonresident_fee_type === "WHOLE GROUP"
+                        ? "Whole group"
+                        : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
+                        ? "Per person per night"
+                        : "Per person"}
+                    </div>
                     <div className="text-sm text-gray-600 font-bold">
                       {fee.name}
                     </div>
@@ -409,6 +466,31 @@ function OtherFees({ residentFees, nonResidentFees }) {
                           {formikNonResidentFees.errors.price}
                         </span>
                       ) : null}
+                    </div>
+                    <div className="mt-2">
+                      <h1 className="text-sm font-bold mb-1">
+                        Enter a fee option. eg. Per person
+                      </h1>
+                      <SelectInput
+                        options={feeOptions}
+                        selectedOption={formikNonResidentFees.values.fee_option}
+                        instanceId="fee_option"
+                        setSelectedOption={(selected) => {
+                          formikNonResidentFees.setFieldValue(
+                            "fee_option",
+                            selected
+                          );
+                        }}
+                        className={
+                          "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                          (formikNonResidentFees.touched.fee_option &&
+                          formikNonResidentFees.errors.fee_option
+                            ? "border-red-500"
+                            : "")
+                        }
+                        placeholder="Select fee option"
+                        isSearchable={false}
+                      ></SelectInput>
                     </div>
                   </div>
 
