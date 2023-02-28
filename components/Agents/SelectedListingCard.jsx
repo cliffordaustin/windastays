@@ -22,6 +22,7 @@ function SelectedListingCard({
   nonResidentFeesOptions,
   residentCommision,
   nonResidentCommision,
+  fees,
 }) {
   const router = useRouter();
 
@@ -406,6 +407,31 @@ function SelectedListingCard({
       }
     });
 
+    fees.forEach((fee) => {
+      if (
+        fee.name &&
+        fee.price &&
+        fee.feeType.value === "PER PERSON PER NIGHT" &&
+        fee.residentType.value === "RESIDENT"
+      ) {
+        total += fee.price * numberOfResidentAdult * nights;
+      } else if (
+        fee.name &&
+        fee.price &&
+        fee.feeType.value === "WHOLE GROUP" &&
+        fee.residentType.value === "RESIDENT"
+      ) {
+        total = total + Number(fee.price);
+      } else if (
+        fee.name &&
+        fee.price &&
+        fee.feeType.value === "PER PERSON" &&
+        fee.residentType.value === "RESIDENT"
+      ) {
+        total += fee.price * numberOfResidentAdult;
+      }
+    });
+
     total += total * (residentCommision / 100);
 
     return total;
@@ -453,6 +479,21 @@ function SelectedListingCard({
       } else if (fee.resident_fee_type === "PER PERSON PER NIGHT") {
         total += fee.price * numberOfNonResidentAdult * nights;
       } else {
+        total += fee.price * numberOfNonResidentAdult;
+      }
+    });
+
+    fees.forEach((fee) => {
+      if (
+        fee.name &&
+        fee.price &&
+        fee.feeType.value === "PER PERSON PER NIGHT" &&
+        fee.residentType.value === "NON-RESIDENT"
+      ) {
+        total += fee.price * numberOfNonResidentAdult * nights;
+      } else if (fee.name && fee.price && fee.feeType.value === "WHOLE GROUP") {
+        total += fee.price;
+      } else if (fee.name && fee.price && fee.feeType.value === "PER PERSON") {
         total += fee.price * numberOfNonResidentAdult;
       }
     });
@@ -1045,7 +1086,7 @@ function SelectedListingCard({
               className="w-5 h-5 text-gray-500"
               icon="material-symbols:group-rounded"
             />
-            <span>Room has a capacity of {room.capacity}</span>
+            <span>Room has adult capacity of {room.capacity}</span>
           </div>
 
           <div className="px-4 my-2 gap-2 flex flex-col">

@@ -25,10 +25,14 @@ function AddAvailability({ stay }) {
     initialValues: {
       name: "",
       capacity: "",
+      childCapacity: "",
+      infantCapacity: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please enter a name for the room"),
-      capacity: Yup.number().required("Please enter a capacity for the room"),
+      capacity: Yup.number("Please enter a valid number"),
+      childCapacity: Yup.number("Please enter a valid number"),
+      infantCapacity: Yup.number("Please enter a valid number"),
     }),
     onSubmit: (values) => {
       setCreateRoomLoading(true);
@@ -38,6 +42,8 @@ function AddAvailability({ stay }) {
           {
             name: values.name,
             capacity: values.capacity,
+            child_capacity: values.childCapacity,
+            infant_capacity: values.infantCapacity,
           },
           {
             headers: {
@@ -219,7 +225,7 @@ function AddAvailability({ stay }) {
                     }}
                     className={"w-full placeholder:text-sm "}
                     inputClassName="!text-sm "
-                    label="Room capacity"
+                    label="Adult capacity"
                   ></Input>
                   {formikCreate.touched.capacity &&
                   formikCreate.errors.capacity ? (
@@ -229,7 +235,7 @@ function AddAvailability({ stay }) {
                   ) : null}
                 </div>
 
-                {/* <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
                   <div className="mt-2 w-[50%]">
                     <Input
                       name="childCapacity"
@@ -283,7 +289,7 @@ function AddAvailability({ stay }) {
                       </span>
                     ) : null}
                   </div>
-                </div> */}
+                </div>
 
                 <div className="flex justify-end mt-4">
                   <Popover.Button className="bg-gray-200 text-sm font-bold px-6 py-1.5 rounded-md">

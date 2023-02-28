@@ -22,6 +22,7 @@ import Input from "../ui/Input";
 import Checkbox from "../ui/Checkbox";
 import Price from "../Stay/Price";
 import ReactJoyride from "react-joyride";
+import SelectInput from "../ui/SelectInput";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -166,11 +167,29 @@ function SelectedListing({ listing, index }) {
     }
   `;
 
+  const feeOptions = [
+    { value: "PER PERSON", label: "Per person" },
+    { value: "PER PERSON PER NIGHT", label: "Per person per night" },
+    { value: "WHOLE GROUP", label: "Whole group" },
+  ];
+
+  const resident = [
+    { value: "RESIDENT", label: "Resident" },
+    { value: "NON-RESIDENT", label: "Non-resident" },
+  ];
+
   const formikFees = useFormik({
     initialValues: {
       commision: 0,
       nonResidentCommission: 0,
-      fees: [],
+      fees: [
+        {
+          name: "",
+          price: "",
+          feeType: { value: "PER PERSON", label: "Per person" },
+          residentType: { value: "RESIDENT", label: "Resident" },
+        },
+      ],
     },
 
     validationSchema: Yup.object({
@@ -227,6 +246,8 @@ function SelectedListing({ listing, index }) {
   const containsNonResidentOption = (option) => {
     return nonResidentFeesOptions.some((item) => item.id === option.id);
   };
+
+  const [openFeesModal, setOpenFeesModal] = React.useState(false);
 
   return (
     <div className="px-4 py-2 bg-gray-100 rounded-md">
@@ -302,6 +323,7 @@ function SelectedListing({ listing, index }) {
                   residentCommision={formikFees.values.commision}
                   nonResidentCommision={formikFees.values.nonResidentCommission}
                   nonResidentFeesOptions={nonResidentFeesOptions}
+                  fees={formikFees.values.fees}
                 ></SelectedListingCard>
               );
             })}
@@ -321,24 +343,24 @@ function SelectedListing({ listing, index }) {
         </div>
       </div>
 
-      <div className="w-fit mt-4 bg-white px-4 py-2 rounded-lg flex flex-col justify-around">
+      <div className="w-full mt-4 bg-white px-4 py-2 rounded-lg flex flex-col justify-around">
         <h1 className="font-black mb-2 font-SourceSans text-sm">
           Add fee to pricing
         </h1>
-        <div className="flex gap-4">
+        <div className="flex gap-4 w-full">
           <PopoverBox
             panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px] !p-0"
-            btnClassName=""
+            btnClassName="!w-full"
             btnPopover={
-              <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-[350px] border">
+              <div className="px-3 !w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
                 <Icon
-                  className="w-6 h-6 text-gray-500"
-                  icon="material-symbols:group-rounded"
+                  className="w-6 h-7 text-gray-500"
+                  icon="material-symbols:feed"
                 />
 
                 <div className="flex flex-col gap-0.5">
                   <h1 className="font-bold text-sm self-start font-SourceSans">
-                    Extra fees from lodge
+                    Other fees from lodge
                   </h1>
                   {residentFeesOptions.length + nonResidentFeesOptions.length >
                     0 && (
@@ -359,7 +381,7 @@ function SelectedListing({ listing, index }) {
                 </div>
               </div>
             }
-            popoverClassName=""
+            popoverClassName="!w-[32%]"
           >
             <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
               <h1 className="font-semibold font-SourceSans text-base">
@@ -438,145 +460,81 @@ function SelectedListing({ listing, index }) {
             </div>
           </PopoverBox>
 
-          <div className="flex justify-between">
-            {/* <PopoverBox
-                panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip left-[0px] border shadow-md mt-2 w-[280px] p-1"
-                btnClassName="w-full"
-                btnPopover={
-                  <div className="px-3 cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg w-full border">
-                    <Icon
-                      className="w-6 h-6 text-gray-500"
-                      icon="material-symbols:group-rounded"
-                    />
+          <PopoverBox
+            panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
+            btnClassName="w-full"
+            btnPopover={
+              <div className="px-3 w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
+                <Icon
+                  className="w-6 h-7 text-gray-500"
+                  icon="material-symbols:feed"
+                />
 
-                    <div className="flex flex-col items-start gap-0.5">
-                      <h1 className="font-bold text-sm font-SourceSans">
-                        Extras
-                      </h1>
-                      <h1 className="font-normal font-SourceSans">
-                        Select fees
-                      </h1>
-                    </div>
-                  </div>
-                }
-                popoverClassName="w-[48%]"
-              >
-                <div className="flex flex-col gap-1 font-SourceSans">
-                  <div className="flex bg-gray-100 px-2 py-2 justify-between items-center">
-                    <h1 className="font-semibold text-sm">Park fees - $20</h1>
-                    <Switch
-                      switchButton={parkFees}
-                      changeSwitchButtonState={() => {
-                        setParkFees(!parkFees);
-                      }}
-                      switchButtonCircle="w-5 h-5"
-                      switchButtonContainer="!w-[52px] !h-6"
-                    ></Switch>
-                  </div>
-
-                  <div className="flex px-2 py-2 justify-between items-center">
-                    <h1 className="font-semibold text-sm">
-                      Conservancy fees - $10
-                    </h1>
-                    <Switch
-                      switchButton={conservancyFees}
-                      changeSwitchButtonState={() => {
-                        setConservancyFees(!conservancyFees);
-                      }}
-                      switchButtonCircle="w-5 h-5"
-                      switchButtonContainer="!w-[52px] !h-6"
-                    ></Switch>
-                  </div>
-
-                  <div className="flex bg-gray-100 px-2 py-2 justify-between items-center">
-                    <h1 className="font-semibold text-sm">Game Drives - $30</h1>
-                    <Switch
-                      switchButton={gameDriveFees}
-                      changeSwitchButtonState={() => {
-                        setGameDriveFees(!gameDriveFees);
-                      }}
-                      switchButtonCircle="w-5 h-5"
-                      switchButtonContainer="!w-[52px] !h-6"
-                    ></Switch>
-                  </div>
+                <div className="flex flex-col gap-0.5">
+                  <h1 className="font-bold self-start text-sm font-SourceSans">
+                    Your commission
+                  </h1>
+                  <h1 className="font-normal self-start font-SourceSans">
+                    Add your commission
+                  </h1>
                 </div>
-              </PopoverBox> */}
-
-            <PopoverBox
-              panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
-              btnClassName="w-[350px]"
-              btnPopover={
-                <div className="px-3 w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
-                  <Icon
-                    className="w-6 h-7 text-gray-500"
-                    icon="material-symbols:feed"
-                  />
-
-                  <div className="flex flex-col gap-0.5">
-                    <h1 className="font-bold self-start text-sm font-SourceSans">
-                      Your commission
-                    </h1>
-                    <h1 className="font-normal self-start font-SourceSans">
-                      Add your commission
-                    </h1>
-                  </div>
-                </div>
-              }
-              popoverClassName="w-[48%]"
-            >
-              <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
-                <h1 className="font-semibold font-SourceSans text-base">
-                  Add your commission
-                </h1>
               </div>
-              <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
-                <div className="flex px-2 py-2 justify-between items-center">
-                  <h1 className="font-semibold text-sm font-SourceSans">
-                    Non-resident commission
-                  </h1>
+            }
+            popoverClassName="!w-[32%]"
+          >
+            <div className="w-full bg-gray-200 rounded-t-md px-3 py-2">
+              <h1 className="font-semibold font-SourceSans text-base">
+                Add your commission
+              </h1>
+            </div>
+            <div className="flex flex-col gap-0.5 mb-2 font-SourceSans">
+              <div className="flex px-2 py-2 justify-between items-center">
+                <h1 className="font-semibold text-sm font-SourceSans">
+                  Non-resident commission
+                </h1>
 
-                  <div className="flex items-center w-[30%]">
-                    <Input
-                      name="nonResidentCommission"
-                      type="number"
-                      value={formikFees.values.nonResidentCommission}
-                      placeholder="0"
-                      onChange={(e) => {
-                        formikFees.handleChange(e);
-                      }}
-                      className={
-                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
-                      }
-                      inputClassName="!text-sm !border-none "
-                    ></Input>
-                    <h1 className="font-semibold">%</h1>
-                  </div>
+                <div className="flex items-center w-[30%]">
+                  <Input
+                    name="nonResidentCommission"
+                    type="number"
+                    value={formikFees.values.nonResidentCommission}
+                    placeholder="0"
+                    onChange={(e) => {
+                      formikFees.handleChange(e);
+                    }}
+                    className={
+                      "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
+                    }
+                    inputClassName="!text-sm !border-none "
+                  ></Input>
+                  <h1 className="font-semibold">%</h1>
                 </div>
+              </div>
 
-                <div className="flex px-2 py-2 justify-between items-center">
-                  <h1 className="font-semibold text-sm font-SourceSans">
-                    Resident commission
-                  </h1>
+              <div className="flex px-2 py-2 justify-between items-center">
+                <h1 className="font-semibold text-sm font-SourceSans">
+                  Resident commission
+                </h1>
 
-                  <div className="flex items-center w-[30%]">
-                    <Input
-                      name="commision"
-                      type="number"
-                      value={formikFees.values.commision}
-                      placeholder="0"
-                      onChange={(e) => {
-                        formikFees.handleChange(e);
-                      }}
-                      className={
-                        "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
-                      }
-                      inputClassName="!text-sm !border-none "
-                    ></Input>
-                    <h1 className="font-semibold">%</h1>
-                  </div>
+                <div className="flex items-center w-[30%]">
+                  <Input
+                    name="commision"
+                    type="number"
+                    value={formikFees.values.commision}
+                    placeholder="0"
+                    onChange={(e) => {
+                      formikFees.handleChange(e);
+                    }}
+                    className={
+                      "w-full !pl-1 !pr-[1px] !py-0.5 border placeholder:text-gray-500 !rounded-none !h-full placeholder:text-sm "
+                    }
+                    inputClassName="!text-sm !border-none "
+                  ></Input>
+                  <h1 className="font-semibold">%</h1>
                 </div>
-                {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
-                {/* {formikFees.values.fees.map((item, index) => {
+              </div>
+              {/* <div className="h-[1px] w-full bg-gray-100"></div> */}
+              {/* {formikFees.values.fees.map((item, index) => {
                   return (
                     <div
                       key={item}
@@ -642,7 +600,7 @@ function SelectedListing({ listing, index }) {
                     </div>
                   );
                 })} */}
-                {/* <div
+              {/* <div
                   onClick={() => {
                     formikFees.setFieldValue("fees", [
                       ...formikFees.values.fees,
@@ -653,8 +611,188 @@ function SelectedListing({ listing, index }) {
                 >
                   Add a fee
                 </div> */}
+            </div>
+          </PopoverBox>
+
+          <Dialogue
+            isOpen={openFeesModal}
+            closeModal={() => {
+              setOpenFeesModal(false);
+            }}
+            dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
+            outsideDialogueClass="!p-0"
+            dialoguePanelClassName={
+              "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-xl screen-height-safari md:!min-h-[300px] md:!max-h-[550px] "
+            }
+          >
+            <div
+              onClick={() => {
+                setOpenFeesModal(false);
+              }}
+              className="border-b px-4 py-2 bg-gray-200 flex items-center gap-4"
+            >
+              <div className="w-[30px] h-[30px] cursor-pointer rounded-full border border-gray-400 flex items-center justify-center">
+                <Icon className="w-6 h-6" icon="iconoir:cancel" />
               </div>
-            </PopoverBox>
+              <h1 className="font-bold font-SourceSans">Add extra fee</h1>
+            </div>
+
+            <div className="flex flex-col gap-2 mb-2 font-SourceSans">
+              {formikFees.values.fees.map((item, index) => {
+                return (
+                  <div
+                    key={item}
+                    className="flex flex-col px-3 py-1 justify-between items-center"
+                  >
+                    <div className="flex gap-2 mb-2 items-center w-full">
+                      <div className="flex items-center w-[50%]">
+                        <Input
+                          name="name"
+                          type="text"
+                          value={item.name}
+                          placeholder="Name"
+                          onChange={(e) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].name`,
+                              e.target.value
+                            );
+                          }}
+                          label="Name"
+                          className={
+                            "w-full !pr-[1px] placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-xs "
+                          }
+                          inputClassName="!text-sm "
+                        ></Input>
+                      </div>
+
+                      <div className="flex justify-between items-center w-[50%]">
+                        <Input
+                          name="price"
+                          type="number"
+                          value={item.price}
+                          placeholder="Price"
+                          onChange={(e) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].price`,
+                              e.target.value
+                            );
+                          }}
+                          label="Price"
+                          className={
+                            "w-full placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-xs "
+                          }
+                          inputClassName="!text-sm "
+                        ></Input>
+                      </div>
+                    </div>
+
+                    <div className="w-full flex gap-2">
+                      <div className="flex flex-col gap-1 justify-between w-[50%]">
+                        <h1 className="text-sm font-bold mb-1">
+                          Enter a fee option. eg. Per person
+                        </h1>
+                        <SelectInput
+                          options={feeOptions}
+                          selectedOption={item.feeType}
+                          instanceId="feeType"
+                          setSelectedOption={(selected) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].feeType`,
+                              selected
+                            );
+                          }}
+                          className={
+                            "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                            (formikFees.touched.fee_option &&
+                            formikFees.errors.fee_option
+                              ? "border-red-500"
+                              : "")
+                          }
+                          placeholder="Select fee option"
+                          isSearchable={false}
+                        ></SelectInput>
+                      </div>
+
+                      <div className="flex flex-col gap-1 justify-between w-[50%]">
+                        <h1 className="text-sm font-bold mb-1">
+                          Resident type
+                        </h1>
+                        <SelectInput
+                          options={resident}
+                          selectedOption={item.residentType}
+                          instanceId="residentType"
+                          setSelectedOption={(selected) => {
+                            formikFees.setFieldValue(
+                              `fees[${index}].residentType`,
+                              selected
+                            );
+                          }}
+                          className={
+                            "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                            (formikFees.touched.residentType &&
+                            formikFees.errors.residentType
+                              ? "border-red-500"
+                              : "")
+                          }
+                          placeholder="Select fee option"
+                          isSearchable={false}
+                        ></SelectInput>
+                      </div>
+                    </div>
+
+                    {index > 0 && (
+                      <div className="px-1 ml-auto flex items-center gap-2">
+                        <div
+                          onClick={() => {
+                            formikFees.setFieldValue(
+                              "fees",
+                              formikFees.values.fees.filter(
+                                (item, i) => i !== index
+                              )
+                            );
+                          }}
+                          className="cursor-pointer font-bold mt-2 text-red-500 rounded-full flex items-center justify-center"
+                        >
+                          Clear
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              <div
+                onClick={() => {
+                  formikFees.setFieldValue("fees", [
+                    ...formikFees.values.fees,
+                    { name: "", price: "" },
+                  ]);
+                }}
+                className="px-1 cursor-pointer py-0.5 rounded-sm ml-3 text-blue-600 w-fit text-sm font-semibold hover:bg-blue-600 hover:bg-opacity-20"
+              >
+                Add a fee
+              </div>
+            </div>
+          </Dialogue>
+
+          <div
+            onClick={() => {
+              setOpenFeesModal(true);
+            }}
+            className="px-3 !w-[32%] cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border"
+          >
+            <Icon
+              className="w-6 h-7 text-gray-500"
+              icon="material-symbols:feed"
+            />
+
+            <div className="flex flex-col gap-0.5">
+              <h1 className="font-bold self-start text-sm font-SourceSans">
+                Extra fees
+              </h1>
+              <h1 className="font-normal self-start font-SourceSans">
+                Add your extra fees
+              </h1>
+            </div>
           </div>
         </div>
       </div>

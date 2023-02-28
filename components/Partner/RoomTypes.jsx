@@ -626,7 +626,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                     formikAdd.setFieldValue("residency", selected);
                   }}
                   className={
-                    "!w-full !border !rounded-md !text-sm !text-sm py-1 pl-1 " +
+                    "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
                     (formikAdd.touched.residency && formikAdd.errors.residency
                       ? "border-red-500"
                       : "")
