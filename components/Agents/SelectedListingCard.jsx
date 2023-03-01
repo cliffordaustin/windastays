@@ -32,8 +32,15 @@ function SelectedListingCard({
   const [roomAvailabilitiesNonResident, setRoomAvailabilitiesNonResident] =
     React.useState([]);
 
-  const startDate = moment(date.from).format("YYYY-MM-DD");
-  const endDate = moment(date.to).format("YYYY-MM-DD");
+  const startDate =
+    date && date.from
+      ? moment(date.from).format("YYYY-MM-DD")
+      : router.query.date;
+
+  const endDate =
+    date && date.to
+      ? moment(date.to).format("YYYY-MM-DD")
+      : router.query.endDate;
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -1113,9 +1120,10 @@ function SelectedListingCard({
                 item.residentAdult +
                 item.nonResidentAdult +
                 item.residentChild +
-                item.nonResidentChild +
-                item.infantResident +
-                item.infantNonResident;
+                item.nonResidentChild;
+
+              const sumInfantGuests =
+                item.residentInfant + item.nonResidentInfant;
               return (
                 <div
                   key={index}
@@ -1408,7 +1416,7 @@ function SelectedListingCard({
                         onClick={() => {
                           if (
                             isResidentInfantAvailable &&
-                            sumOfGuests < room.capacity
+                            sumInfantGuests < room.infant_capacity
                           ) {
                             formik.setFieldValue(
                               `rooms[${index}].infantResident`,
@@ -1470,7 +1478,7 @@ function SelectedListingCard({
                         onClick={() => {
                           if (
                             isNonResidentInfantAvailable &&
-                            sumOfGuests < room.capacity
+                            sumInfantGuests < room.infant_capacity
                           ) {
                             formik.setFieldValue(
                               `rooms[${index}].infantNonResident`,

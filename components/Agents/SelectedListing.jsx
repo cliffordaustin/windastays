@@ -299,7 +299,7 @@ function SelectedListing({ listing, index }) {
         <h1 className="text-2xl font-SourceSans text-gray-600 font-semibold">
           {startDate && startDate.from
             ? moment(startDate.from).format("MMM Do")
-            : ""}
+            : moment(router.query.date).format("MMM Do")}
         </h1>
 
         <div className="w-fit flex items-center">
@@ -311,7 +311,7 @@ function SelectedListing({ listing, index }) {
         <h1 className="text-2xl font-SourceSans font-semibold text-gray-600">
           {startDate && startDate.to
             ? moment(startDate.to).format("MMM Do")
-            : ""}
+            : moment(router.query.endDate).format("MMM Do")}
         </h1>
 
         <PopoverBox
