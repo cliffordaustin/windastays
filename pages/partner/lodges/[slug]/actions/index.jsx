@@ -144,7 +144,6 @@ function AddAvailability({ stay }) {
             numberOfMonths={2}
             onSelect={(date) => {
               setStartDate(date);
-              console.log(date);
             }}
           />
         </PopoverBox>

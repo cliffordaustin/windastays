@@ -242,6 +242,47 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
   const [showBulkAvailabilityModal, setShowBulkAvailabilityModal] =
     React.useState(false);
 
+  const [editRoomLoading, setEditRoomLoading] = React.useState(false);
+
+  const formikEdit = useFormik({
+    initialValues: {
+      name: room.name,
+      capacity: room.capacity,
+      childCapacity: room.child_capacity,
+      infantCapacity: room.infant_capacity,
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Please enter a name for the room"),
+      capacity: Yup.number("Please enter a valid number"),
+      childCapacity: Yup.number("Please enter a valid number"),
+      infantCapacity: Yup.number("Please enter a valid number"),
+    }),
+    onSubmit: (values) => {
+      setEditRoomLoading(true);
+      axios
+        .patch(
+          `${process.env.NEXT_PUBLIC_baseURL}/stays/${router.query.slug}/room-types/${room.slug}/`,
+          {
+            name: values.name,
+            capacity: values.capacity,
+            child_capacity: values.childCapacity,
+            infant_capacity: values.infantCapacity,
+          },
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          router.reload();
+        })
+        .catch((err) => {
+          setEditRoomLoading(false);
+        });
+    },
+  });
+
   return (
     <div className="">
       <div
@@ -281,6 +322,165 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             >
               <span> + </span>
             </button>
+
+            <Popover className="relative z-20 ">
+              <Popover.Button className="outline-none ">
+                <button className="bg-white shadow-lg border flex items-center justify-center text-lg font-bold text-black w-8 h-8 rounded-full">
+                  <Icon
+                    className="text-blue-600"
+                    icon="material-symbols:edit-rounded"
+                  />
+                </button>
+              </Popover.Button>
+
+              <Transition
+                as={React.Fragment}
+                enter="transition ease-out duration-200"
+                enterFrom="opacity-0 translate-y-1"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-150"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-1"
+              >
+                <Popover.Panel
+                  className={
+                    "absolute z-[30] bg-white rounded-xl !right-0 shadow-md mt-2 border w-[500px] px-3 py-3"
+                  }
+                >
+                  <div>
+                    <Input
+                      name="name"
+                      type="text"
+                      value={formikEdit.values.name}
+                      placeholder="Enter the name of the room. eg. Standard Room"
+                      errorStyle={
+                        formikEdit.touched.name && formikEdit.errors.name
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        formikEdit.handleChange(e);
+                      }}
+                      className={"w-full placeholder:text-sm "}
+                      inputClassName="!text-sm "
+                      label="Room name"
+                    ></Input>
+                    {formikEdit.touched.name && formikEdit.errors.name ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikEdit.errors.name}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-2">
+                    <Input
+                      name="capacity"
+                      type="number"
+                      value={formikEdit.values.capacity}
+                      placeholder="Enter the capacity of the room. eg. 2"
+                      errorStyle={
+                        formikEdit.touched.capacity &&
+                        formikEdit.errors.capacity
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        formikEdit.handleChange(e);
+                      }}
+                      className={"w-full placeholder:text-sm "}
+                      inputClassName="!text-sm "
+                      label="Adult capacity"
+                    ></Input>
+                    {formikEdit.touched.capacity &&
+                    formikEdit.errors.capacity ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikEdit.errors.capacity}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="mt-2 w-[50%]">
+                      <Input
+                        name="childCapacity"
+                        type="number"
+                        value={formikEdit.values.childCapacity}
+                        placeholder="Enter the capacity of the room. eg. 2"
+                        errorStyle={
+                          formikEdit.touched.childCapacity &&
+                          formikEdit.errors.childCapacity
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => {
+                          formikEdit.handleChange(e);
+                        }}
+                        className={"w-full placeholder:text-sm "}
+                        inputClassName="!text-sm "
+                        label="Child capacity"
+                      ></Input>
+                      {formikEdit.touched.childCapacity &&
+                      formikEdit.errors.childCapacity ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.childCapacity}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-2 w-[50%]">
+                      <Input
+                        name="infantCapacity"
+                        type="number"
+                        value={formikEdit.values.infantCapacity}
+                        placeholder="Enter the capacity of the room. eg. 2"
+                        errorStyle={
+                          formikEdit.touched.infantCapacity &&
+                          formikEdit.errors.infantCapacity
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => {
+                          formikEdit.handleChange(e);
+                        }}
+                        className={"w-full placeholder:text-sm "}
+                        inputClassName="!text-sm "
+                        label="Infant capacity"
+                      ></Input>
+                      {formikEdit.touched.infantCapacity &&
+                      formikEdit.errors.infantCapacity ? (
+                        <span className="text-sm font-bold text-red-400">
+                          {formikEdit.errors.infantCapacity}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end mt-4">
+                    <Popover.Button className="bg-gray-200 text-sm font-bold px-6 py-1.5 rounded-md">
+                      Cancel
+                    </Popover.Button>
+
+                    <button
+                      onClick={() => {
+                        formikEdit.handleSubmit();
+                      }}
+                      className="bg-blue-500 flex justify-center items-center gap-2 text-white text-sm font-bold ml-2 px-6 py-1.5 rounded-md"
+                    >
+                      Post{" "}
+                      {editRoomLoading && (
+                        <div>
+                          <LoadingSpinerChase
+                            color="white"
+                            width={12}
+                            height={12}
+                          ></LoadingSpinerChase>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                </Popover.Panel>
+              </Transition>
+            </Popover>
 
             <button
               onClick={() => {

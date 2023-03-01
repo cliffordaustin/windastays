@@ -23,6 +23,7 @@ import Checkbox from "../ui/Checkbox";
 import Price from "../Stay/Price";
 import ReactJoyride from "react-joyride";
 import SelectInput from "../ui/SelectInput";
+import ListItem from "../ui/ListItem";
 
 function SelectedListing({ listing, index }) {
   const router = useRouter();
@@ -249,6 +250,13 @@ function SelectedListing({ listing, index }) {
 
   const [openFeesModal, setOpenFeesModal] = React.useState(false);
 
+  const [startDate, setDateRange] = React.useState({
+    from: router.query.date ? new Date(router.query.date) : new Date(),
+    to: router.query.endDate
+      ? new Date(router.query.endDate)
+      : new Date(new Date().setDate(new Date().getDate() + 3)),
+  });
+
   return (
     <div className="px-4 py-2 bg-gray-100 rounded-md">
       <GlobalStyle />
@@ -283,18 +291,15 @@ function SelectedListing({ listing, index }) {
           </button>
         </div>
       </div>
-      {/* {isOpen && (
-        <div className="w-full mt-2 bg-white">
-          {data.length > 0 && <Table columns={columns} data={data}></Table>}
-        </div>
-      )} */}
 
       <div
         id="step2"
         className="mt-4 flex gap-4 items-center justify-self-start"
       >
         <h1 className="text-2xl font-SourceSans text-gray-600 font-semibold">
-          {moment(router.query.date).format("MMM Do")}
+          {startDate && startDate.from
+            ? moment(startDate.from).format("MMM Do")
+            : ""}
         </h1>
 
         <div className="w-fit flex items-center">
@@ -304,8 +309,33 @@ function SelectedListing({ listing, index }) {
         </div>
 
         <h1 className="text-2xl font-SourceSans font-semibold text-gray-600">
-          {moment(router.query.endDate).format("MMM Do")}
+          {startDate && startDate.to
+            ? moment(startDate.to).format("MMM Do")
+            : ""}
         </h1>
+
+        <PopoverBox
+          panelClassName="bg-white w-[800px] rounded-xl !z-20 shadow-md mt-2 border w-fit -left-[250px] p-2"
+          btnClassName="!rounded-3xl shadow-md"
+          btnPopover={
+            <div className="cursor-pointer">
+              <Icon
+                className="w-5 h-5 text-blue-600"
+                icon="material-symbols:edit-square-outline"
+              />
+            </div>
+          }
+        >
+          <DayPicker
+            mode="range"
+            disabled={{ before: new Date() }}
+            selected={startDate}
+            numberOfMonths={2}
+            onSelect={(date) => {
+              setDateRange(date);
+            }}
+          />
+        </PopoverBox>
       </div>
 
       <div
@@ -324,6 +354,7 @@ function SelectedListing({ listing, index }) {
                   nonResidentCommision={formikFees.values.nonResidentCommission}
                   nonResidentFeesOptions={nonResidentFeesOptions}
                   fees={formikFees.values.fees}
+                  date={startDate}
                 ></SelectedListingCard>
               );
             })}
@@ -385,7 +416,7 @@ function SelectedListing({ listing, index }) {
           >
             <div className="w-full bg-gray-200 rounded-t-lg px-3 py-2">
               <h1 className="font-semibold font-SourceSans text-base">
-                Add extra fees
+                Add other fees
               </h1>
             </div>
             <div className="flex flex-col">
@@ -459,6 +490,27 @@ function SelectedListing({ listing, index }) {
               ))}
             </div>
           </PopoverBox>
+
+          <div
+            onClick={() => {
+              setOpenFeesModal(true);
+            }}
+            className="px-3 !w-[32%] cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border"
+          >
+            <Icon
+              className="w-6 h-7 text-gray-500"
+              icon="material-symbols:feed"
+            />
+
+            <div className="flex flex-col gap-0.5">
+              <h1 className="font-bold self-start text-sm font-SourceSans">
+                Extra fees
+              </h1>
+              <h1 className="font-normal self-start font-SourceSans">
+                Add your extra fees
+              </h1>
+            </div>
+          </div>
 
           <PopoverBox
             panelClassName="bg-white rounded-md after:!left-[27%] after:!border-b-gray-200 tooltip -left-[0px] border shadow-md mt-2 w-[320px] p-0"
@@ -622,7 +674,7 @@ function SelectedListing({ listing, index }) {
             dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
             outsideDialogueClass="!p-0"
             dialoguePanelClassName={
-              "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-xl screen-height-safari md:!min-h-[300px] md:!max-h-[550px] "
+              "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-2xl screen-height-safari md:!min-h-[300px] md:!max-h-[550px] "
             }
           >
             <div
@@ -659,7 +711,7 @@ function SelectedListing({ listing, index }) {
                           }}
                           label="Name"
                           className={
-                            "w-full !pr-[1px] placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-xs "
+                            "w-full !pr-[1px] placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-sm "
                           }
                           inputClassName="!text-sm "
                         ></Input>
@@ -679,14 +731,14 @@ function SelectedListing({ listing, index }) {
                           }}
                           label="Price"
                           className={
-                            "w-full placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-xs "
+                            "w-full placeholder:text-gray-500 placeholder:font-semibold !h-full placeholder:text-sm "
                           }
                           inputClassName="!text-sm "
                         ></Input>
                       </div>
                     </div>
 
-                    <div className="w-full flex gap-2">
+                    <div className="w-full flex items-start gap-2">
                       <div className="flex flex-col gap-1 justify-between w-[50%]">
                         <h1 className="text-sm font-bold mb-1">
                           Enter a fee option. eg. Per person
@@ -760,6 +812,7 @@ function SelectedListing({ listing, index }) {
                   </div>
                 );
               })}
+
               <div
                 onClick={() => {
                   formikFees.setFieldValue("fees", [
@@ -771,29 +824,26 @@ function SelectedListing({ listing, index }) {
               >
                 Add a fee
               </div>
+
+              <div className="flex flex-col gap-2 px-4">
+                <span className="font-bold font-SourceSans">Note:</span>
+                <ListItem>
+                  <span className="font-bold">Per person</span> - This fee will
+                  be charged per person each guest added.
+                </ListItem>
+
+                <ListItem>
+                  <span className="font-bold">Per person per night</span> - This
+                  fee will be charged per person per night.
+                </ListItem>
+
+                <ListItem>
+                  <span className="font-bold">Whole group</span> - This fee will
+                  be added to the total price.
+                </ListItem>
+              </div>
             </div>
           </Dialogue>
-
-          <div
-            onClick={() => {
-              setOpenFeesModal(true);
-            }}
-            className="px-3 !w-[32%] cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border"
-          >
-            <Icon
-              className="w-6 h-7 text-gray-500"
-              icon="material-symbols:feed"
-            />
-
-            <div className="flex flex-col gap-0.5">
-              <h1 className="font-bold self-start text-sm font-SourceSans">
-                Extra fees
-              </h1>
-              <h1 className="font-normal self-start font-SourceSans">
-                Add your extra fees
-              </h1>
-            </div>
-          </div>
         </div>
       </div>
     </div>

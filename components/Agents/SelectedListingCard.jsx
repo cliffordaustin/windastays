@@ -23,6 +23,7 @@ function SelectedListingCard({
   residentCommision,
   nonResidentCommision,
   fees,
+  date,
 }) {
   const router = useRouter();
 
@@ -31,15 +32,18 @@ function SelectedListingCard({
   const [roomAvailabilitiesNonResident, setRoomAvailabilitiesNonResident] =
     React.useState([]);
 
+  const startDate = moment(date.from).format("YYYY-MM-DD");
+  const endDate = moment(date.to).format("YYYY-MM-DD");
+
   useEffect(() => {
-    if (router.query.date && router.query.endDate) {
+    if (startDate && endDate) {
       axios
         .get(
           `${process.env.NEXT_PUBLIC_baseURL}/room-types/${
             room.slug
-          }/resident-availabilities/?start_date=${
-            router.query.date
-          }&end_date=${moment(router.query.endDate)
+          }/resident-availabilities/?start_date=${startDate}&end_date=${moment(
+            endDate
+          )
             .subtract(1, "days")
             .format("YYYY-MM-DD")}`,
           {
@@ -56,9 +60,9 @@ function SelectedListingCard({
         .get(
           `${process.env.NEXT_PUBLIC_baseURL}/room-types/${
             room.slug
-          }/nonresident-availabilities/?start_date=${
-            router.query.date
-          }&end_date=${moment(router.query.endDate)
+          }/nonresident-availabilities/?start_date=${startDate}&end_date=${moment(
+            endDate
+          )
             .subtract(1, "days")
             .format("YYYY-MM-DD")}`,
           {
@@ -71,7 +75,7 @@ function SelectedListingCard({
           setRoomAvailabilitiesNonResident(res.data.results);
         });
     }
-  }, [router.query.date, router.query.endDate]);
+  }, [startDate, endDate]);
 
   const singleResidentAdultPrice = React.useMemo(
     () => pricing.singleResidentAdultPrice(roomAvailabilities),
@@ -188,7 +192,7 @@ function SelectedListingCard({
   });
 
   const nights = moment
-    .duration(moment(router.query.endDate).diff(moment(router.query.date)))
+    .duration(moment(endDate).diff(moment(startDate)))
     .asDays();
 
   const numberOfResidentAdult = React.useMemo(
@@ -474,9 +478,9 @@ function SelectedListingCard({
     });
 
     nonResidentFeesOptions.forEach((fee) => {
-      if (fee.resident_fee_type === "WHOLE GROUP") {
+      if (fee.nonresident_fee_type === "WHOLE GROUP") {
         total += fee.price;
-      } else if (fee.resident_fee_type === "PER PERSON PER NIGHT") {
+      } else if (fee.nonresident_fee_type === "PER PERSON PER NIGHT") {
         total += fee.price * numberOfNonResidentAdult * nights;
       } else {
         total += fee.price * numberOfNonResidentAdult;
@@ -935,7 +939,15 @@ function SelectedListingCard({
               return (
                 <div key={index} className="flex flex-col gap-2 px-2">
                   <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                    <h1 className="text-sm font-semibold">{fee.name}</h1>
+                    <h1 className="text-sm font-semibold">
+                      {fee.name} (
+                      {fee.resident_fee_type === "WHOLE GROUP"
+                        ? "Whole group"
+                        : fee.resident_fee_type === "PER PERSON PER NIGHT"
+                        ? "Per person per night"
+                        : "Per person"}
+                      )
+                    </h1>
                     <div className="flex gap-1 items-center">
                       <Price
                         currency="KES"
@@ -943,7 +955,6 @@ function SelectedListingCard({
                         autoCurrency={false}
                         className="!font-normal !text-sm !font-SourceSans"
                       ></Price>{" "}
-                      <span className="font-semibold mb-1">pp</span>
                     </div>
                   </div>
                 </div>
@@ -959,14 +970,21 @@ function SelectedListingCard({
               return (
                 <div key={index} className="flex flex-col gap-2 px-2">
                   <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                    <h1 className="text-sm font-semibold">{fee.name}</h1>
+                    <h1 className="text-sm font-semibold">
+                      {fee.name} (
+                      {fee.nonresident_fee_type === "WHOLE GROUP"
+                        ? "Whole group"
+                        : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
+                        ? "Per person per night"
+                        : "Per person"}
+                      )
+                    </h1>
                     <div className="flex gap-1 items-center">
                       <Price
                         stayPrice={fee.price}
                         autoCurrency={false}
                         className="!font-normal !text-sm !font-SourceSans"
                       ></Price>{" "}
-                      <span className="font-semibold mb-1">pp</span>
                     </div>
                   </div>
                 </div>
@@ -1497,7 +1515,7 @@ function SelectedListingCard({
                 formik.setFieldValue("rooms", [
                   ...formik.values.rooms,
                   {
-                    residentAdult: 1,
+                    residentAdult: 0,
                     nonResidentAdult: 0,
                     residentChild: 0,
                     nonResidentChild: 0,
