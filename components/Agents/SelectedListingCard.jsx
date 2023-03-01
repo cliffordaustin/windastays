@@ -1123,7 +1123,7 @@ function SelectedListingCard({
                 item.nonResidentChild;
 
               const sumInfantGuests =
-                item.residentInfant + item.nonResidentInfant;
+                item.infantNonResident + item.infantResident;
               return (
                 <div
                   key={index}
