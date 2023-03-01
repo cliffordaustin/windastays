@@ -380,7 +380,7 @@ function SelectedListing({ listing, index }) {
         </h1>
         <div className="flex gap-4 w-full">
           <PopoverBox
-            panelClassName="bg-white rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px] !p-0"
+            panelClassName="bg-white !overflow-x-hidden rounded-lg after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px] !p-0"
             btnClassName="!w-full"
             btnPopover={
               <div className="px-3 !w-full cursor-pointer py-1 flex items-center gap-4 mx-auto rounded-lg border">
@@ -425,7 +425,15 @@ function SelectedListing({ listing, index }) {
                   <div className="flex justify-between items-center">
                     <h1 className="text-sm">
                       {fee.name}{" "}
-                      <span className="font-normal">(For resident)</span>
+                      <span className="font-normal">
+                        (For resident{" "}
+                        {fee.guest_type === "CHILD"
+                          ? "child"
+                          : fee.guest_type === "INFANT"
+                          ? "infant"
+                          : "adult"}
+                        )
+                      </span>
                       <span className="font-normal">
                         {" "}
                         ={" "}
@@ -461,7 +469,15 @@ function SelectedListing({ listing, index }) {
                   <div className="flex justify-between items-center">
                     <h1 className="text-sm">
                       {fee.name}{" "}
-                      <span className="font-normal">(For non-resident)</span>
+                      <span className="font-normal">
+                        (For non-resident{" "}
+                        {fee.guest_type === "CHILD"
+                          ? "child"
+                          : fee.guest_type === "INFANT"
+                          ? "infant"
+                          : "adult"}
+                        )
+                      </span>
                       <span className="font-normal">
                         {" "}
                         ={" "}
@@ -841,6 +857,18 @@ function SelectedListing({ listing, index }) {
                   <span className="font-bold">Whole group</span> - This fee will
                   be added to the total price.
                 </ListItem>
+              </div>
+
+              <div className="px-4">
+                <Button
+                  onClick={() => {
+                    setOpenFeesModal(false);
+                  }}
+                  type={"submit"}
+                  className="!w-full mt-4 btn-gradient-2 !h-full !rounded-3xl font-bold"
+                >
+                  Done
+                </Button>
               </div>
             </div>
           </Dialogue>

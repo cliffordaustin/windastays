@@ -409,10 +409,27 @@ function SelectedListingCard({
     });
 
     residentFeesOptions.forEach((fee) => {
-      if (fee.resident_fee_type === "WHOLE GROUP") {
+      if (fee.resident_fee_type === "WHOLE GROUP" && total > 0) {
         total += fee.price;
-      } else if (fee.resident_fee_type === "PER PERSON PER NIGHT") {
+      } else if (
+        fee.resident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "ADULT"
+      ) {
         total += fee.price * numberOfResidentAdult * nights;
+      } else if (
+        fee.resident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "CHILD"
+      ) {
+        total += fee.price * numberOfResidentChild * nights;
+      } else if (
+        fee.resident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "INFANT"
+      ) {
+        total += fee.price * numberOfInfantResident * nights;
+      } else if (fee.guest_type === "CHILD") {
+        total += fee.price * numberOfResidentChild;
+      } else if (fee.guest_type === "INFANT") {
+        total += fee.price * numberOfInfantResident;
       } else {
         total += fee.price * numberOfResidentAdult;
       }
@@ -485,10 +502,27 @@ function SelectedListingCard({
     });
 
     nonResidentFeesOptions.forEach((fee) => {
-      if (fee.nonresident_fee_type === "WHOLE GROUP") {
+      if (fee.nonresident_fee_type === "WHOLE GROUP" && total > 0) {
         total += fee.price;
-      } else if (fee.nonresident_fee_type === "PER PERSON PER NIGHT") {
+      } else if (
+        fee.nonresident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "ADULT"
+      ) {
         total += fee.price * numberOfNonResidentAdult * nights;
+      } else if (
+        fee.nonresident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "CHILD"
+      ) {
+        total += fee.price * numberOfNonResidentChild * nights;
+      } else if (
+        fee.nonresident_fee_type === "PER PERSON PER NIGHT" &&
+        fee.guest_type === "INFANT"
+      ) {
+        total += fee.price * numberOfInfantNonResident * nights;
+      } else if (fee.guest_type === "CHILD") {
+        total += fee.price * numberOfNonResidentChild;
+      } else if (fee.guest_type === "INFANT") {
+        total += fee.price * numberOfInfantNonResident;
       } else {
         total += fee.price * numberOfNonResidentAdult;
       }
@@ -952,7 +986,13 @@ function SelectedListingCard({
                         ? "Whole group"
                         : fee.resident_fee_type === "PER PERSON PER NIGHT"
                         ? "Per person per night"
-                        : "Per person"}
+                        : "Per person"}{" "}
+                      -{" "}
+                      {fee.guest_type === "CHILD"
+                        ? "Child"
+                        : fee.guest_type === "INFANT"
+                        ? "Infant"
+                        : "Adult"}
                       )
                     </h1>
                     <div className="flex gap-1 items-center">
@@ -983,7 +1023,13 @@ function SelectedListingCard({
                         ? "Whole group"
                         : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
                         ? "Per person per night"
-                        : "Per person"}
+                        : "Per person"}{" "}
+                      -{" "}
+                      {fee.guest_type === "CHILD"
+                        ? "Child"
+                        : fee.guest_type === "INFANT"
+                        ? "Infant"
+                        : "Adult"}
                       )
                     </h1>
                     <div className="flex gap-1 items-center">
@@ -1122,6 +1168,8 @@ function SelectedListingCard({
                 item.residentChild +
                 item.nonResidentChild;
 
+              const sumChildGuests = item.residentChild + item.nonResidentChild;
+
               const sumInfantGuests =
                 item.infantNonResident + item.infantResident;
               return (
@@ -1231,7 +1279,8 @@ function SelectedListingCard({
                         onClick={() => {
                           if (
                             isResidentChildAvailable &&
-                            sumOfGuests < room.capacity
+                            (sumChildGuests < room.child_capacity ||
+                              sumOfGuests < room.capacity)
                           ) {
                             formik.setFieldValue(
                               `rooms[${index}].residentChild`,
@@ -1355,7 +1404,8 @@ function SelectedListingCard({
                         onClick={() => {
                           if (
                             isNonResidentChildAvailable &&
-                            sumOfGuests < room.capacity
+                            (sumChildGuests < room.child_capacity ||
+                              sumOfGuests < room.capacity)
                           ) {
                             formik.setFieldValue(
                               `rooms[${index}].nonResidentChild`,

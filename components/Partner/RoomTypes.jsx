@@ -287,8 +287,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
     <div className="">
       <div
         className={
-          "flex z-10 top-[81px] bg-white justify-between shadow-md px-2 py-2 border items-center " +
-          (inPartnerHomepage ? "" : "sticky")
+          "flex top-[80px] bg-white justify-between shadow-md px-2 py-2 border items-center " +
+          (inPartnerHomepage ? "" : "")
         }
       >
         <div className="flex gap-2 items-center">
@@ -323,7 +323,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
               <span> + </span>
             </button>
 
-            <Popover className="relative z-20 ">
+            <Popover className="relative ">
               <Popover.Button className="outline-none ">
                 <button className="bg-white shadow-lg border flex items-center justify-center text-lg font-bold text-black w-8 h-8 rounded-full">
                   <Icon
