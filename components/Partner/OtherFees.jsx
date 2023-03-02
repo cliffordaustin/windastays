@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import Cookies from "js-cookie";
 import SelectInput from "../ui/SelectInput";
 import Dialogue from "../Home/Dialogue";
+import ResidentOtherFee from "./ResidentOtherFee";
+import NonResidentOtherFee from "./NonResidentOtherFee";
 
 function OtherFees({ residentFees, nonResidentFees }) {
   const router = useRouter();
@@ -31,6 +33,10 @@ function OtherFees({ residentFees, nonResidentFees }) {
     { value: "CHILD", label: "Child" },
     { value: "INFANT", label: "Infant" },
   ];
+
+  const [residentOpenModal, setResidentOpenModal] = useState(false);
+
+  const [nonResidentOpenModal, setNonResidentOpenModal] = useState(false);
 
   const formikNonResidentFees = useFormik({
     initialValues: {
@@ -76,14 +82,18 @@ function OtherFees({ residentFees, nonResidentFees }) {
           }
         )
         .then((res) => {
-          values.fees.push({
-            name: values.name,
-            price: values.price,
-            nonresident_fee_type: values.fee_option.value,
-            guest_type: values.guest_type.value,
-          });
+          formikNonResidentFees.setFieldValue("fees", [
+            ...values.fees,
+            {
+              id: res.data.id,
+              name: values.name,
+              price: values.price,
+              resident_fee_type: values.fee_option.value,
+              guest_type: values.guest_type.value,
+            },
+          ]);
           setNonResidentFeesLoading(false);
-          formikNonResidentFees.resetForm();
+          setNonResidentOpenModal(false);
         })
         .catch((err) => {
           setNonResidentFeesLoading(false);
@@ -135,14 +145,18 @@ function OtherFees({ residentFees, nonResidentFees }) {
           }
         )
         .then((res) => {
-          values.fees.push({
-            name: values.name,
-            price: values.price,
-            fee_option: values.fee_option.value,
-            guest_type: values.guest_type.value,
-          });
+          formikResidentFees.setFieldValue("fees", [
+            ...values.fees,
+            {
+              id: res.data.id,
+              name: values.name,
+              price: values.price,
+              resident_fee_type: values.fee_option.value,
+              guest_type: values.guest_type.value,
+            },
+          ]);
           setResidentFeesLoading(false);
-          formikResidentFees.resetForm();
+          setResidentOpenModal(false);
         })
         .catch((err) => {
           setResidentFeesLoading(false);
@@ -156,6 +170,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
         "fees",
         residentFees.map((fee) => {
           return {
+            id: fee.id,
             name: fee.name,
             price: fee.price,
             resident_fee_type: fee.resident_fee_type,
@@ -170,6 +185,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
         "fees",
         nonResidentFees.map((fee) => {
           return {
+            id: fee.id,
             name: fee.name,
             price: fee.price,
             nonresident_fee_type: fee.nonresident_fee_type,
@@ -180,9 +196,6 @@ function OtherFees({ residentFees, nonResidentFees }) {
     }
   }, []);
 
-  const [residentOpenModal, setResidentOpenModal] = useState(false);
-
-  const [nonResidentOpenModal, setNonResidentOpenModal] = useState(false);
   return (
     <div className="mt-5 ">
       <div className="flex flex-col">
@@ -195,27 +208,10 @@ function OtherFees({ residentFees, nonResidentFees }) {
             return (
               <div key={index}>
                 {fee.name && fee.price && (
-                  <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
-                    <div className="px-2 py-1 w-fit mt-2 bg-gray-100 text-sm font-bold rounded-3xl">
-                      {fee.resident_fee_type === "WHOLE GROUP"
-                        ? "Whole group"
-                        : fee.resident_fee_type === "PER PERSON PER NIGHT"
-                        ? "Per person per night"
-                        : "Per person"}
-                    </div>
-                    <div className="text-sm text-gray-600 font-bold">
-                      {fee.name}
-                    </div>
-
-                    <div className="flex gap-1">
-                      <Price
-                        stayPrice={fee.price}
-                        autoCurrency={false}
-                        currency="KES"
-                        className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
-                      ></Price>
-                    </div>
-                  </div>
+                  <ResidentOtherFee
+                    fee={fee}
+                    formikResidentFees={formikResidentFees}
+                  ></ResidentOtherFee>
                 )}
               </div>
             );
@@ -332,6 +328,27 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     isSearchable={false}
                   ></SelectInput>
                 </div>
+
+                <div className="mt-2">
+                  <h1 className="text-sm font-bold mb-1">Guest type</h1>
+                  <SelectInput
+                    options={guestTypes}
+                    selectedOption={formikResidentFees.values.guest_type}
+                    instanceId="guest_type"
+                    setSelectedOption={(selected) => {
+                      formikResidentFees.setFieldValue("guest_type", selected);
+                    }}
+                    className={
+                      "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                      (formikResidentFees.touched.guest_type &&
+                      formikResidentFees.errors.guest_type
+                        ? "border-red-500"
+                        : "")
+                    }
+                    placeholder="Select a guest type this fee applies to"
+                    isSearchable={false}
+                  ></SelectInput>
+                </div>
               </div>
 
               <div className="flex justify-end mt-4 mb-3 mr-2">
@@ -377,26 +394,10 @@ function OtherFees({ residentFees, nonResidentFees }) {
             return (
               <div key={index}>
                 {fee.name && fee.price && (
-                  <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 py-2 border rounded-lg">
-                    <div className="px-2 py-1 w-fit mt-2 bg-gray-100 text-sm font-bold rounded-3xl">
-                      {fee.nonresident_fee_type === "WHOLE GROUP"
-                        ? "Whole group"
-                        : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
-                        ? "Per person per night"
-                        : "Per person"}
-                    </div>
-                    <div className="text-sm text-gray-600 font-bold">
-                      {fee.name}
-                    </div>
-
-                    <div className="flex gap-1">
-                      <Price
-                        stayPrice={fee.price}
-                        autoCurrency={false}
-                        className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
-                      ></Price>
-                    </div>
-                  </div>
+                  <NonResidentOtherFee
+                    fee={fee}
+                    formikNonResidentFees={formikNonResidentFees}
+                  ></NonResidentOtherFee>
                 )}
               </div>
             );
