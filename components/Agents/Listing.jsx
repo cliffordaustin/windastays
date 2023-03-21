@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Card from "../ui/Card";
 import Price from "../Stay/Price";
@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import moment from "moment";
 import { Icon } from "@iconify/react";
 
-function Listing({ listing, currentOptions, setCurrentOptions }) {
+function Listing({ listing, currentOptions, setCurrentOptions, setOpenPopup }) {
   const router = useRouter();
 
   const sortedImages = listing.stay_images.sort((x, y) => y.main - x.main);
@@ -171,12 +171,15 @@ function Listing({ listing, currentOptions, setCurrentOptions }) {
         <div className="mt-2">
           <label
             htmlFor={"btn" + listing.id}
+            onClick={() => {
+              setOpenPopup(true);
+            }}
             className="button-expand btn-gradient-2 absolute top-[45%] cursor-pointer"
           >
             <>
               <span className="button-expand-icon">+</span>
               <span className="button-expand-text font-bold mr-2">
-                Calculate pricing
+                Check availability
               </span>
             </>
           </label>

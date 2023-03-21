@@ -661,3 +661,21 @@ body {
   white-space: nowrap;
   padding-right: 5px;
 }
+
+.selected-card-gradient {
+  background: rgb(195, 34, 79);
+  background: linear-gradient(
+    0deg,
+    rgba(195, 34, 79, 0.028018043154767) 39%,
+    rgba(253, 45, 45, 0.1088235977984944) 100%
+  );
+}
+
+.selected-card-gradient-left {
+  background: rgb(195, 34, 79);
+  background: linear-gradient(
+    266deg,
+    rgba(195, 34, 79, 0.028018043154767) 49%,
+    rgba(253, 45, 45, 0.1088235977984944) 100%
+  );
+}

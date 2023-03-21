@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useRouter } from "next/router";
 import SelectedListing from "./SelectedListing";
 import { Icon } from "@iconify/react";
+import Selected from "./Selected";
 
 function SelectedListings({ listings }) {
   return (
@@ -13,7 +14,7 @@ function SelectedListings({ listings }) {
         </div>
       )}
 
-      <div className="flex w-[150px] mb-2 bg-white rounded-md overflow-hidden">
+      {/* <div className="flex w-[150px] mb-2 bg-white rounded-md overflow-hidden">
         <div className="w-[50%] gap-0.5 font-bold text-sm text-white cursor-pointer flex items-center justify-center bg-blue-500 px-2 py-1">
           <Icon
             icon="ic:sharp-grid-view"
@@ -28,10 +29,15 @@ function SelectedListings({ listings }) {
           />
           <span>Table</span>
         </div>
-      </div>
+      </div> */}
       {listings.length > 0 &&
         listings.map((listing, index) => {
           return (
+            // <Selected
+            //   key={listing.id}
+            //   index={index}
+            //   listing={listing}
+            // ></Selected>
             <SelectedListing key={listing.id} index={index} listing={listing} />
           );
         })}

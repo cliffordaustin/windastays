@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 function Switch({
   switchButton,
   changeSwitchButtonState,
-  slideColorClass = "bg-red-200",
+  slideColorClass = "bg-red-500",
   roundedColorClass = "bg-red-500",
   switchButtonCircle = "",
   switchButtonContainer = "",
@@ -23,7 +23,7 @@ function Switch({
     <motion.div
       onClick={changeSwitchButtonState}
       className={
-        "w-16 h-9 bg-gray-200 rounded-3xl flex items-center px-1 cursor-pointer transition-colors duration-300 ease-in-out " +
+        "w-16 h-9 bg-gray-300 rounded-3xl flex items-center px-1 cursor-pointer transition-colors duration-300 ease-in-out " +
         switchButtonContainer +
         " " +
         (switchButton ? slideColorClass : "")

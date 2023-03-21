@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import getToken from "../../../lib/getToken";
 import axios from "axios";
 import Search from "../../../components/Agents/Search";
@@ -109,6 +109,8 @@ function Agents({ userProfile, stays }) {
     },
   ];
 
+  const [openPopup, setOpenPopup] = useState(false);
+
   return (
     <div>
       <div className="bg-white">
@@ -125,6 +127,7 @@ function Agents({ userProfile, stays }) {
             <Listing
               key={index}
               currentOptions={currentOptions}
+              setOpenPopup={setOpenPopup}
               setCurrentOptions={setCurrentOptions}
               listing={stay}
             ></Listing>
@@ -191,7 +194,7 @@ function Agents({ userProfile, stays }) {
         leave="transition-all duration-300"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
-        show={showPopup}
+        show={showPopup || openPopup}
       >
         <div
           onClick={() => {
@@ -201,8 +204,8 @@ function Agents({ userProfile, stays }) {
           className="fixed top-0 !overflow-y-scroll left-0 right-0 bottom-0 bg-black bg-opacity-40"
         ></div>
       </Transition>
-      <div className="w-full fixed h-fit !overflow-y-scroll bg-gray-100 bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
-        {!showPopup && (
+      <div className="w-full fixed h-fit !overflow-y-scroll bg-white bottom-0 px-4 border border-gray-300 rounded-t-3xl shadow-top">
+        {!showPopup && !openPopup && (
           <div id="step6" className="flex justify-between items-center">
             <div></div>
             {listings.length === 0 && (
@@ -219,6 +222,7 @@ function Agents({ userProfile, stays }) {
             <div
               onClick={() => {
                 setShowPopup(!showPopup);
+                setOpenPopup(false);
               }}
               className="w-[40px] btn-gradient-2 cursor-pointer mt-2 mb-1 h-[40px] rounded-full flex items-center justify-center"
             >
@@ -233,7 +237,7 @@ function Agents({ userProfile, stays }) {
           leave="transition-all duration-300"
           leaveFrom="opacity-100 h-[55px]"
           leaveTo="h-0 opacity-0"
-          show={showPopup}
+          show={showPopup || openPopup}
         >
           <SelectedListings listings={listings}></SelectedListings>
 
@@ -249,7 +253,8 @@ function Agents({ userProfile, stays }) {
 
           <div
             onClick={() => {
-              setShowPopup(!showPopup);
+              setShowPopup(false);
+              setOpenPopup(false);
             }}
             className="w-[40px] absolute top-2 right-4 btn-gradient-2 cursor-pointer mt-2 h-[40px] rounded-full flex items-center justify-center"
           >
@@ -263,16 +268,16 @@ function Agents({ userProfile, stays }) {
 
 export async function getServerSideProps(context) {
   try {
-    // const token = getToken(context);
+    const token = getToken(context);
 
-    // const response = await axios.get(
-    //   `${process.env.NEXT_PUBLIC_baseURL}/user/`,
-    //   {
-    //     headers: {
-    //       Authorization: "Token " + token,
-    //     },
-    //   }
-    // );
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_baseURL}/user/`,
+      {
+        headers: {
+          Authorization: "Token " + token,
+        },
+      }
+    );
 
     const stays = await axios.get(
       `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/`
@@ -280,33 +285,26 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        // userProfile: response.data[0],
+        userProfile: response.data[0],
         stays: stays.data.results,
       },
     };
   } catch (error) {
-    // if (error.response.status === 401) {
-    //   return {
-    //     redirect: {
-    //       permanent: false,
-    //       destination: `/login?redirect=/partner/agent`,
-    //     },
-    //   };
-    // } else {
-    //   return {
-    //     props: {
-    //       userProfile: "",
-    //       stays: [],
-    //     },
-    //   };
-    // }
-
-    return {
-      props: {
-        userProfile: "",
-        stays: [],
-      },
-    };
+    if (error.response.status === 401) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: `/login?redirect=/partner/agent`,
+        },
+      };
+    } else {
+      return {
+        props: {
+          userProfile: "",
+          stays: [],
+        },
+      };
+    }
   }
 }
 

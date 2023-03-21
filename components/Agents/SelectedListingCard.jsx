@@ -439,22 +439,22 @@ function SelectedListingCard({
       if (
         fee.name &&
         fee.price &&
-        fee.feeType.value === "PER PERSON PER NIGHT" &&
-        fee.residentType.value === "RESIDENT"
+        fee?.feeType?.value === "PER PERSON PER NIGHT" &&
+        fee?.residentType?.value === "RESIDENT"
       ) {
         total += fee.price * numberOfResidentAdult * nights;
       } else if (
         fee.name &&
         fee.price &&
-        fee.feeType.value === "WHOLE GROUP" &&
-        fee.residentType.value === "RESIDENT"
+        fee?.feeType?.value === "WHOLE GROUP" &&
+        fee?.residentType?.value === "RESIDENT"
       ) {
         total = total + Number(fee.price);
       } else if (
         fee.name &&
         fee.price &&
-        fee.feeType.value === "PER PERSON" &&
-        fee.residentType.value === "RESIDENT"
+        fee?.feeType?.value === "PER PERSON" &&
+        fee?.residentType?.value === "RESIDENT"
       ) {
         total += fee.price * numberOfResidentAdult;
       }
@@ -532,13 +532,21 @@ function SelectedListingCard({
       if (
         fee.name &&
         fee.price &&
-        fee.feeType.value === "PER PERSON PER NIGHT" &&
-        fee.residentType.value === "NON-RESIDENT"
+        fee?.feeType?.value === "PER PERSON PER NIGHT" &&
+        fee?.residentType?.value === "NON-RESIDENT"
       ) {
         total += fee.price * numberOfNonResidentAdult * nights;
-      } else if (fee.name && fee.price && fee.feeType.value === "WHOLE GROUP") {
+      } else if (
+        fee.name &&
+        fee.price &&
+        fee?.feeType?.value === "WHOLE GROUP"
+      ) {
         total += fee.price;
-      } else if (fee.name && fee.price && fee.feeType.value === "PER PERSON") {
+      } else if (
+        fee.name &&
+        fee.price &&
+        fee?.feeType?.value === "PER PERSON"
+      ) {
         total += fee.price * numberOfNonResidentAdult;
       }
     });
@@ -596,22 +604,22 @@ function SelectedListingCard({
   );
 
   return (
-    <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 border rounded-lg">
-      <div className="text-sm text-gray-600 flex flex-col gap-1 font-bold absolute top-4">
-        <div
-          onClick={() => {
-            setOpenGuestModal(true);
-          }}
-          id="step4"
-          className="bg-red-200 flex items-center justify-center px-2 py-1 font-bold cursor-pointer rounded-md"
-        >
-          Add a guest to calculate
-          <Icon
-            className="w-6 h-6"
-            icon="material-symbols:arrow-drop-down-rounded"
-          />
+    <div className="min-w-[250px] h-[full] px-4 relative flex flex-col justify-around py-3 shadow-lg selected-card-gradient rounded-lg">
+      <div className="text-sm text-black flex w-full flex-col gap-1 font-bold absolute left-0 right-0 top-2">
+        <div className="px-2">
+          <div
+            onClick={() => {
+              setOpenGuestModal(true);
+            }}
+            id="step4"
+            className="bg-white border text-xs flex gap-1 items-center justify-center px-2 py-2 font-bold cursor-pointer rounded-md"
+          >
+            <Icon className="w-4 h-4" icon="material-symbols:calculate" />
+            Add guest to calculate
+          </div>
         </div>
-        {room.name}
+        {/* <div className="w-full h-[1px] bg-white"></div> */}
+        <div className="px-3">{room.name}</div>
       </div>
 
       <div className="flex gap-1 mt-4">
@@ -621,7 +629,7 @@ function SelectedListingCard({
               stayPrice={getResidentTotalPrice()}
               currency="KES"
               autoCurrency={false}
-              className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+              className="!text-3xl !font-SourceSans !font-semibold !text-black"
             ></Price>
 
             <PopoverBox
@@ -645,7 +653,7 @@ function SelectedListingCard({
         )}
 
         {getNonResidentTotalPrice() && getResidentTotalPrice() ? (
-          <h1 className="!text-3xl !font-SourceSans !font-semibold !text-gray-600">
+          <h1 className="!text-3xl !font-SourceSans !font-semibold !text-black">
             /
           </h1>
         ) : (
@@ -657,7 +665,7 @@ function SelectedListingCard({
             <Price
               stayPrice={getNonResidentTotalPrice()}
               autoCurrency={false}
-              className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
+              className="!text-3xl !font-SourceSans !font-semibold !text-black"
             ></Price>
 
             <PopoverBox
@@ -681,7 +689,7 @@ function SelectedListingCard({
         )}
 
         {!getNonResidentTotalPrice() && !getResidentTotalPrice() ? (
-          <div className="!text-3xl !font-SourceSans !font-semibold !text-gray-600">
+          <div className="!text-3xl !font-SourceSans !font-semibold !text-black">
             $0
           </div>
         ) : (
@@ -689,12 +697,13 @@ function SelectedListingCard({
         )}
       </div>
 
-      <div className="flex items-center gap-2 absolute bottom-2">
+      <div className="flex flex-col items-center gap-2 absolute left-0 right-0 w-full bottom-2">
+        {/* <div className="w-full h-[1px] bg-gray-200"></div> */}
         <PopoverBox
           panelClassName="bg-white rounded-xl after:!left-[30%] tooltip shadow-md mt-2 border w-[500px] max-h-[300px] overflow-y-scroll -left-[0px]"
-          btnClassName=""
+          btnClassName="w-full"
           btnPopover={
-            <div className="bg-gray-100 flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-md">
+            <div className="bg-white border !w-full flex items-center justify-center px-2 py-1 text-xs font-bold cursor-pointer rounded-md">
               Price breakdown
               <Icon
                 className="w-6 h-6"
@@ -702,7 +711,7 @@ function SelectedListingCard({
               />
             </div>
           }
-          popoverClassName=""
+          popoverClassName="w-full px-2"
         >
           {/* <h1 className="font-bold mb-2 font-SourceSans">Price breakdown</h1> */}
 
@@ -1030,6 +1039,42 @@ function SelectedListingCard({
                         : fee.guest_type === "INFANT"
                         ? "Infant"
                         : "Adult"}
+                      )
+                    </h1>
+                    <div className="flex gap-1 items-center">
+                      <Price
+                        stayPrice={fee.price}
+                        autoCurrency={false}
+                        className="!font-normal !text-sm !font-SourceSans"
+                      ></Price>{" "}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-col gap-2 px-2 mb-3">
+            {fees.length > 0 && (
+              <div className="flex flex-col gap-4 mt-2">
+                <div className="w-full h-[1px] bg-gray-200"></div>
+                <h1 className="font-semibold text-sm font-SourceSans">
+                  Extra Fees
+                </h1>
+              </div>
+            )}
+
+            {fees.map((fee, index) => {
+              return (
+                <div key={index} className="flex flex-col gap-2 px-2">
+                  <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                    <h1 className="text-sm font-semibold">
+                      {fee.name}(
+                      {fee.fee_type === "WHOLE GROUP"
+                        ? "Whole group"
+                        : fee.fee_type === "PER PERSON PER NIGHT"
+                        ? "Per person per night"
+                        : "Per person"}
                       )
                     </h1>
                     <div className="flex gap-1 items-center">

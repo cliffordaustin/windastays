@@ -318,6 +318,7 @@ export async function getServerSideProps(context) {
       // statusCode: error.response.statusCode,
     };
   } catch (error) {
+    console.log(error);
     if (error.response.status === 401) {
       return {
         redirect: {
