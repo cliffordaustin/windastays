@@ -539,13 +539,15 @@ function SelectedListingCard({
       } else if (
         fee.name &&
         fee.price &&
-        fee?.feeType?.value === "WHOLE GROUP"
+        fee?.feeType?.value === "WHOLE GROUP" &&
+        fee?.residentType?.value === "NON-RESIDENT"
       ) {
         total += fee.price;
       } else if (
         fee.name &&
         fee.price &&
-        fee?.feeType?.value === "PER PERSON"
+        fee?.feeType?.value === "PER PERSON" &&
+        fee?.residentType?.value === "NON-RESIDENT"
       ) {
         total += fee.price * numberOfNonResidentAdult;
       }
