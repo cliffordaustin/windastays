@@ -91,7 +91,7 @@ function Listing({ listing, currentOptions, setCurrentOptions, setOpenPopup }) {
   };
 
   return (
-    <div className="w-[325px] relative">
+    <div className="w-[24%] relative">
       <Card
         imagePaths={images}
         carouselClassName="h-44"
