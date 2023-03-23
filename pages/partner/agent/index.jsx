@@ -130,7 +130,7 @@ function Agents({ userProfile, stays }) {
         Showing results for {stays.length}{" "}
         {stays.length > 1 ? "lodges" : "lodge"}
       </h1>
-      <div className="px-4 py-2 flex flex-wrap mx-auto gap-4">
+      <div className="px-4 py-2 flex flex-wrap mx-auto mb-20 gap-4">
         {stays.map((stay, index) => {
           return (
             <Listing
