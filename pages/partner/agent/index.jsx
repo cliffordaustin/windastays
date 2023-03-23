@@ -257,16 +257,6 @@ function Agents({ userProfile, stays }) {
             setListi
           ></SelectedListings>
 
-          {/* <div
-            onClick={handleClickStart}
-            className="flex cursor-pointer animate-pulse justify-center items-center absolute bottom-10 right-6 w-[40px] h-[40px] rounded-full bg-blue-700"
-          >
-            <Icon
-              className="w-8 h-8 text-white"
-              icon="ic:baseline-question-mark"
-            />
-          </div> */}
-
           <div
             onClick={() => {
               setShowPopup(false);
