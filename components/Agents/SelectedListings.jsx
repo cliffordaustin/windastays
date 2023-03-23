@@ -5,7 +5,12 @@ import SelectedListing from "./SelectedListing";
 import { Icon } from "@iconify/react";
 import Selected from "./Selected";
 
-function SelectedListings({ listings }) {
+function SelectedListings({
+  listings,
+  hasRoomTypeData,
+  setHasRoomTypeData,
+  openPopup,
+}) {
   return (
     <div>
       {listings.length > 0 && (
@@ -38,7 +43,13 @@ function SelectedListings({ listings }) {
             //   index={index}
             //   listing={listing}
             // ></Selected>
-            <SelectedListing key={listing.id} index={index} listing={listing} />
+            <SelectedListing
+              hasRoomTypeData={hasRoomTypeData}
+              setHasRoomTypeData={setHasRoomTypeData}
+              key={listing.id}
+              index={index}
+              listing={listing}
+            />
           );
         })}
 

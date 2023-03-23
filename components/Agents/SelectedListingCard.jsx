@@ -256,49 +256,49 @@ function SelectedListingCard({
 
   const doubleResidentAdultPriceCalc = doubleResidentAdultPrice
     ? doubleResidentAdultPrice
-    : singleResidentAdultPriceCalc * 2;
+    : singleResidentAdultPriceCalc;
 
   const tripleResidentAdultPriceCalc = tripleResidentAdultPrice
     ? tripleResidentAdultPrice
     : doubleResidentAdultPriceCalc
-    ? doubleResidentAdultPriceCalc * 3
-    : singleResidentAdultPriceCalc * 3;
+    ? doubleResidentAdultPriceCalc
+    : singleResidentAdultPriceCalc;
 
   const singleNonResidentAdultPriceCalc = singleNonResidentAdultPrice;
 
   const doubleNonResidentAdultPriceCalc = doubleNonResidentAdultPrice
     ? doubleNonResidentAdultPrice
-    : singleNonResidentAdultPriceCalc * 2;
+    : singleNonResidentAdultPriceCalc;
 
   const tripleNonResidentAdultPriceCalc = tripleNonResidentAdultPrice
     ? tripleNonResidentAdultPrice
     : doubleNonResidentAdultPriceCalc
-    ? doubleNonResidentAdultPriceCalc * 3
-    : singleNonResidentAdultPriceCalc * 3;
+    ? doubleNonResidentAdultPriceCalc
+    : singleNonResidentAdultPriceCalc;
 
   const singleResidentChildPriceCalc = singleResidentChildPrice;
 
   const doubleResidentChildPriceCalc = doubleResidentChildPrice
     ? doubleResidentChildPrice
-    : singleResidentChildPriceCalc * 2;
+    : singleResidentChildPriceCalc;
 
   const tripleResidentChildPriceCalc = tripleResidentChildPrice
     ? tripleResidentChildPrice
     : doubleResidentChildPriceCalc
-    ? doubleResidentChildPriceCalc * 3
-    : singleResidentChildPriceCalc * 3;
+    ? doubleResidentChildPriceCalc
+    : singleResidentChildPriceCalc;
 
   const singleNonResidentChildPriceCalc = singleNonResidentChildPrice;
 
   const doubleNonResidentChildPriceCalc = doubleNonResidentChildPrice
     ? doubleNonResidentChildPrice
-    : singleNonResidentChildPriceCalc * 2;
+    : singleNonResidentChildPriceCalc;
 
   const tripleNonResidentChildPriceCalc = tripleNonResidentChildPrice
     ? tripleNonResidentChildPrice
     : doubleNonResidentChildPriceCalc
-    ? doubleNonResidentChildPriceCalc * 3
-    : singleNonResidentChildPriceCalc * 3;
+    ? doubleNonResidentChildPriceCalc
+    : singleNonResidentChildPriceCalc;
 
   const infantResidentPriceCalc = infantResidentPrice;
 
@@ -380,9 +380,7 @@ function SelectedListingCard({
         room.residentAdult +
         room.nonResidentAdult +
         room.residentChild +
-        room.nonResidentChild +
-        room.infantResident +
-        room.infantNonResident;
+        room.nonResidentChild;
 
       if (sumOfGuests === 1) {
         if (room.residentAdult > 0) {
@@ -391,6 +389,9 @@ function SelectedListingCard({
         if (room.residentChild > 0) {
           total += singleResidentChildPriceCalc;
         }
+        if (room.infantResident > 0) {
+          total += infantResidentPriceCalc * room.infantResident;
+        }
       } else if (sumOfGuests === 2) {
         if (room.residentAdult > 0) {
           total += doubleResidentAdultPriceCalc * room.residentAdult;
@@ -398,12 +399,18 @@ function SelectedListingCard({
         if (room.residentChild > 0) {
           total += doubleResidentChildPriceCalc * room.residentChild;
         }
+        if (room.infantResident > 0) {
+          total += infantResidentPriceCalc * room.infantResident;
+        }
       } else if (sumOfGuests === 3) {
         if (room.residentAdult > 0) {
           total += tripleResidentAdultPriceCalc * room.residentAdult;
         }
         if (room.residentChild > 0) {
           total += tripleResidentChildPriceCalc * room.residentChild;
+        }
+        if (room.infantResident > 0) {
+          total += infantResidentPriceCalc * room.infantResident;
         }
       }
     });
@@ -473,9 +480,7 @@ function SelectedListingCard({
         room.residentAdult +
         room.nonResidentAdult +
         room.residentChild +
-        room.nonResidentChild +
-        room.infantResident +
-        room.infantNonResident;
+        room.nonResidentChild;
 
       if (sumOfGuests === 1) {
         if (room.nonResidentAdult > 0) {
@@ -484,6 +489,9 @@ function SelectedListingCard({
         if (room.nonResidentChild > 0) {
           total += singleNonResidentChildPriceCalc;
         }
+        if (room.infantNonResident > 0) {
+          total += infantNonResidentPriceCalc * room.infantNonResident;
+        }
       } else if (sumOfGuests === 2) {
         if (room.nonResidentAdult > 0) {
           total += doubleNonResidentAdultPriceCalc * room.nonResidentAdult;
@@ -491,12 +499,18 @@ function SelectedListingCard({
         if (room.nonResidentChild > 0) {
           total += doubleNonResidentChildPriceCalc * room.nonResidentChild;
         }
+        if (room.infantNonResident > 0) {
+          total += infantNonResidentPriceCalc * room.infantNonResident;
+        }
       } else if (sumOfGuests === 3) {
         if (room.nonResidentAdult > 0) {
           total += tripleNonResidentAdultPriceCalc * room.nonResidentAdult;
         }
         if (room.nonResidentChild > 0) {
           total += tripleNonResidentChildPriceCalc * room.nonResidentChild;
+        }
+        if (room.infantNonResident > 0) {
+          total += infantNonResidentPriceCalc * room.infantNonResident;
         }
       }
     });
@@ -733,9 +747,7 @@ function SelectedListingCard({
               room.residentAdult +
               room.nonResidentAdult +
               room.residentChild +
-              room.nonResidentChild +
-              room.infantResident +
-              room.infantNonResident;
+              room.nonResidentChild;
 
             return (
               <div key={index} className="flex flex-col gap-2 px-2 mb-3">
@@ -743,7 +755,27 @@ function SelectedListingCard({
                   Room {index + 1} :{" "}
                   <span className="font-medium">
                     {room.residentAdult > 0
-                      ? `${room.residentAdult} resident adult`
+                      ? ` | ${room.residentAdult} resident adult`
+                      : ""}
+
+                    {room.nonResidentAdult > 0
+                      ? ` | ${room.nonResidentAdult} non-resident adult`
+                      : ""}
+
+                    {room.residentChild > 0
+                      ? ` | ${room.residentChild} resident child`
+                      : ""}
+
+                    {room.nonResidentChild > 0
+                      ? ` | ${room.nonResidentChild} non-resident child`
+                      : ""}
+
+                    {room.infantResident > 0
+                      ? ` | ${room.infantResident} resident infant`
+                      : ""}
+
+                    {room.infantNonResident > 0
+                      ? ` | ${room.infantNonResident} non-resident infant`
                       : ""}
                   </span>
                 </h1>
@@ -975,6 +1007,45 @@ function SelectedListingCard({
                     )}
                   </div>
                 )}
+
+                <div className="pl-3">
+                  {room.infantResident > 0 && (
+                    <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                      <h1 className="text-sm font-semibold">
+                        Resident infant ({nights} nights)
+                      </h1>
+
+                      <div className="flex gap-1 items-center">
+                        <Price
+                          currency="KES"
+                          autoCurrency={false}
+                          stayPrice={infantResidentPriceCalc}
+                          className="!font-normal !text-sm !font-SourceSans"
+                        ></Price>
+
+                        <span className="font-semibold mb-1">pp</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {room.infantNonResident > 0 && (
+                    <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                      <h1 className="text-sm font-semibold">
+                        Non-resident infant ({nights} nights)
+                      </h1>
+
+                      <div className="flex gap-1 items-center">
+                        <Price
+                          autoCurrency={false}
+                          stayPrice={infantNonResidentPriceCalc}
+                          className="!font-normal !text-sm !font-SourceSans"
+                        ></Price>
+
+                        <span className="font-semibold mb-1">pp</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -1061,7 +1132,57 @@ function SelectedListingCard({
               <div className="flex flex-col gap-4 mt-2">
                 <div className="w-full h-[1px] bg-gray-200"></div>
                 <h1 className="font-semibold text-sm font-SourceSans">
-                  Extra Fees
+                  Your commission
+                </h1>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 px-2">
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <div className="flex gap-2">
+                  <h1 className="text-sm font-semibold">Resident commission</h1>
+                </div>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    stayPrice={
+                      getResidentTotalPrice() -
+                      (getResidentTotalPrice() -
+                        getResidentTotalPrice() * (residentCommision / 100))
+                    }
+                    autoCurrency={false}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>{" "}
+                </div>
+              </div>
+
+              <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                <div className="flex gap-2">
+                  <h1 className="text-sm font-semibold">
+                    Non-Resident commission
+                  </h1>
+                </div>
+                <div className="flex gap-1 items-center">
+                  <Price
+                    stayPrice={
+                      getNonResidentTotalPrice() -
+                      (getNonResidentTotalPrice() -
+                        getNonResidentTotalPrice() *
+                          (nonResidentCommision / 100))
+                    }
+                    autoCurrency={false}
+                    className="!font-normal !text-sm !font-SourceSans"
+                  ></Price>{" "}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 px-2 mb-3">
+            {fees.length > 0 && (
+              <div className="flex flex-col gap-4 mt-2">
+                <div className="w-full h-[1px] bg-gray-200"></div>
+                <h1 className="font-semibold text-sm font-SourceSans">
+                  Other fees from lodge
                 </h1>
               </div>
             )}
@@ -1069,24 +1190,31 @@ function SelectedListingCard({
             {fees.map((fee, index) => {
               return (
                 <div key={index} className="flex flex-col gap-2 px-2">
-                  <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
-                    <h1 className="text-sm font-semibold">
-                      {fee.name}(
-                      {fee.fee_type === "WHOLE GROUP"
-                        ? "Whole group"
-                        : fee.fee_type === "PER PERSON PER NIGHT"
-                        ? "Per person per night"
-                        : "Per person"}
-                      )
-                    </h1>
-                    <div className="flex gap-1 items-center">
-                      <Price
-                        stayPrice={fee.price}
-                        autoCurrency={false}
-                        className="!font-normal !text-sm !font-SourceSans"
-                      ></Price>{" "}
+                  {fee.price && fee.name && (
+                    <div className="px-3 flex bg-gray-100 font-SourceSans justify-between items-center py-1 w-full">
+                      <div className="flex gap-2">
+                        <h1 className="text-sm font-semibold">
+                          {fee.name}(
+                          {fee.fee_type === "WHOLE GROUP"
+                            ? "Whole group"
+                            : fee.fee_type === "PER PERSON PER NIGHT"
+                            ? "Per person per night"
+                            : "Per person"}
+                          )
+                        </h1>{" "}
+                        <h1 className="text-sm font-semibold lowercase">
+                          {fee?.residentType?.value}
+                        </h1>
+                      </div>
+                      <div className="flex gap-1 items-center">
+                        <Price
+                          stayPrice={fee.price}
+                          autoCurrency={false}
+                          className="!font-normal !text-sm !font-SourceSans"
+                        ></Price>{" "}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}

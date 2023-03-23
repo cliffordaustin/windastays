@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import Table from "../Partner/Table";
 import { createGlobalStyle } from "styled-components";
@@ -26,7 +26,13 @@ import SelectInput from "../ui/SelectInput";
 import ListItem from "../ui/ListItem";
 import { Popover, Transition } from "@headlessui/react";
 
-function SelectedListing({ listing, index }) {
+function SelectedListing({
+  listing,
+  index,
+  setHasRoomTypeData,
+  hasRoomTypeData,
+  openPopup,
+}) {
   const router = useRouter();
 
   const [startDates, setStartDate] = React.useState();
@@ -352,6 +358,8 @@ function SelectedListing({ listing, index }) {
     }
   }, [guestOptionChanged]);
 
+  const allRoomTypes = useMemo(() => roomTypes, [roomTypes]);
+
   const [residentNumberOfRooms, setResidentNumberOfRooms] = React.useState(0);
   const [nonResidentNumberOfRooms, setNonResidentNumberOfRooms] =
     React.useState(0);
@@ -504,7 +512,19 @@ function SelectedListing({ listing, index }) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              //   setOpenDeleteRoomModal(true);
+              router.replace(
+                {
+                  query: {
+                    ...router.query,
+                    selected: router.query.selected.replaceAll(
+                      listing.id.toString(),
+                      ""
+                    ),
+                  },
+                },
+                undefined,
+                { shallow: true }
+              );
             }}
             className="bg-white shadow-lg flex items-center justify-center text-lg font-bold text-black w-8 h-8 rounded-full"
           >
@@ -570,7 +590,7 @@ function SelectedListing({ listing, index }) {
           >
             <div className="flex gap-4 w-full h-full">
               {!roomTypesLoading &&
-                roomTypes.map((item, index) => {
+                allRoomTypes?.map((item, index) => {
                   return (
                     <SelectedListingCard
                       key={index}
@@ -797,7 +817,7 @@ function SelectedListing({ listing, index }) {
               </div>
 
               <PopoverBox
-                panelClassName="bg-white rounded-md after:!left-[27%] -left-[0px] border shadow-md mt-2 w-[350px] p-0"
+                panelClassName="bg-white rounded-md after:!left-[27%] -left-[40px] border shadow-md mt-2 w-[350px] p-0"
                 btnClassName="w-full bg-white !shadow-lg rounded-lg"
                 btnPopover={
                   <div className="px-3 w-full cursor-pointer py-2 flex justify-between items-center gap-4 mx-auto rounded-lg border">

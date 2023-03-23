@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import getToken from "../../../lib/getToken";
 import axios from "axios";
 import Search from "../../../components/Agents/Search";
@@ -51,8 +51,7 @@ function Agents({ userProfile, stays }) {
             endDate: moment(values.date.to).format("YYYY-MM-DD"),
           },
         },
-        undefined,
-        { shallow: true }
+        undefined
       );
     },
   });
@@ -61,11 +60,15 @@ function Agents({ userProfile, stays }) {
 
   const [showPopup, setShowPopup] = React.useState(false);
 
-  const listings = stays.filter((listing) => {
-    return router.query.selected
-      ? router.query.selected.includes(listing.id)
-      : null;
-  });
+  const listings = useMemo(
+    () =>
+      stays.filter((listing) => {
+        return router.query.selected
+          ? router.query.selected.includes(listing.id)
+          : null;
+      }),
+    [router.query.selected]
+  );
 
   const [showTour, setShowTour] = React.useState(true);
 
@@ -110,6 +113,8 @@ function Agents({ userProfile, stays }) {
   ];
 
   const [openPopup, setOpenPopup] = useState(false);
+
+  const [hasRoomTypeData, setHasRoomTypeData] = useState(false);
 
   return (
     <div>
@@ -199,6 +204,7 @@ function Agents({ userProfile, stays }) {
         <div
           onClick={() => {
             setShowPopup(false);
+            setOpenPopup(false);
           }}
           id="step5"
           className="fixed top-0 !overflow-y-scroll left-0 right-0 bottom-0 bg-black bg-opacity-40"
@@ -239,7 +245,13 @@ function Agents({ userProfile, stays }) {
           leaveTo="h-0 opacity-0"
           show={showPopup || openPopup}
         >
-          <SelectedListings listings={listings}></SelectedListings>
+          <SelectedListings
+            listings={listings}
+            setHasRoomTypeData={setHasRoomTypeData}
+            hasRoomTypeData={hasRoomTypeData}
+            openPopup={openPopup}
+            setListi
+          ></SelectedListings>
 
           {/* <div
             onClick={handleClickStart}
@@ -280,7 +292,9 @@ export async function getServerSideProps(context) {
     );
 
     const stays = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/`
+      `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/?search=${
+        context.query.location | ""
+      }`
     );
 
     return {
