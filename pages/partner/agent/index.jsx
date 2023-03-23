@@ -47,8 +47,12 @@ function Agents({ userProfile, stays }) {
           query: {
             ...router.query,
             ...values,
-            date: moment(values.date.from).format("YYYY-MM-DD"),
-            endDate: moment(values.date.to).format("YYYY-MM-DD"),
+            date: values.date.from
+              ? moment(values.date.from).format("YYYY-MM-DD")
+              : values.date.from,
+            endDate: values.date.to
+              ? moment(values.date.to).format("YYYY-MM-DD")
+              : values.date.to,
           },
         },
         undefined
@@ -293,7 +297,7 @@ export async function getServerSideProps(context) {
 
     const stays = await axios.get(
       `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/?search=${
-        context.query.location | ""
+        context.query.location || ""
       }`
     );
 
