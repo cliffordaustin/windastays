@@ -209,7 +209,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
     <div className="mt-5 ">
       <div className="flex flex-col">
         <h1 className="font-bold font-SourceSans text-lg">
-          Other fees(Resident)
+          Park/Conservancy fees(Resident)
         </h1>
 
         <div className="flex mt-2 flex-wrap gap-3 px-4">
@@ -395,7 +395,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
 
       <div className="flex flex-col mt-5">
         <h1 className="font-bold font-SourceSans text-lg">
-          Other fees(Non-resident)
+          Park/Conservancy fees(Non-resident)
         </h1>
 
         <div className="flex mt-2 flex-wrap gap-3 px-4">
