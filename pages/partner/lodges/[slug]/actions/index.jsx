@@ -16,10 +16,19 @@ import { DayPicker } from "react-day-picker";
 import moment from "moment";
 import Dropdown from "../../../../../components/ui/Dropdown";
 import OtherFees from "../../../../../components/Partner/OtherFees";
+import SelectInput from "../../../../../components/ui/SelectInput";
 
 function AddAvailability({ stay }) {
   const router = useRouter();
   const [createRoomLoading, setCreateRoomLoading] = React.useState(false);
+
+  const packages = [
+    { value: "ALL INCLUSIVE", label: "All Inclusive" },
+    { value: "GAME PACKAGE", label: "Game Package" },
+    { value: "FULL BOARD", label: "Full Board" },
+    { value: "HALF BOARD", label: "Half Board" },
+    { value: "BED AND BREAKFAST", label: "Bed and Breakfast" },
+  ];
 
   const formikCreate = useFormik({
     initialValues: {
@@ -27,12 +36,14 @@ function AddAvailability({ stay }) {
       capacity: "",
       childCapacity: "",
       infantCapacity: "",
+      package: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please enter a name for the room"),
       capacity: Yup.number("Please enter a valid number"),
       childCapacity: Yup.number("Please enter a valid number"),
       infantCapacity: Yup.number("Please enter a valid number"),
+      package: Yup.object().required("Please select a package"),
     }),
     onSubmit: (values) => {
       setCreateRoomLoading(true);
@@ -44,6 +55,7 @@ function AddAvailability({ stay }) {
             capacity: values.capacity,
             child_capacity: values.childCapacity,
             infant_capacity: values.infantCapacity,
+            package: values.package.value,
           },
           {
             headers: {
@@ -159,10 +171,7 @@ function AddAvailability({ stay }) {
 
           <Popover className="relative z-20 ">
             <Popover.Button className="outline-none ">
-              <button
-                onClick={() => {}}
-                className="gradient-blue flex items-center gap-1 text-white text-sm font-bold mt-2 px-6 py-1.5 rounded-md"
-              >
+              <button className="gradient-blue flex items-center gap-1 text-white text-sm font-bold mt-2 px-6 py-1.5 rounded-md">
                 Add a room
                 <Icon className="text-xl" icon="material-symbols:add" />
               </button>
@@ -203,6 +212,37 @@ function AddAvailability({ stay }) {
                   {formikCreate.touched.name && formikCreate.errors.name ? (
                     <span className="text-sm font-bold text-red-400">
                       {formikCreate.errors.name}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <h1 className="text-sm font-bold mb-1">
+                    Enter a room package
+                  </h1>
+
+                  <SelectInput
+                    options={packages}
+                    selectedOption={formikCreate.values.package}
+                    instanceId="package"
+                    setSelectedOption={(selected) => {
+                      formikCreate.setFieldValue("package", selected);
+                    }}
+                    className={
+                      "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                      (formikCreate.touched.package &&
+                      formikCreate.errors.package
+                        ? "border-red-500"
+                        : "")
+                    }
+                    placeholder="Select a package"
+                    isSearchable={false}
+                  ></SelectInput>
+
+                  {formikCreate.touched.package &&
+                  formikCreate.errors.package ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikCreate.errors.package}
                     </span>
                   ) : null}
                 </div>

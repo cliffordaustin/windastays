@@ -48,7 +48,6 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
   const guestTypes = [
     { value: "ADULT", label: "Adult" },
     { value: "CHILD", label: "Child" },
-    { value: "INFANT", label: "Infant" },
   ];
 
   const formikNonResidentEditFees = useFormik({
@@ -74,6 +73,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
             ? "Infant"
             : "Adult",
       },
+      is_park_fee: fee.is_park_fee,
     },
 
     validationSchema: Yup.object({
@@ -91,6 +91,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
       ),
       fee_option: Yup.object().required("Fee option is required"),
       guest_type: Yup.object().required("Guest type is required"),
+      is_park_fee: Yup.boolean(),
     }),
 
     onSubmit: async (values) => {
@@ -102,6 +103,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
             price: values.price,
             resident_fee_type: values.fee_option.value,
             guest_type: values.guest_type.value,
+            is_park_fee: values.is_park_fee,
           },
           {
             headers: {
@@ -123,6 +125,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
                   price: values.price,
                   nonresident_fee_type: values.fee_option.value,
                   guest_type: values.guest_type.value,
+                  is_park_fee: values.is_park_fee,
                 };
               } else {
                 return item;
@@ -135,15 +138,15 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
   });
 
   return (
-    <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 py-2 border rounded-lg">
+    <div className="px-2 min-w-[140px] h-[120px] relative flex flex-col gap-2 py-2 border rounded-lg">
       <div className="flex gap-7 items-start">
-        <div className="px-2 py-1 w-fit bg-gray-100 text-sm font-bold rounded-3xl">
+        {/* <div className="px-2 py-1 w-fit bg-gray-100 text-sm font-bold rounded-3xl">
           {fee.nonresident_fee_type === "WHOLE GROUP"
             ? "Whole group"
             : fee.nonresident_fee_type === "PER PERSON PER NIGHT"
             ? "Per person per night"
             : "Per person"}
-        </div>
+        </div> */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
@@ -172,12 +175,16 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
       </div>
       <div className="text-sm text-gray-600 font-bold">{fee.name}</div>
 
-      <div className="flex gap-1">
+      <div className="flex flex-col gap-1">
         <Price
           stayPrice={fee.price}
           autoCurrency={false}
           className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
         ></Price>
+
+        {/* <div className="px-2 py-1 w-fit bg-blue-100 text-sm font-bold rounded-3xl">
+          {fee.is_park_fee ? "Park fee" : "Activity fee"}
+        </div> */}
       </div>
 
       <Dialogue
@@ -251,7 +258,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
               </span>
             ) : null}
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <h1 className="text-sm font-bold mb-1">
               Enter a fee option. eg. Per person
             </h1>
@@ -272,7 +279,7 @@ function NonResidentOtherFee({ fee, formikNonResidentFees }) {
               placeholder="Select fee option"
               isSearchable={false}
             ></SelectInput>
-          </div>
+          </div> */}
 
           <div className="mt-2">
             <h1 className="text-sm font-bold mb-1">Guest type</h1>

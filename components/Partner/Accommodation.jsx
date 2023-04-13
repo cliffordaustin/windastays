@@ -121,24 +121,8 @@ function Accommodation({ listing, index }) {
         </div>
 
         <div className="flex gap-1 justify-center items-center mt-2">
-          <Button
-            onClick={() => {
-              router.push({
-                query: {
-                  ...router.query,
-                  index: index,
-                },
-              });
-            }}
-            className="!rounded-lg mt-2 h-[40px] !flex gap-1 !px-4 items-center justify-center w-full gradient-blue"
-          >
-            <span className="text-white font-bold text-sm">
-              check availability
-            </span>
-          </Button>
-
           <PopoverBox
-            panelClassName="bg-white absolute rounded-xl shadow-md mt-1 border -left-[20px] w-[250px] p-1"
+            panelClassName="bg-white absolute rounded-xl shadow-md mt-1 border bottom-12 -left-[20px] w-[250px] p-1"
             btnPopover={
               <div className="rounded-lg xl:!rounded-3xl cursor-pointer mt-2 !w-[60px] xl:!w-[40px] !h-[40px] !flex !px-0 !py-0 items-center justify-center bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
                 <Icon
@@ -168,6 +152,22 @@ function Accommodation({ listing, index }) {
               Request to delete accommodation
             </div>
           </PopoverBox>
+
+          <Button
+            onClick={() => {
+              router.push({
+                query: {
+                  ...router.query,
+                  index: index,
+                },
+              });
+            }}
+            className="!rounded-lg mt-2 h-[40px] !flex gap-1 !px-4 items-center justify-center w-full gradient-blue"
+          >
+            <span className="text-white font-bold text-sm">
+              check availability
+            </span>
+          </Button>
         </div>
       </div>
     </div>

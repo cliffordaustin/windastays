@@ -48,7 +48,6 @@ function OtherFee({ fee, formikResidentFees }) {
   const guestTypes = [
     { value: "ADULT", label: "Adult" },
     { value: "CHILD", label: "Child" },
-    { value: "INFANT", label: "Infant" },
   ];
 
   const formikResidentEditFees = useFormik({
@@ -74,6 +73,7 @@ function OtherFee({ fee, formikResidentFees }) {
             ? "Infant"
             : "Adult",
       },
+      is_park_fee: fee.is_park_fee,
     },
 
     validationSchema: Yup.object({
@@ -91,6 +91,7 @@ function OtherFee({ fee, formikResidentFees }) {
       ),
       fee_option: Yup.object().required("Fee option is required"),
       guest_type: Yup.object().required("Guest type is required"),
+      is_park_fee: Yup.boolean(),
     }),
 
     onSubmit: async (values) => {
@@ -104,6 +105,7 @@ function OtherFee({ fee, formikResidentFees }) {
             price: values.price,
             resident_fee_type: values.fee_option.value,
             guest_type: values.guest_type.value,
+            is_park_fee: values.is_park_fee,
           },
           {
             headers: {
@@ -125,6 +127,7 @@ function OtherFee({ fee, formikResidentFees }) {
                   price: values.price,
                   resident_fee_type: values.fee_option.value,
                   guest_type: values.guest_type.value,
+                  is_park_fee: values.is_park_fee,
                 };
               } else {
                 return item;
@@ -136,15 +139,15 @@ function OtherFee({ fee, formikResidentFees }) {
     },
   });
   return (
-    <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-4 justify-around py-2 border rounded-lg">
+    <div className="px-2 min-w-[150px] h-[140px] relative flex flex-col gap-2 justify-around py-2 border rounded-lg">
       <div className="flex items-start gap-7">
-        <div className="px-2 py-1 w-fit bg-gray-100 text-sm font-bold rounded-3xl">
+        {/* <div className="px-2 py-1 w-fit bg-gray-100 text-sm font-bold rounded-3xl">
           {fee.resident_fee_type === "WHOLE GROUP"
             ? "Whole group"
             : fee.resident_fee_type === "PER PERSON PER NIGHT"
             ? "Per person per night"
             : "Per person"}
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2">
           <button
@@ -245,7 +248,7 @@ function OtherFee({ fee, formikResidentFees }) {
             ) : null}
           </div>
 
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <h1 className="text-sm font-bold mb-1">
               Enter a fee option. eg. Per person
             </h1>
@@ -266,7 +269,7 @@ function OtherFee({ fee, formikResidentFees }) {
               placeholder="Select fee option"
               isSearchable={false}
             ></SelectInput>
-          </div>
+          </div> */}
 
           <div className="mt-2">
             <h1 className="text-sm font-bold mb-1">Guest type</h1>
@@ -322,13 +325,16 @@ function OtherFee({ fee, formikResidentFees }) {
 
       <div className="text-sm text-gray-600 font-bold">{fee.name}</div>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1 flex-col">
         <Price
           stayPrice={fee.price}
           autoCurrency={false}
           currency="KES"
           className="!text-3xl !font-SourceSans !font-semibold !text-gray-600"
         ></Price>
+        {/* <div className="px-2 py-1 w-fit bg-blue-100 text-sm font-bold rounded-3xl">
+          {fee.is_park_fee ? "Park fee" : "Activity fee"}
+        </div> */}
       </div>
     </div>
   );

@@ -244,18 +244,31 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
 
   const [editRoomLoading, setEditRoomLoading] = React.useState(false);
 
+  const packages = [
+    { value: "ALL INCLUSIVE", label: "All Inclusive" },
+    { value: "GAME PACKAGE", label: "Game Package" },
+    { value: "FULL BOARD", label: "Full Board" },
+    { value: "HALF BOARD", label: "Half Board" },
+    { value: "BED AND BREAKFAST", label: "Bed and Breakfast" },
+  ];
+
   const formikEdit = useFormik({
     initialValues: {
       name: room.name,
       capacity: room.capacity,
       childCapacity: room.child_capacity,
       infantCapacity: room.infant_capacity,
+      package: {
+        value: room.package,
+        label: room.package.toLowerCase().replace("_", " "),
+      },
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please enter a name for the room"),
       capacity: Yup.number("Please enter a valid number"),
       childCapacity: Yup.number("Please enter a valid number"),
       infantCapacity: Yup.number("Please enter a valid number"),
+      package: Yup.object().required("Please select a package"),
     }),
     onSubmit: (values) => {
       setEditRoomLoading(true);
@@ -267,6 +280,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
             capacity: values.capacity,
             child_capacity: values.childCapacity,
             infant_capacity: values.infantCapacity,
+            package: values.package.value,
           },
           {
             headers: {
@@ -308,6 +322,10 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
 
           <div className="text-sm font-bold px-2 py-0.5 rounded-md bg-gray-200">
             Capacity: {room.capacity}
+          </div>
+
+          <div className="text-sm font-bold px-2 py-0.5 rounded-md bg-gray-200">
+            {room.package.toLowerCase()}
           </div>
         </div>
 
@@ -368,6 +386,35 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                     {formikEdit.touched.name && formikEdit.errors.name ? (
                       <span className="text-sm font-bold text-red-400">
                         {formikEdit.errors.name}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-2">
+                    <h1 className="text-sm font-bold mb-1">
+                      Enter a room package
+                    </h1>
+
+                    <SelectInput
+                      options={packages}
+                      selectedOption={formikEdit.values.package}
+                      instanceId="package"
+                      setSelectedOption={(selected) => {
+                        formikEdit.setFieldValue("package", selected);
+                      }}
+                      className={
+                        "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                        (formikEdit.touched.package && formikEdit.errors.package
+                          ? "border-red-500"
+                          : "")
+                      }
+                      placeholder="Select a package"
+                      isSearchable={false}
+                    ></SelectInput>
+
+                    {formikEdit.touched.package && formikEdit.errors.package ? (
+                      <span className="text-sm font-bold text-red-400">
+                        {formikEdit.errors.package}
                       </span>
                     ) : null}
                   </div>

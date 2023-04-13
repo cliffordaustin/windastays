@@ -262,7 +262,7 @@ function PartnerLodges({ stays }) {
       )}
       {stays.length > 0 && (
         <div className="w-full flex">
-          <div className="w-[420px] sticky left-0 top-0 h-[100vh] bg-white border-r">
+          <div className="w-[480px] overflow-y-scroll sticky left-0 top-0 h-[100vh] bg-white border-r">
             <div className="px-3 py-2 h-[70px] border-b flex items-center justify-center">
               <div className="flex gap-4 items-center justify-center">
                 <div className="relative w-28 h-9 z-40">

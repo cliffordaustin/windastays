@@ -31,7 +31,6 @@ function OtherFees({ residentFees, nonResidentFees }) {
   const guestTypes = [
     { value: "ADULT", label: "Adult" },
     { value: "CHILD", label: "Child" },
-    { value: "INFANT", label: "Infant" },
   ];
 
   const [residentOpenModal, setResidentOpenModal] = useState(false);
@@ -45,6 +44,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       fees: [],
       fee_option: { value: "PER PERSON", label: "Per person" },
       guest_type: { value: "ADULT", label: "Adult" },
+      is_park_fee: false,
     },
 
     validationSchema: Yup.object({
@@ -62,6 +62,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       ),
       fee_option: Yup.object().required("Fee option is required"),
       guest_type: Yup.object().required("Guest type is required"),
+      is_park_fee: Yup.boolean(),
     }),
 
     onSubmit: async (values) => {
@@ -74,6 +75,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
             price: values.price,
             nonresident_fee_type: values.fee_option.value,
             guest_type: values.guest_type.value,
+            is_park_fee: values.is_park_fee,
           },
           {
             headers: {
@@ -90,6 +92,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
               price: values.price,
               resident_fee_type: values.fee_option.value,
               guest_type: values.guest_type.value,
+              is_park_fee: values.is_park_fee,
             },
           ]);
           setNonResidentFeesLoading(false);
@@ -106,6 +109,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       name: "",
       price: "",
       fees: [],
+      is_park_fee: false,
       fee_option: { value: "PER PERSON", label: "Per person" },
       guest_type: { value: "ADULT", label: "Adult" },
     },
@@ -125,6 +129,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
       ),
       fee_option: Yup.object().required("Fee option is required"),
       guest_type: Yup.object().required("Guest type is required"),
+      is_park_fee: Yup.boolean(),
     }),
 
     onSubmit: async (values) => {
@@ -137,6 +142,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
             price: values.price,
             resident_fee_type: values.fee_option.value,
             guest_type: values.guest_type.value,
+            is_park_fee: values.is_park_fee,
           },
           {
             headers: {
@@ -153,6 +159,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
               price: values.price,
               resident_fee_type: values.fee_option.value,
               guest_type: values.guest_type.value,
+              is_park_fee: values.is_park_fee,
             },
           ]);
           setResidentFeesLoading(false);
@@ -175,6 +182,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
             price: fee.price,
             resident_fee_type: fee.resident_fee_type,
             guest_type: fee.guest_type,
+            is_park_fee: fee.is_park_fee,
           };
         })
       );
@@ -190,6 +198,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
             price: fee.price,
             nonresident_fee_type: fee.nonresident_fee_type,
             guest_type: fee.guest_type,
+            is_park_fee: fee.is_park_fee,
           };
         })
       );
@@ -306,7 +315,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                   ) : null}
                 </div>
 
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">
                     Enter a fee option. eg. Per person
                   </h1>
@@ -327,7 +336,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     placeholder="Select fee option"
                     isSearchable={false}
                   ></SelectInput>
-                </div>
+                </div> */}
 
                 <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">Guest type</h1>
@@ -479,7 +488,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">
                     Enter a fee option. eg. Per person
                   </h1>
@@ -503,7 +512,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     placeholder="Select fee option"
                     isSearchable={false}
                   ></SelectInput>
-                </div>
+                </div> */}
 
                 <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">Guest type</h1>
