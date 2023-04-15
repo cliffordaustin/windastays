@@ -110,6 +110,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
         {
           name: "",
           age_group: "",
+          description: "",
           price: "",
         },
       ],
@@ -727,10 +728,28 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                   return (
                     <div key={index} className="flex justify-between">
                       <div className="w-[31%] flex flex-col gap-1.5">
-                        <h1 className="text-sm font-bold">
-                          Add the type of guest. eg &quot;Adult single&quot;
-                        </h1>
-                        <SelectInput
+                        <Input
+                          name="room"
+                          type="text"
+                          value={guest.name}
+                          placeholder="Enter the type of guest"
+                          errorStyle={
+                            formikAdd.touched.name && formikAdd.errors.name
+                              ? true
+                              : false
+                          }
+                          onChange={(e) => {
+                            formikAdd.setFieldValue(
+                              `guestTypes[${index}].name`,
+                              e.target.value
+                            );
+                          }}
+                          className={"w-full placeholder:text-sm "}
+                          inputClassName="!text-sm "
+                          label="Add the type of guest. eg 'Adult single'"
+                        ></Input>
+
+                        {/* <SelectInput
                           options={guestOptions}
                           selectedOption={guestOptions.find(
                             (option) => option.value === guest.name
@@ -751,7 +770,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                           }
                           placeholder="Select a type of guest"
                           isSearchable={false}
-                        ></SelectInput>
+                        ></SelectInput> */}
 
                         {formikAdd.touched.guestTypes &&
                         formikAdd.errors.guestTypes ? (
