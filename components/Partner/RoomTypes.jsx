@@ -552,7 +552,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
           dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
           outsideDialogueClass="!p-0"
           dialoguePanelClassName={
-            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-4xl screen-height-safari md:!min-h-0 md:!max-h-[650px] "
+            "md:!rounded-md !rounded-none !p-0 overflow-y-scroll remove-scroll !max-w-5xl screen-height-safari md:!min-h-0 md:!max-h-[650px] "
           }
         >
           <div className="px-4 py-2">
@@ -727,7 +727,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                 {formikAdd.values.guestTypes.map((guest, index) => {
                   return (
                     <div key={index} className="flex justify-between">
-                      <div className="w-[31%] flex flex-col gap-1.5">
+                      <div className="w-[28%] flex flex-col gap-1.5">
                         <Input
                           name="room"
                           type="text"
@@ -780,7 +780,37 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         ) : null}
                       </div>
 
-                      <div className="w-[31%] flex flex-col gap-1.5">
+                      <div className="w-[28%] flex flex-col gap-1.5">
+                        <Input
+                          name="description"
+                          type="text"
+                          value={guest.description}
+                          placeholder="Enter age group."
+                          errorStyle={
+                            formikAdd.touched.description &&
+                            formikAdd.errors.description
+                              ? true
+                              : false
+                          }
+                          onChange={(e) => {
+                            formikAdd.setFieldValue(
+                              `guestTypes[${index}].description`,
+                              e.target.value
+                            );
+                          }}
+                          className={"w-full placeholder:text-sm "}
+                          inputClassName="!text-sm "
+                          label="Describe type of guest(optional)"
+                        ></Input>
+                        {formikAdd.touched.description &&
+                        formikAdd.errors.description ? (
+                          <span className="text-sm font-bold text-red-400">
+                            {formikAdd.errors.guestTypes[index].description}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="w-[20%] flex flex-col gap-1.5">
                         <Input
                           name="age_group"
                           type="text"
@@ -800,7 +830,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                           }}
                           className={"w-full placeholder:text-sm "}
                           inputClassName="!text-sm "
-                          label="Age group. eg '12-18 years', '18+ years'"
+                          label="Age group. eg '12-18 years'"
                         ></Input>
                         {formikAdd.touched.age_group &&
                         formikAdd.errors.age_group ? (
@@ -810,7 +840,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         ) : null}
                       </div>
 
-                      <div className="w-[31%] gap-2 flex items-center">
+                      <div className="w-[20%] gap-2 flex items-center">
                         <div className={index > 0 ? "w-[94%]" : "w-[99%]"}>
                           <Input
                             name="price"
@@ -831,7 +861,7 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                             }}
                             className={"w-full placeholder:text-sm "}
                             inputClassName="!text-sm "
-                            label="Add the agent price of the guest type"
+                            label="Add the agent price"
                           ></Input>
 
                           {formikAdd.touched.guestTypes &&
