@@ -163,14 +163,14 @@ function RoomAvailability({
   roomAvailability.forEach((item) => {
     if (isNonResident) {
       item.room_non_resident_guest_availabilities.map((item) => {
-        if (!guestTypes.includes(item.name)) {
-          guestTypes.push(item.name);
+        if (!guestTypes.includes(item.name.toLowerCase())) {
+          guestTypes.push(item.name.toLowerCase().trim());
         }
       });
     } else {
       item.room_resident_guest_availabilities.map((item) => {
-        if (!guestTypes.includes(item.name)) {
-          guestTypes.push(item.name);
+        if (!guestTypes.includes(item.name.toLowerCase())) {
+          guestTypes.push(item.name.toLowerCase().trim());
         }
       });
     }
@@ -211,10 +211,10 @@ function RoomAvailability({
               Cell: (row) => {
                 const guestType = isNonResident
                   ? row.row.original.room_non_resident_guest_availabilities.find(
-                      (item) => item.name == row.column.Header
+                      (item) => item.name.toLowerCase() == row.column.Header
                     )
                   : row.row.original.room_resident_guest_availabilities.find(
-                      (item) => item.name == row.column.Header
+                      (item) => item.name.toLowerCase() == row.column.Header
                     );
 
                 return (
