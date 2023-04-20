@@ -176,6 +176,9 @@ function RoomAvailability({
     }
   });
 
+  // remove duplicates from guestTypes
+  const uniqueGuestTypes = [...new Set(guestTypes)];
+
   const columns = React.useMemo(
     () => [
       {
@@ -205,16 +208,20 @@ function RoomAvailability({
       {
         Header: "Pricing",
         columns: [
-          ...guestTypes.map((item) => {
+          ...uniqueGuestTypes.map((item) => {
             return {
               Header: item,
               Cell: (row) => {
                 const guestType = isNonResident
                   ? row.row.original.room_non_resident_guest_availabilities.find(
-                      (item) => item.name.toLowerCase() == row.column.Header
+                      (item) =>
+                        item.name.toLowerCase().trim() ==
+                        row.column.Header.trim()
                     )
                   : row.row.original.room_resident_guest_availabilities.find(
-                      (item) => item.name.toLowerCase() == row.column.Header
+                      (item) =>
+                        item.name.toLowerCase().trim() ==
+                        row.column.Header.trim()
                     );
 
                 return (
