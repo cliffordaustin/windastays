@@ -629,7 +629,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
 
                         {formikAdd.touched.dates && formikAdd.errors.dates ? (
                           <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.dates[index].startDate}
+                            {formikAdd.errors.dates[index] &&
+                              formikAdd.errors.dates[index].startDate}
                           </span>
                         ) : null}
                       </div>
@@ -682,7 +683,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
 
                           {formikAdd.touched.dates && formikAdd.errors.dates ? (
                             <span className="text-sm font-bold text-red-400">
-                              {formikAdd.errors.dates[index].endDate}
+                              {formikAdd.errors.dates[index] &&
+                                formikAdd.errors.dates[index].endDate}
                             </span>
                           ) : null}
                         </div>
@@ -775,7 +777,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         {formikAdd.touched.guestTypes &&
                         formikAdd.errors.guestTypes ? (
                           <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.guestTypes[index].name}
+                            {formikAdd.errors.guestTypes[index] &&
+                              formikAdd.errors.guestTypes[index].name}
                           </span>
                         ) : null}
                       </div>
@@ -805,7 +808,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                         {formikAdd.touched.description &&
                         formikAdd.errors.description ? (
                           <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.guestTypes[index].description}
+                            {formikAdd.errors.guestTypes[index] &&
+                              formikAdd.errors.guestTypes[index].description}
                           </span>
                         ) : null}
                       </div>
@@ -817,8 +821,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                           value={guest.age_group}
                           placeholder="Enter age group."
                           errorStyle={
-                            formikAdd.touched.age_group &&
-                            formikAdd.errors.age_group
+                            formikAdd.touched.guestTypes &&
+                            formikAdd.errors.guestTypes
                               ? true
                               : false
                           }
@@ -832,10 +836,11 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                           inputClassName="!text-sm "
                           label="Age group. eg '12-18 years'"
                         ></Input>
-                        {formikAdd.touched.age_group &&
-                        formikAdd.errors.age_group ? (
+                        {formikAdd.touched.guestTypes &&
+                        formikAdd.errors.guestTypes ? (
                           <span className="text-sm font-bold text-red-400">
-                            {formikAdd.errors.guestTypes[index].age_group}
+                            {formikAdd.errors.guestTypes[index] &&
+                              formikAdd.errors.guestTypes[index].age_group}
                           </span>
                         ) : null}
                       </div>
@@ -867,7 +872,8 @@ function RoomTypes({ room, index, inPartnerHomepage = false, staySlug = "" }) {
                           {formikAdd.touched.guestTypes &&
                           formikAdd.errors.guestTypes ? (
                             <span className="text-sm font-bold text-red-400">
-                              {formikAdd.errors.guestTypes[index].price}
+                              {formikAdd.errors.guestTypes[index] &&
+                                formikAdd.errors.guestTypes[index].price}
                             </span>
                           ) : null}
                         </div>
