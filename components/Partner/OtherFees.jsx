@@ -40,7 +40,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
   const formikNonResidentFees = useFormik({
     initialValues: {
       name: "",
-      price: "",
+      adultPrice: "",
+      childPrice: "",
+      teenPrice: "",
       fees: [],
       fee_option: { value: "PER PERSON", label: "Per person" },
       guest_type: { value: "ADULT", label: "Adult" },
@@ -57,7 +59,13 @@ function OtherFees({ residentFees, nonResidentFees }) {
       name: Yup.string("Please enter a valid text of name").required(
         "Name is required"
       ),
-      price: Yup.number("Please enter a valid number of price").required(
+      adultPrice: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+      childPrice: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+      teenPrice: Yup.number("Please enter a valid number of price").required(
         "Price is required"
       ),
       fee_option: Yup.object().required("Fee option is required"),
@@ -72,10 +80,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
           `${process.env.NEXT_PUBLIC_baseURL}/stays/${router.query.slug}/nonresident-other-fees/`,
           {
             name: values.name,
-            price: values.price,
-            nonresident_fee_type: values.fee_option.value,
-            guest_type: values.guest_type.value,
-            is_park_fee: values.is_park_fee,
+            adult_price: values.adultPrice,
+            child_price: values.childPrice,
+            teen_price: values.teenPrice,
           },
           {
             headers: {
@@ -89,10 +96,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
             {
               id: res.data.id,
               name: values.name,
-              price: values.price,
-              resident_fee_type: values.fee_option.value,
-              guest_type: values.guest_type.value,
-              is_park_fee: values.is_park_fee,
+              adultPrice: values.adultPrice,
+              childPrice: values.childPrice,
+              teenPrice: values.teenPrice,
             },
           ]);
           setNonResidentFeesLoading(false);
@@ -107,7 +113,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
   const formikResidentFees = useFormik({
     initialValues: {
       name: "",
-      price: "",
+      adultPrice: "",
+      childPrice: "",
+      teenPrice: "",
       fees: [],
       is_park_fee: false,
       fee_option: { value: "PER PERSON", label: "Per person" },
@@ -124,7 +132,13 @@ function OtherFees({ residentFees, nonResidentFees }) {
       name: Yup.string("Please enter a valid text of name").required(
         "Name is required"
       ),
-      price: Yup.number("Please enter a valid number of price").required(
+      adultPrice: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+      childPrice: Yup.number("Please enter a valid number of price").required(
+        "Price is required"
+      ),
+      teenPrice: Yup.number("Please enter a valid number of price").required(
         "Price is required"
       ),
       fee_option: Yup.object().required("Fee option is required"),
@@ -139,10 +153,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
           `${process.env.NEXT_PUBLIC_baseURL}/stays/${router.query.slug}/resident-other-fees/`,
           {
             name: values.name,
-            price: values.price,
-            resident_fee_type: values.fee_option.value,
-            guest_type: values.guest_type.value,
-            is_park_fee: values.is_park_fee,
+            adult_price: values.adultPrice,
+            child_price: values.childPrice,
+            teen_price: values.teenPrice,
           },
           {
             headers: {
@@ -156,10 +169,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
             {
               id: res.data.id,
               name: values.name,
-              price: values.price,
-              resident_fee_type: values.fee_option.value,
-              guest_type: values.guest_type.value,
-              is_park_fee: values.is_park_fee,
+              adultPrice: values.adultPrice,
+              childPrice: values.childPrice,
+              teenPrice: values.teenPrice,
             },
           ]);
           setResidentFeesLoading(false);
@@ -179,10 +191,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
           return {
             id: fee.id,
             name: fee.name,
-            price: fee.price,
-            resident_fee_type: fee.resident_fee_type,
-            guest_type: fee.guest_type,
-            is_park_fee: fee.is_park_fee,
+            adultPrice: fee.adult_price,
+            childPrice: fee.child_price,
+            teenPrice: fee.teen_price,
           };
         })
       );
@@ -195,10 +206,9 @@ function OtherFees({ residentFees, nonResidentFees }) {
           return {
             id: fee.id,
             name: fee.name,
-            price: fee.price,
-            nonresident_fee_type: fee.nonresident_fee_type,
-            guest_type: fee.guest_type,
-            is_park_fee: fee.is_park_fee,
+            adultPrice: fee.adult_price,
+            childPrice: fee.child_price,
+            teenPrice: fee.teen_price,
           };
         })
       );
@@ -216,12 +226,13 @@ function OtherFees({ residentFees, nonResidentFees }) {
           {formikResidentFees.values.fees.map((fee, index) => {
             return (
               <div key={index}>
-                {fee.name && fee.price && (
-                  <ResidentOtherFee
-                    fee={fee}
-                    formikResidentFees={formikResidentFees}
-                  ></ResidentOtherFee>
-                )}
+                {fee.name &&
+                  !!(fee.adultPrice || fee.childPrice || fee.teenPrice) && (
+                    <ResidentOtherFee
+                      fee={fee}
+                      formikResidentFees={formikResidentFees}
+                    ></ResidentOtherFee>
+                  )}
               </div>
             );
           })}
@@ -290,13 +301,13 @@ function OtherFees({ residentFees, nonResidentFees }) {
 
                 <div className="mt-2">
                   <Input
-                    name="price"
+                    name="adultPrice"
                     type="number"
-                    value={formikResidentFees.values.price}
+                    value={formikResidentFees.values.adultPrice}
                     placeholder="Enter the price of the fee."
                     errorStyle={
-                      formikResidentFees.touched.price &&
-                      formikResidentFees.errors.price
+                      formikResidentFees.touched.adultPrice &&
+                      formikResidentFees.errors.adultPrice
                         ? true
                         : false
                     }
@@ -305,12 +316,66 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     }}
                     className={"w-full placeholder:text-sm "}
                     inputClassName="!text-sm "
-                    label="Fee price (KES)"
+                    label="Adult fee price (KES)"
                   ></Input>
-                  {formikResidentFees.touched.price &&
-                  formikResidentFees.errors.price ? (
+                  {formikResidentFees.touched.adultPrice &&
+                  formikResidentFees.errors.adultPrice ? (
                     <span className="text-sm font-bold text-red-400">
-                      {formikResidentFees.errors.price}
+                      {formikResidentFees.errors.adultPrice}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <Input
+                    name="teenPrice"
+                    type="number"
+                    value={formikResidentFees.values.teenPrice}
+                    placeholder="Enter the price of the fee."
+                    errorStyle={
+                      formikResidentFees.touched.teenPrice &&
+                      formikResidentFees.errors.teenPrice
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikResidentFees.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Teen fee price (KES)"
+                  ></Input>
+                  {formikResidentFees.touched.teenPrice &&
+                  formikResidentFees.errors.teenPrice ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikResidentFees.errors.teenPrice}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <Input
+                    name="childPrice"
+                    type="number"
+                    value={formikResidentFees.values.childPrice}
+                    placeholder="Enter the price of the fee."
+                    errorStyle={
+                      formikResidentFees.touched.childPrice &&
+                      formikResidentFees.errors.childPrice
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikResidentFees.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Child fee price (KES)"
+                  ></Input>
+                  {formikResidentFees.touched.childPrice &&
+                  formikResidentFees.errors.childPrice ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikResidentFees.errors.childPrice}
                     </span>
                   ) : null}
                 </div>
@@ -338,7 +403,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                   ></SelectInput>
                 </div> */}
 
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">Guest type</h1>
                   <SelectInput
                     options={guestTypes}
@@ -357,7 +422,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     placeholder="Select a guest type this fee applies to"
                     isSearchable={false}
                   ></SelectInput>
-                </div>
+                </div> */}
               </div>
 
               <div className="flex justify-end mt-4 mb-3 mr-2">
@@ -402,12 +467,13 @@ function OtherFees({ residentFees, nonResidentFees }) {
           {formikNonResidentFees.values.fees.map((fee, index) => {
             return (
               <div key={index}>
-                {fee.name && fee.price && (
-                  <NonResidentOtherFee
-                    fee={fee}
-                    formikNonResidentFees={formikNonResidentFees}
-                  ></NonResidentOtherFee>
-                )}
+                {fee.name &&
+                  !!(fee.adultPrice || fee.childPrice || fee.teenPrice) && (
+                    <NonResidentOtherFee
+                      fee={fee}
+                      formikNonResidentFees={formikNonResidentFees}
+                    ></NonResidentOtherFee>
+                  )}
               </div>
             );
           })}
@@ -464,6 +530,87 @@ function OtherFees({ residentFees, nonResidentFees }) {
 
                 <div className="mt-2">
                   <Input
+                    name="adultPrice"
+                    type="number"
+                    value={formikNonResidentFees.values.adultPrice}
+                    placeholder="Enter the price of the fee."
+                    errorStyle={
+                      formikNonResidentFees.touched.adultPrice &&
+                      formikNonResidentFees.errors.adultPrice
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikNonResidentFees.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Adult fee price (KES)"
+                  ></Input>
+                  {formikNonResidentFees.touched.adultPrice &&
+                  formikNonResidentFees.errors.adultPrice ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikNonResidentFees.errors.adultPrice}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <Input
+                    name="teenPrice"
+                    type="number"
+                    value={formikNonResidentFees.values.teenPrice}
+                    placeholder="Enter the price of the fee."
+                    errorStyle={
+                      formikNonResidentFees.touched.teenPrice &&
+                      formikNonResidentFees.errors.teenPrice
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikNonResidentFees.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Teen fee price (KES)"
+                  ></Input>
+                  {formikNonResidentFees.touched.teenPrice &&
+                  formikNonResidentFees.errors.teenPrice ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikNonResidentFees.errors.teenPrice}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-2">
+                  <Input
+                    name="childPrice"
+                    type="number"
+                    value={formikNonResidentFees.values.childPrice}
+                    placeholder="Enter the price of the fee."
+                    errorStyle={
+                      formikNonResidentFees.touched.childPrice &&
+                      formikNonResidentFees.errors.childPrice
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => {
+                      formikNonResidentFees.handleChange(e);
+                    }}
+                    className={"w-full placeholder:text-sm "}
+                    inputClassName="!text-sm "
+                    label="Child fee price (KES)"
+                  ></Input>
+                  {formikNonResidentFees.touched.childPrice &&
+                  formikNonResidentFees.errors.childPrice ? (
+                    <span className="text-sm font-bold text-red-400">
+                      {formikNonResidentFees.errors.childPrice}
+                    </span>
+                  ) : null}
+                </div>
+
+                {/* <div className="mt-2">
+                  <Input
                     name="price"
                     type="number"
                     value={formikNonResidentFees.values.price}
@@ -487,7 +634,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                       {formikNonResidentFees.errors.price}
                     </span>
                   ) : null}
-                </div>
+                </div> */}
                 {/* <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">
                     Enter a fee option. eg. Per person
@@ -514,7 +661,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                   ></SelectInput>
                 </div> */}
 
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <h1 className="text-sm font-bold mb-1">Guest type</h1>
                   <SelectInput
                     options={guestTypes}
@@ -536,7 +683,7 @@ function OtherFees({ residentFees, nonResidentFees }) {
                     placeholder="Select a guest type this fee applies to"
                     isSearchable={false}
                   ></SelectInput>
-                </div>
+                </div> */}
               </div>
 
               <div className="flex justify-end mt-4 mb-3 mr-2">
