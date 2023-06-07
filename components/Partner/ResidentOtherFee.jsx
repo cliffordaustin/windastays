@@ -412,18 +412,54 @@ function OtherFee({ fee, formikResidentFees }) {
         </div>
       </Dialogue>
 
-      <div className="text-sm text-gray-600 font-bold">{fee.name}</div>
+      <div className="text-base text-gray-600 font-bold">{fee.name}</div>
 
-      <div className="flex gap-1 flex-col">
-        <Price
-          stayPrice={fee.price}
-          autoCurrency={false}
-          currency="KES"
-          className="!text-xl !font-SourceSans !font-semibold !text-gray-600"
-        ></Price>
-        {/* <div className="px-2 py-1 w-fit bg-blue-100 text-sm font-bold rounded-3xl">
-          {fee.is_park_fee ? "Park fee" : "Activity fee"}
-        </div> */}
+      <div className="flex gap-4 items-center">
+        <div className="flex flex-col gap-1">
+          <div className="text-sm text-gray-600 font-bold">Adult</div>
+          {fee.adultPrice ? (
+            <Price
+              stayPrice={fee.adultPrice}
+              autoCurrency={false}
+              currency="KES"
+              className="!text-xl !font-SourceSans !font-semibold !text-gray-600"
+            ></Price>
+          ) : (
+            <div className="text-xl text-gray-600 font-bold">$0</div>
+          )}
+        </div>
+
+        <div className="w-[1px] h-[20px] bg-gray-300"></div>
+
+        <div className="flex flex-col gap-1">
+          <div className="text-sm text-gray-600 font-bold">Teen</div>
+          {fee.teenPrice ? (
+            <Price
+              stayPrice={fee.teenPrice}
+              autoCurrency={false}
+              currency="KES"
+              className="!text-xl !font-SourceSans !font-semibold !text-gray-600"
+            ></Price>
+          ) : (
+            <div className="text-xl text-gray-600 font-bold">$0</div>
+          )}
+        </div>
+
+        <div className="w-[1px] h-[20px] bg-gray-300"></div>
+
+        <div className="flex flex-col gap-1">
+          <div className="text-sm text-gray-600 font-bold">Child</div>
+          {fee.childPrice ? (
+            <Price
+              stayPrice={fee.childPrice}
+              autoCurrency={false}
+              currency="KES"
+              className="!text-xl !font-SourceSans !font-semibold !text-gray-600"
+            ></Price>
+          ) : (
+            <div className="text-xl text-gray-600 font-bold">$0</div>
+          )}
+        </div>
       </div>
     </div>
   );
