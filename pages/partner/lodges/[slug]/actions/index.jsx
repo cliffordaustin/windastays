@@ -17,6 +17,8 @@ import moment from "moment";
 import Dropdown from "../../../../../components/ui/Dropdown";
 import OtherFees from "../../../../../components/Partner/OtherFees";
 import SelectInput from "../../../../../components/ui/SelectInput";
+import Activity from "../../../../../components/Partner/Activity";
+import Dialogue from "../../../../../components/Home/Dialogue";
 
 function AddAvailability({ stay }) {
   const router = useRouter();
@@ -96,6 +98,69 @@ function AddAvailability({ stay }) {
       );
     }
   }, [startDate]);
+
+  const [openModal, setOpenModal] = React.useState(false);
+
+  const [activityFees, setActivityFees] = React.useState(
+    stay.activity_fees || []
+  );
+
+  const [activityLoading, setActivityLoading] = React.useState(false);
+
+  const options = [
+    { value: "PER PERSON", label: "Per Person" },
+    { value: "PER PERSON PER NIGHT", label: "Per Person Per Night" },
+    { value: "WHOLE GROUP", label: "Whole Group" },
+  ];
+
+  const formikActivityFees = useFormik({
+    initialValues: {
+      name: "",
+      description: "",
+      nonResidentPrice: "",
+      residentPrice: "",
+      priceType: "PER PERSON",
+    },
+
+    validationSchema: Yup.object({
+      name: Yup.string("Please enter a valid text of name").required(
+        "Name is required"
+      ),
+      description: Yup.string("Please enter a valid text of description"),
+      nonResidentPrice: Yup.number("Please enter a valid number"),
+      residentPrice: Yup.number("Please enter a valid number"),
+      priceType: Yup.string("Please enter a valid text of price type"),
+    }),
+
+    onSubmit: async (values) => {
+      setActivityLoading(true);
+
+      await axios
+        .post(
+          `${process.env.NEXT_PUBLIC_baseURL}/partner-stays/${router.query.slug}/activities/`,
+          {
+            name: values.name,
+            description: values.description,
+            price: values.nonResidentPrice,
+            resident_price: values.residentPrice,
+            price_type: values.priceType,
+          },
+          {
+            headers: {
+              Authorization: "Token " + Cookies.get("token"),
+            },
+          }
+        )
+        .then((res) => {
+          setActivityLoading(false);
+          setOpenModal(false);
+          setActivityFees((prev) => [...prev, res.data]);
+        })
+        .catch((err) => {
+          setActivityLoading(false);
+        });
+    },
+  });
 
   return (
     <div className="mb-20">
@@ -363,12 +428,214 @@ function AddAvailability({ stay }) {
             stay.room_types.map((room, index) => (
               <RoomTypes key={index} room={room} index={index}></RoomTypes>
             ))}
+          <Dialogue
+            isOpen={openModal}
+            closeModal={() => {
+              setOpenModal(false);
+            }}
+            dialogueTitleClassName="!font-bold !ml-4 !text-xl md:!text-2xl"
+            outsideDialogueClass="!p-0"
+            dialoguePanelClassName={
+              "md:!rounded-md !rounded-none !p-0 !overflow-visible remove-scroll !max-w-2xl screen-height-safari md:!min-h-0 md:!max-h-[650px] "
+            }
+          >
+            <div className="w-full bg-gray-200 px-3 py-2">
+              <h1 className="font-semibold font-SourceSans">Add Activity</h1>
+            </div>
 
+            <div className="px-2 mb-2 mt-2">
+              <div>
+                <Input
+                  name="name"
+                  type="text"
+                  value={formikActivityFees.values.name}
+                  placeholder="Enter the name of the activity"
+                  errorStyle={
+                    formikActivityFees.touched.name &&
+                    formikActivityFees.errors.name
+                      ? true
+                      : false
+                  }
+                  onChange={(e) => {
+                    formikActivityFees.handleChange(e);
+                  }}
+                  className={"w-full placeholder:text-sm "}
+                  inputClassName="!text-sm "
+                  label="Activity name"
+                ></Input>
+                {formikActivityFees.touched.name &&
+                formikActivityFees.errors.name ? (
+                  <span className="text-sm font-bold text-red-400">
+                    {formikActivityFees.errors.name}
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  name="description"
+                  type="text"
+                  value={formikActivityFees.values.description}
+                  placeholder="Enter the description of the activity"
+                  errorStyle={
+                    formikActivityFees.touched.description &&
+                    formikActivityFees.errors.description
+                      ? true
+                      : false
+                  }
+                  onChange={(e) => {
+                    formikActivityFees.handleChange(e);
+                  }}
+                  className={"w-full placeholder:text-sm "}
+                  inputClassName="!text-sm "
+                  label="Activity description"
+                ></Input>
+                {formikActivityFees.touched.description &&
+                formikActivityFees.errors.description ? (
+                  <span className="text-sm font-bold text-red-400">
+                    {formikActivityFees.errors.description}
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-2 flex flex-col gap-1">
+                <h1 className="text-sm font-bold">
+                  Select the price type for the activity
+                </h1>
+
+                <SelectInput
+                  options={options}
+                  instanceId="price_type"
+                  setSelectedOption={(selected) => {
+                    formikActivityFees.setFieldValue(
+                      `priceType`,
+                      selected.value
+                    );
+                  }}
+                  className={
+                    "!w-full !border !rounded-md !text-sm py-1 pl-1 " +
+                    (formikActivityFees.touched.priceType &&
+                    formikActivityFees.errors.priceType
+                      ? "border-red-500"
+                      : "")
+                  }
+                  placeholder="Select a price type"
+                  isSearchable={false}
+                ></SelectInput>
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  name="nonResidentPrice"
+                  type="number"
+                  value={formikActivityFees.values.nonResidentPrice}
+                  placeholder="Enter the price of this activity."
+                  errorStyle={
+                    formikActivityFees.touched.nonResidentPrice &&
+                    formikActivityFees.errors.nonResidentPrice
+                      ? true
+                      : false
+                  }
+                  onChange={(e) => {
+                    formikActivityFees.handleChange(e);
+                  }}
+                  className={"w-full placeholder:text-sm "}
+                  inputClassName="!text-sm "
+                  label="Activity price($)"
+                ></Input>
+                {formikActivityFees.touched.nonResidentPrice &&
+                formikActivityFees.errors.nonResidentPrice ? (
+                  <span className="text-sm font-bold text-red-400">
+                    {formikActivityFees.errors.nonResidentPrice}
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  name="residentPrice"
+                  type="number"
+                  value={formikActivityFees.values.residentPrice}
+                  placeholder="Enter the price of this activity."
+                  errorStyle={
+                    formikActivityFees.touched.residentPrice &&
+                    formikActivityFees.errors.residentPrice
+                      ? true
+                      : false
+                  }
+                  onChange={(e) => {
+                    formikActivityFees.handleChange(e);
+                  }}
+                  className={"w-full placeholder:text-sm "}
+                  inputClassName="!text-sm "
+                  label="Activity price (KES)"
+                ></Input>
+                {formikActivityFees.touched.residentPrice &&
+                formikActivityFees.errors.residentPrice ? (
+                  <span className="text-sm font-bold text-red-400">
+                    {formikActivityFees.errors.residentPrice}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4 mb-3 mr-2">
+              <button
+                onClick={() => {
+                  setOpenModal(false);
+                }}
+                className="bg-gray-200 text-sm font-bold px-6 py-1.5 rounded-md"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  formikActivityFees.handleSubmit();
+                }}
+                className="bg-blue-500 flex justify-center items-center gap-2 text-white text-sm font-bold ml-2 px-6 py-1.5 rounded-md"
+              >
+                Post{" "}
+                {activityLoading && (
+                  <div>
+                    <LoadingSpinerChase
+                      color="white"
+                      width={12}
+                      height={12}
+                    ></LoadingSpinerChase>
+                  </div>
+                )}
+              </button>
+            </div>
+          </Dialogue>
+          <div className="flex justify-between items-center">
+            <h1 className="text-lg font-black">Activities</h1>
+
+            <button
+              onClick={() => {
+                setOpenModal(true);
+              }}
+              className="bg-blue-500 flex justify-center items-center gap-2 text-white text-sm font-bold ml-2 px-2 py-1.5 rounded-md"
+            >
+              Add an activity
+            </button>
+          </div>
+          {activityFees.map((activity, index) => (
+            <Activity
+              setActivityFees={setActivityFees}
+              key={index}
+              activity={activity}
+            ></Activity>
+          ))}
+          {activityFees.length === 0 && (
+            <h1 className="font-bold text-gray-600 text-center">
+              You have no activities added yet. Click the button above to add.
+            </h1>
+          )}
           <OtherFees
             nonResidentFees={stay.other_fees_non_resident}
             residentFees={stay.other_fees_resident}
           ></OtherFees>
-
           {stay.room_types.length === 0 && (
             <div className="absolute flex flex-col items-center gap-2 top-[40%] left-[50%] -translate-x-[50%]">
               <div className="w-[100px] h-[70px] flex items-center justify-center bg-gray-200 rounded-lg">
