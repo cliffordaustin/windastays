@@ -1,13 +1,4 @@
-const withTM = require("next-transpile-modules")([
-  "@fullcalendar/common",
-  "@fullcalendar/list",
-  "@fullcalendar/daygrid",
-  "@fullcalendar/timegrid",
-  "@fullcalendar/interaction",
-  "@fullcalendar/react",
-]);
-
-module.exports = withTM({
+module.exports = {
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
@@ -31,4 +22,4 @@ module.exports = withTM({
         : null,
     ].filter(Boolean);
   },
-});
+};

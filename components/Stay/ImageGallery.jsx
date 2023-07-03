@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import PhotoGallery from "react-photo-gallery";
 import Image from "next/image";
 
 const ImageGallery = ({
