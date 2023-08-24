@@ -289,7 +289,7 @@ export async function getServerSideProps(context) {
     const token = getToken(context);
 
     const specialLodges = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/stays/?in_homepage=true&has_options=true`
+      `${process.env.NEXT_PUBLIC_baseURL}/highlighted-detail-stays/`
     );
 
     if (token) {

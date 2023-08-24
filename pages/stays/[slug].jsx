@@ -99,54 +99,54 @@ const StaysDetail = ({ userProfile, stay }) => {
     rootMargin: "70px 0px",
   });
 
-  const getReview = async () => {
-    setReviewLoading(true);
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.slug}/reviews/`
-      );
+  // const getReview = async () => {
+  //   setReviewLoading(true);
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.slug}/reviews/`
+  //     );
 
-      setReviews(response.data.results);
-      setReviewCount(response.data.total_pages);
-      setReviewPageSize(response.data.page_size);
-      setReviewLoading(false);
-    } catch (error) {
-      setReviewLoading(false);
-      console.log(error);
-    }
-  };
+  //     setReviews(response.data.results);
+  //     setReviewCount(response.data.total_pages);
+  //     setReviewPageSize(response.data.page_size);
+  //     setReviewLoading(false);
+  //   } catch (error) {
+  //     setReviewLoading(false);
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    try {
-      axios.post(
-        `${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.slug}/add-view/`
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  // useEffect(() => {
+  //   try {
+  //     axios.post(
+  //       `${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.slug}/add-view/`
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    getReview();
-  }, []);
+  // useEffect(() => {
+  //   getReview();
+  // }, []);
 
-  const filterReview = async () => {
-    setSpinner(true);
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/stays/${
-        stay.slug
-      }/reviews/?ordering=${
-        router.query.ordering ? router.query.ordering : ""
-      }?page=${router.query.rate_page ? router.query.rate_page : ""}`
-    );
-    setFilteredReviews(data.results);
-    setReviewCount(data.total_pages);
-    setSpinner(false);
-  };
+  // const filterReview = async () => {
+  //   setSpinner(true);
+  //   const { data } = await axios.get(
+  //     `${process.env.NEXT_PUBLIC_baseURL}/stays/${
+  //       stay.slug
+  //     }/reviews/?ordering=${
+  //       router.query.ordering ? router.query.ordering : ""
+  //     }?page=${router.query.rate_page ? router.query.rate_page : ""}`
+  //   );
+  //   setFilteredReviews(data.results);
+  //   setReviewCount(data.total_pages);
+  //   setSpinner(false);
+  // };
 
-  useEffect(() => {
-    filterReview();
-  }, [router.query.ordering, router.query.rate_page]);
+  // useEffect(() => {
+  //   filterReview();
+  // }, [router.query.ordering, router.query.rate_page]);
 
   const [guestPopup, setGuestPopup] = useState(false);
 
@@ -295,12 +295,45 @@ const StaysDetail = ({ userProfile, stay }) => {
     );
   };
 
+  // const getDisabledDates = () => {
+  //   return stay.unavailable_dates
+  //     ? stay.unavailable_dates.map((date) => {
+  //         return new Date(date);
+  //       })
+  //     : [];
+  // };
+
   const getDisabledDates = () => {
-    return stay.unavailable_dates
-      ? stay.unavailable_dates.map((date) => {
-          return new Date(date);
-        })
-      : [];
+    return [
+      // from janurary 2024
+      {
+        after: new Date("2024-01-01"),
+      },
+      {
+        from: new Date("2023-10-05"),
+        to: new Date("2023-10-10"),
+      },
+      {
+        from: new Date("2023-10-20"),
+        to: new Date("2023-10-25"),
+      },
+      {
+        from: new Date("2023-09-07"),
+        to: new Date("2023-09-15"),
+      },
+      {
+        from: new Date("2023-09-23"),
+        to: new Date("2023-09-27"),
+      },
+      {
+        from: new Date("2023-11-15"),
+        to: new Date("2023-11-20"),
+      },
+      {
+        from: new Date("2023-11-31"),
+        to: new Date("2023-12-05"),
+      },
+    ];
   };
 
   const [isSafari, setIsSafari] = useState(false);
@@ -945,8 +978,8 @@ const StaysDetail = ({ userProfile, stay }) => {
                       allSortedImages={getAllImages()}
                     ></ImageGallery>
 
-                    <div className="flex absolute bg-white px-3 rounded-3xl py-1 top-[80px] right-3 gap-2 items-center">
-                      <div className="cursor-pointer">
+                    <div className="flex absolute bg-white px-2 rounded-3xl py-2 top-[80px] right-3 gap-2 items-center">
+                      {/* <div className="cursor-pointer">
                         {!liked && (
                           <svg
                             width="28px"
@@ -989,7 +1022,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                             />
                           </svg>
                         )}
-                      </div>
+                      </div> */}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-6 w-6 cursor-pointer"
@@ -1621,7 +1654,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                 </Element>
 
                 {/* reviews */}
-                <Element name="reviews" className={"pt-24 px-4"}>
+                {/* <Element name="reviews" className={"pt-24 px-4"}>
                   {!reviewLoading && reviews.length > 0 && (
                     <div className="mb-16 md:mb-24">
                       <div className="max-w-[750px] mb-10">
@@ -1716,31 +1749,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                             </div>
                           </PopoverBox>
 
-                          {/* {filteredReviews && (
-                      <div
-                        onClick={() => {
-                          getReview();
-                          setFilteredReviews(null);
-                        }}
-                        className="flex gap-1 border border-gray-200 cursor-pointer rounded-md px-2 py-2 w-fit mt-4"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <div>Clear Filter</div>
-                      </div>
-                    )} */}
+                          
                         </div>
                       </div>
 
@@ -1784,7 +1793,7 @@ const StaysDetail = ({ userProfile, stay }) => {
                       pageLinkClassName="bg-white h-8 w-8 font-bold flex justify-center items-center cursor-pointer hover:border border-gray-200 rounded-full text-sm"
                     />
                   )}
-                </Element>
+                </Element> */}
 
                 <div>
                   <Share
@@ -2286,7 +2295,7 @@ export async function getServerSideProps(context) {
     let cart = getCart(context);
 
     const stay = await axios.get(
-      `${process.env.NEXT_PUBLIC_baseURL}/stays/${context.query.slug}/`
+      `${process.env.NEXT_PUBLIC_baseURL}/highlighted-detail-stays/${context.query.slug}/`
     );
 
     if (token) {
@@ -2313,7 +2322,7 @@ export async function getServerSideProps(context) {
       });
 
       const stay = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/stays/${context.query.slug}/`,
+        `${process.env.NEXT_PUBLIC_baseURL}/highlighted-detail-stays/${context.query.slug}/`,
         {
           headers: {
             Authorization: "Token " + token,
