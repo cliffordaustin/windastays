@@ -229,7 +229,16 @@ export default function Home({ userProfile, specialLodges }) {
             className="w-full h-full absolute inset-0 object-cover object-center"
             id="video"
           >
-            <source src="videos/winda.mp4" type="video/mp4"></source>
+            <source
+              src="https://winda-guide.s3.eu-west-2.amazonaws.com/video/winda-homevid.webm"
+              type="video/webm"
+              width={700}
+            ></source>
+            <source
+              src="https://winda-guide.s3.eu-west-2.amazonaws.com/video/winda-homevid.mp4"
+              type="video/mp4"
+              width={700}
+            ></source>
             <Image
               className={"w-full "}
               layout="fill"

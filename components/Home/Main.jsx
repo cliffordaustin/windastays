@@ -181,9 +181,9 @@ function Main({ specialLodges }) {
               className="w-full h-full md:rounded-3xl"
               layout="fill"
               src="/images/home/nairobi-activity.webp"
-              unoptimized={true}
               objectFit="cover"
               alt="Image"
+              priority
             />
           </div>
         </div>
@@ -194,9 +194,9 @@ function Main({ specialLodges }) {
               className="w-full h-full md:rounded-3xl"
               layout="fill"
               src="/images/home/group-of-travelers.jpg"
-              unoptimized={true}
               objectFit="cover"
               alt="Image"
+              priority
             />
           </div>
           <div className="md:w-[55%] px-6 md:px-0 md:ml-8 flex flex-col gap-8 justify-center">
