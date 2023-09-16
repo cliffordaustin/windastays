@@ -218,7 +218,7 @@ function Navbar({ userProfile, showBookNowBtn = false }) {
             </div>
           </Dialogue>
 
-          <UserDropdown userProfile={userProfile}></UserDropdown>
+          {/* <UserDropdown userProfile={userProfile}></UserDropdown> */}
           {showBookNowBtn && (
             <ScrollLink
               to="stays"

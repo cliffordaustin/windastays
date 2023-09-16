@@ -164,48 +164,6 @@ const StaysDetail = ({ userProfile, stay }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showMoreActivities, setShowMoreActivities] = useState(false);
 
-  const changeLikeState = () => {
-    if (Cookies.get("token")) {
-      setLiked(false);
-      axios
-        .delete(`${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.id}/delete/`, {
-          headers: {
-            Authorization: `Token ${Cookies.get("token")}`,
-          },
-        })
-        .then(() => {})
-        .catch((err) => console.log(err.response));
-    } else {
-      router.push({
-        pathname: "/login",
-        query: { redirect: `${router.asPath}` },
-      });
-    }
-  };
-
-  const changeUnLikeState = () => {
-    if (Cookies.get("token")) {
-      setLiked(true);
-      axios
-        .post(
-          `${process.env.NEXT_PUBLIC_baseURL}/stays/${stay.slug}/save/`,
-          "",
-          {
-            headers: {
-              Authorization: "Token " + Cookies.get("token"),
-            },
-          }
-        )
-        .then(() => {})
-        .catch((err) => console.log(err.response));
-    } else {
-      router.push({
-        pathname: "/login",
-        query: { redirect: `${router.asPath}` },
-      });
-    }
-  };
-
   const [phone, setPhone] = useState("");
 
   const [invalidPhone, setInvalidPhone] = useState(false);
@@ -2289,75 +2247,15 @@ const StaysDetail = ({ userProfile, stay }) => {
 StaysDetail.propTypes = {};
 
 export async function getServerSideProps(context) {
-  let exist = false;
   try {
-    const token = getToken(context);
-    let cart = getCart(context);
-
     const stay = await axios.get(
       `${process.env.NEXT_PUBLIC_baseURL}/highlighted-detail-stays/${context.query.slug}/`
     );
-
-    if (token) {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/user/`,
-        {
-          headers: {
-            Authorization: "Token " + token,
-          },
-        }
-      );
-
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/user-cart/`,
-        {
-          headers: {
-            Authorization: "Token " + token,
-          },
-        }
-      );
-
-      exist = data.results.some((val) => {
-        return val.stay.slug === context.query.slug;
-      });
-
-      const stay = await axios.get(
-        `${process.env.NEXT_PUBLIC_baseURL}/highlighted-detail-stays/${context.query.slug}/`,
-        {
-          headers: {
-            Authorization: "Token " + token,
-          },
-        }
-      );
-
-      return {
-        props: {
-          userProfile: response.data[0],
-          stay: stay.data,
-          inCart: exist,
-        },
-      };
-    } else if (cart) {
-      cart = JSON.parse(decodeURIComponent(cart));
-
-      exist = cart.some((val) => {
-        return val.slug === context.query.slug;
-      });
-
-      return {
-        props: {
-          userProfile: "",
-          stay: stay.data,
-          inCart: exist,
-        },
-      };
-    }
 
     return {
       props: {
         userProfile: "",
         stay: stay.data,
-        inCart: exist,
       },
     };
   } catch (error) {
@@ -2377,7 +2275,6 @@ export async function getServerSideProps(context) {
         props: {
           userProfile: "",
           stay: "",
-          inCart: exist,
         },
       };
     }
